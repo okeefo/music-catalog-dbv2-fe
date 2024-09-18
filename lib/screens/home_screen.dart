@@ -1,4 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart' as material;
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import '../utils/app_styles.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,6 +19,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  Color pageTextColor = AppTheme.lightText;
+  Color sidebarTextColor = AppTheme.lightText;
+  Color sidebarIconColor = AppTheme.lightText;
 
   @override
   Widget build(BuildContext context) {
@@ -26,73 +31,104 @@ class _HomeScreenState extends State<HomeScreen> {
         onChanged: (index) => setState(() => _selectedIndex = index),
         displayMode: PaneDisplayMode.auto,
         items: [
-          PaneItem(
-            icon: Icon(
-              FluentIcons.settings,
-              color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
-            ),
-            title: Text(
-              'Settings',
-              style: TextStyle(
-                color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
-              ),
-            ),
+          _buildPaneItem(
+            icon: FluentIcons.settings,
+            title: 'Settings',
             body: const SettingsPage(),
           ),
-          PaneItem(
-            icon: Icon(
-              FluentIcons.database,
-              color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
-            ),
-            title: Text(
-              'DB Browser',
-              style: TextStyle(
-                color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
-              ),
-            ),
+          _buildPaneItem(
+            icon: FluentIcons.database,
+            title: 'DB Browser',
             body: const DbBrowserPage(),
           ),
-          PaneItem(
-            icon: Icon(
-              FluentIcons.database_view,
-              color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
-            ),
-            title: Text(
-              'DB Connections',
-              style: TextStyle(
-                color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
-              ),
-            ),
+          _buildPaneItem(
+            icon: FluentIcons.database_view,
+            title: 'DB Connections',
             body: const DbConnectionsPage(),
           ),
         ],
         footerItems: [
-          PaneItem(
-            icon: Icon(
-              FluentIcons.light,
-              color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
-            ),
-            title: Text(
-              'Light/Dark Mode',
-              style: TextStyle(
-                color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
-              ),
-            ),
-            body: Center(
-              child: ToggleSwitch(
-                checked: widget.isDarkMode,
-                onChanged: widget.onThemeChanged,
-                content: Text(
-                  widget.isDarkMode ? 'Dark Mode' : 'Light Mode',
-                  style: TextStyle(
-                    color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
-                  ),
+          _buildPaneItem(
+            icon: FluentIcons.light,
+            title: 'Light/Dark Mode',
+            body: SingleChildScrollView(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ToggleSwitch(
+                      checked: widget.isDarkMode,
+                      onChanged: widget.onThemeChanged,
+                      content: Text(
+                        widget.isDarkMode ? 'Dark Mode' : 'Light Mode',
+                        style: TextStyle(
+                          color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text('Change Page Text Color'),
+                    material.Material(
+                      child: ColorPicker(
+                        pickerColor: pageTextColor,
+                        onColorChanged: (color) {
+                          setState(() {
+                            pageTextColor = color;
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text('Change Sidebar Text Color'),
+                    material.Material(
+                      child: ColorPicker(
+                        pickerColor: sidebarTextColor,
+                        onColorChanged: (color) {
+                          setState(() {
+                            sidebarTextColor = color;
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text('Change Sidebar Icon Color'),
+                    material.Material(
+                      child: ColorPicker(
+                        pickerColor: sidebarIconColor,
+                        onColorChanged: (color) {
+                          setState(() {
+                            sidebarIconColor = color;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  PaneItem _buildPaneItem({
+    required IconData icon,
+    required String title,
+    required Widget body,
+  }) {
+    return PaneItem(
+      icon: Icon(
+        icon,
+        color: sidebarIconColor,
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: sidebarTextColor,
+        ),
+      ),
+      body: body,
     );
   }
 }
