@@ -19,8 +19,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  Color sidebarTextColor = AppTheme.lightText;
-  Color sidebarIconColor = AppTheme.lightText;
+
+  // Light mode colors
+  Color lightSidebarTextColor = AppTheme.lightSideBarText;
+  Color lightSidebarIconColor = AppTheme.lightSideBarIconColor;
+
+  // Dark mode colors
+  Color darkSidebarTextColor = AppTheme.darkSideBarText;
+  Color darkSidebarIconColor = AppTheme.darkSideBarIconColor;
 
   @override
   Widget build(BuildContext context) {
@@ -72,20 +78,48 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(height: 20),
                           _buildColorPickerRow(
                             'Change Sidebar Text Color',
-                            sidebarTextColor,
+                            widget.isDarkMode ? darkSidebarTextColor : lightSidebarTextColor,
                             (color) {
                               setState(() {
-                                sidebarTextColor = color;
+                                if (widget.isDarkMode) {
+                                  darkSidebarTextColor = color;
+                                } else {
+                                  lightSidebarTextColor = color;
+                                }
                               });
                             },
                           ),
                           const SizedBox(height: 20),
                           _buildColorPickerRow(
                             'Change Sidebar Icon Color',
-                            sidebarIconColor,
+                            widget.isDarkMode ? darkSidebarIconColor : lightSidebarIconColor,
                             (color) {
                               setState(() {
-                                sidebarIconColor = color;
+                                if (widget.isDarkMode) {
+                                  darkSidebarIconColor = color;
+                                } else {
+                                  lightSidebarIconColor = color;
+                                }
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          Button(
+                            child: Text(
+                              'Reset to Default',
+                              style: TextStyle(
+                                color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
+                              ),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                if (widget.isDarkMode) {
+                                  darkSidebarTextColor = AppTheme.darkSideBarText;
+                                  darkSidebarIconColor = AppTheme.darkSideBarIconColor;
+                                } else {
+                                  lightSidebarTextColor = AppTheme.lightSideBarText;
+                                  lightSidebarIconColor = AppTheme.lightSideBarIconColor;
+                                }
                               });
                             },
                           ),
@@ -106,7 +140,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(text),
+        Text(
+          text,
+          style: TextStyle(
+            color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
+          ),
+        ),
         const SizedBox(width: 10),
         GestureDetector(
           onTap: () {
@@ -156,12 +195,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return PaneItem(
       icon: Icon(
         icon,
-        color: sidebarIconColor,
+        color: widget.isDarkMode ? darkSidebarIconColor : lightSidebarIconColor,
       ),
       title: Text(
         title,
         style: TextStyle(
-          color: sidebarTextColor,
+          color: widget.isDarkMode ? darkSidebarTextColor : lightSidebarTextColor,
         ),
       ),
       body: body,
