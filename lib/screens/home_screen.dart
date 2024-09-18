@@ -172,6 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: ColorPicker(
               pickerColor: currentColor,
               onColorChanged: onColorChanged,
+              enableAlpha: false, // Disable alpha to avoid opacity issues
             ),
           ),
           actions: <Widget>[
