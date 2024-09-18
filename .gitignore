@@ -30,6 +30,15 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+# ignore the windows, linux and mac build folders
+**/windows/
+**/linux/
+**/mac/
+# Generated files
+/build/
+# Generated files
+**generated*
+pubspec.lock
 
 # Symbolication related
 app.*.symbols
@@ -41,3 +50,11 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+pubspec.lock
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugins.cmake
+macos/Flutter/GeneratedPluginRegistrant.swift
+*.lock
+*.cc
+*.cmake
+*.swift
