@@ -1,31 +1,37 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
+import 'screens/home_screen.dart';
+import 'utils/app_styles.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Music Catalog',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: HomeScreen(),
-    );
-  }
+  State<MyApp> createState() => _MyAppState();
 }
 
-class HomeScreen extends StatelessWidget {
+class _MyAppState extends State<MyApp> {
+  bool isDarkMode = false;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Music Catalog'),
+    return FluentApp(
+      title: 'Fluent UI App',
+      theme: FluentThemeData(
+        brightness: isDarkMode ? Brightness.dark : Brightness.light,
+        accentColor: Colors.blue,
+        scaffoldBackgroundColor: isDarkMode ? AppTheme.dark : AppTheme.light,
       ),
-      body: Center(
-        child: Text('Welcome to Music Catalog'),
+      home: HomeScreen(
+        isDarkMode: isDarkMode,
+        onThemeChanged: (value) {
+          setState(() {
+            isDarkMode = value;
+          });
+        },
       ),
     );
   }
