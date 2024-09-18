@@ -27,25 +27,57 @@ class _HomeScreenState extends State<HomeScreen> {
         displayMode: PaneDisplayMode.auto,
         items: [
           PaneItem(
-            icon: const Icon(FluentIcons.settings),
-            title: const Text('Settings'),
+            icon: Icon(
+              FluentIcons.settings,
+              color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
+            ),
+            title: Text(
+              'Settings',
+              style: TextStyle(
+                color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
+              ),
+            ),
             body: const SettingsPage(),
           ),
           PaneItem(
-            icon: const Icon(FluentIcons.database),
-            title: const Text('DB Browser'),
+            icon: Icon(
+              FluentIcons.database,
+              color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
+            ),
+            title: Text(
+              'DB Browser',
+              style: TextStyle(
+                color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
+              ),
+            ),
             body: const DbBrowserPage(),
           ),
           PaneItem(
-            icon: const Icon(FluentIcons.database_view),
-            title: const Text('DB Connections'),
+            icon: Icon(
+              FluentIcons.database_view,
+              color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
+            ),
+            title: Text(
+              'DB Connections',
+              style: TextStyle(
+                color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
+              ),
+            ),
             body: const DbConnectionsPage(),
           ),
         ],
         footerItems: [
           PaneItem(
-            icon: const Icon(FluentIcons.light),
-            title: const Text('Light/Dark Mode'),
+            icon: Icon(
+              FluentIcons.light,
+              color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
+            ),
+            title: Text(
+              'Light/Dark Mode',
+              style: TextStyle(
+                color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
+              ),
+            ),
             body: Center(
               child: ToggleSwitch(
                 checked: widget.isDarkMode,
