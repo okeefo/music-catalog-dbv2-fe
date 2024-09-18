@@ -1,7 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:front_end/main.dart';
 import '../utils/app_styles.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -35,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
       pane: NavigationPane(
         selected: _selectedIndex,
         onChanged: (index) => setState(() => _selectedIndex = index),
-        displayMode: PaneDisplayMode.auto,
+        displayMode: PaneDisplayMode.compact, // Set to compact mode
         items: [
           _buildPaneItem(
             icon: FluentIcons.settings,
