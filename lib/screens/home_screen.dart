@@ -19,7 +19,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  Color pageTextColor = AppTheme.lightText;
   Color sidebarTextColor = AppTheme.lightText;
   Color sidebarIconColor = AppTheme.lightText;
 
@@ -51,64 +50,101 @@ class _HomeScreenState extends State<HomeScreen> {
           _buildPaneItem(
             icon: FluentIcons.light,
             title: 'Light/Dark Mode',
-            body: SingleChildScrollView(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ToggleSwitch(
-                      checked: widget.isDarkMode,
-                      onChanged: widget.onThemeChanged,
-                      content: Text(
-                        widget.isDarkMode ? 'Dark Mode' : 'Light Mode',
-                        style: TextStyle(
-                          color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
-                        ),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ToggleSwitch(
+                            checked: widget.isDarkMode,
+                            onChanged: widget.onThemeChanged,
+                            content: Text(
+                              widget.isDarkMode ? 'Dark Mode' : 'Light Mode',
+                              style: TextStyle(
+                                color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          _buildColorPickerRow(
+                            'Change Sidebar Text Color',
+                            sidebarTextColor,
+                            (color) {
+                              setState(() {
+                                sidebarTextColor = color;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          _buildColorPickerRow(
+                            'Change Sidebar Icon Color',
+                            sidebarIconColor,
+                            (color) {
+                              setState(() {
+                                sidebarIconColor = color;
+                              });
+                            },
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    const Text('Change Page Text Color'),
-                    material.Material(
-                      child: ColorPicker(
-                        pickerColor: pageTextColor,
-                        onColorChanged: (color) {
-                          setState(() {
-                            pageTextColor = color;
-                          });
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text('Change Sidebar Text Color'),
-                    material.Material(
-                      child: ColorPicker(
-                        pickerColor: sidebarTextColor,
-                        onColorChanged: (color) {
-                          setState(() {
-                            sidebarTextColor = color;
-                          });
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text('Change Sidebar Icon Color'),
-                    material.Material(
-                      child: ColorPicker(
-                        pickerColor: sidebarIconColor,
-                        onColorChanged: (color) {
-                          setState(() {
-                            sidebarIconColor = color;
-                          });
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildColorPickerRow(String text, Color color, ValueChanged<Color> onColorChanged) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(text),
+        const SizedBox(width: 10),
+        GestureDetector(
+          onTap: () {
+            _showColorPickerDialog(color, onColorChanged);
+          },
+          child: Container(
+            width: 24,
+            height: 24,
+            color: color,
+            margin: const EdgeInsets.symmetric(horizontal: 8),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showColorPickerDialog(Color currentColor, ValueChanged<Color> onColorChanged) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return material.AlertDialog(
+          title: const Text('Pick a color'),
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              pickerColor: currentColor,
+              onColorChanged: onColorChanged,
+            ),
+          ),
+          actions: <Widget>[
+            material.TextButton(
+              child: const Text('Done'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
