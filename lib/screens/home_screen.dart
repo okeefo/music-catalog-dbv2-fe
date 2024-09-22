@@ -8,6 +8,9 @@ import 'color_picker_row.dart';
 import 'navigation_items.dart';
 import 'db_browser_page.dart';
 import 'db_connections_page.dart';
+import 'light_dark_mode_page.dart';
+
+// lib/screens/home_screen.dart
 
 class HomeScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -53,14 +56,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      darkSidebarTextColor = Color(prefs.getInt('darkSidebarTextColor') ??
-          AppTheme.darkSideBarText.value);
-      darkSidebarIconColor = Color(prefs.getInt('darkSidebarIconColor') ??
-          AppTheme.darkSideBarIconColor.value);
-      lightSidebarTextColor = Color(prefs.getInt('lightSidebarTextColor') ??
-          AppTheme.lightSideBarText.value);
-      lightSidebarIconColor = Color(prefs.getInt('lightSidebarIconColor') ??
-          AppTheme.lightSideBarIconColor.value);
+      darkSidebarTextColor = Color(prefs.getInt('darkSidebarTextColor') ?? AppTheme.darkSideBarText.value);
+      darkSidebarIconColor = Color(prefs.getInt('darkSidebarIconColor') ?? AppTheme.darkSideBarIconColor.value);
+      lightSidebarTextColor = Color(prefs.getInt('lightSidebarTextColor') ?? AppTheme.lightSideBarText.value);
+      lightSidebarIconColor = Color(prefs.getInt('lightSidebarIconColor') ?? AppTheme.lightSideBarIconColor.value);
       widget.onThemeChanged(prefs.getBool('isDarkMode') ?? widget.isDarkMode);
     });
   }
@@ -74,8 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _saveColorToPrefs('darkSidebarTextColor', AppTheme.darkSideBarText);
       _saveColorToPrefs('darkSidebarIconColor', AppTheme.darkSideBarIconColor);
       _saveColorToPrefs('lightSidebarTextColor', AppTheme.lightSideBarText);
-      _saveColorToPrefs(
-          'lightSidebarIconColor', AppTheme.lightSideBarIconColor);
+      _saveColorToPrefs('lightSidebarIconColor', AppTheme.lightSideBarIconColor);
     });
   }
 
@@ -120,7 +118,14 @@ class _HomeScreenState extends State<HomeScreen> {
       NavigationItems.buildPaneItem(
         icon: FluentIcons.light,
         title: 'Light/Dark Mode',
-        body: _buildLightDarkModeBody(),
+        body: LightDarkModePage(
+          isDarkMode: widget.isDarkMode,
+          onThemeChanged: widget.onThemeChanged,
+          darkSidebarTextColor: darkSidebarTextColor,
+          lightSidebarTextColor: lightSidebarTextColor,
+          darkSidebarIconColor: darkSidebarIconColor,
+          lightSidebarIconColor: lightSidebarIconColor,
+        ),
         isDarkMode: widget.isDarkMode,
         darkSidebarIconColor: darkSidebarIconColor,
         lightSidebarIconColor: lightSidebarIconColor,
@@ -128,90 +133,6 @@ class _HomeScreenState extends State<HomeScreen> {
         lightSidebarTextColor: lightSidebarTextColor,
       ),
     ];
-  }
-
-  Widget _buildLightDarkModeBody() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ToggleSwitch(
-                    checked: widget.isDarkMode,
-                    onChanged: (isDarkMode) {
-                      widget.onThemeChanged(isDarkMode);
-                      _saveThemeToPrefs(isDarkMode);
-                    },
-                    content: Text(
-                      widget.isDarkMode ? 'Dark Mode' : 'Light Mode',
-                      style: TextStyle(
-                        color: widget.isDarkMode
-                            ? AppTheme.darkText
-                            : AppTheme.lightText,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  ColorPickerRow(
-                    text: 'Change Sidebar Text Color',
-                    color: widget.isDarkMode
-                        ? darkSidebarTextColor
-                        : lightSidebarTextColor,
-                    onColorChanged: (color) {
-                      setState(() {
-                        if (widget.isDarkMode) {
-                          darkSidebarTextColor = color;
-                          _saveColorToPrefs('darkSidebarTextColor', color);
-                        } else {
-                          lightSidebarTextColor = color;
-                          _saveColorToPrefs('lightSidebarTextColor', color);
-                        }
-                      });
-                    },
-                    isDarkMode: widget.isDarkMode,
-                  ),
-                  const SizedBox(height: 20),
-                  ColorPickerRow(
-                    text: 'Change Sidebar Icon Color',
-                    color: widget.isDarkMode
-                        ? darkSidebarIconColor
-                        : lightSidebarIconColor,
-                    onColorChanged: (color) {
-                      setState(() {
-                        if (widget.isDarkMode) {
-                          darkSidebarIconColor = color;
-                          _saveColorToPrefs('darkSidebarIconColor', color);
-                        } else {
-                          lightSidebarIconColor = color;
-                          _saveColorToPrefs('lightSidebarIconColor', color);
-                        }
-                      });
-                    },
-                    isDarkMode: widget.isDarkMode,
-                  ),
-                  const SizedBox(height: 20),
-                  Button(
-                    onPressed: _resetToDefault,
-                    child: Text(
-                      'Reset to Default',
-                      style: TextStyle(
-                        color: widget.isDarkMode
-                            ? AppTheme.darkText
-                            : AppTheme.lightText,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
