@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/app_styles.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -27,6 +28,40 @@ class _HomeScreenState extends State<HomeScreen> {
   // Dark mode colors
   Color darkSidebarTextColor = AppTheme.darkSideBarText;
   Color darkSidebarIconColor = AppTheme.darkSideBarIconColor;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadColorsFromPrefs();
+  }
+
+  Future<void> _saveColorToPrefs(String key, Color color) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt(key, color.value);
+  }
+
+  Future<void> _loadColorsFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      darkSidebarTextColor = Color(prefs.getInt('darkSidebarTextColor') ?? AppTheme.darkSideBarText.value);
+      darkSidebarIconColor = Color(prefs.getInt('darkSidebarIconColor') ?? AppTheme.darkSideBarIconColor.value);
+      lightSidebarTextColor = Color(prefs.getInt('lightSidebarTextColor') ?? AppTheme.lightSideBarText.value);
+      lightSidebarIconColor = Color(prefs.getInt('lightSidebarIconColor') ?? AppTheme.lightSideBarIconColor.value);
+    });
+  }
+
+  void _resetToDefault() {
+    setState(() {
+      darkSidebarTextColor = AppTheme.darkSideBarText;
+      darkSidebarIconColor = AppTheme.darkSideBarIconColor;
+      lightSidebarTextColor = AppTheme.lightSideBarText;
+      lightSidebarIconColor = AppTheme.lightSideBarIconColor;
+      _saveColorToPrefs('darkSidebarTextColor', AppTheme.darkSideBarText);
+      _saveColorToPrefs('darkSidebarIconColor', AppTheme.darkSideBarIconColor);
+      _saveColorToPrefs('lightSidebarTextColor', AppTheme.lightSideBarText);
+      _saveColorToPrefs('lightSidebarIconColor', AppTheme.lightSideBarIconColor);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<NavigationPaneItem> _buildFooterItems() {
     return [
-      PaneItemSeparator(), // Add a separator
+      PaneItemSeparator(),
       _buildPaneItem(
         icon: FluentIcons.light,
         title: 'Light/Dark Mode',
@@ -88,24 +123,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     content: Text(
                       widget.isDarkMode ? 'Dark Mode' : 'Light Mode',
                       style: TextStyle(
-                        color: widget.isDarkMode
-                            ? AppTheme.darkText
-                            : AppTheme.lightText,
+                        color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
                       ),
                     ),
                   ),
                   const SizedBox(height: 20),
                   _buildColorPickerRow(
                     'Change Sidebar Text Color',
-                    widget.isDarkMode
-                        ? darkSidebarTextColor
-                        : lightSidebarTextColor,
+                    widget.isDarkMode ? darkSidebarTextColor : lightSidebarTextColor,
                     (color) {
                       setState(() {
                         if (widget.isDarkMode) {
                           darkSidebarTextColor = color;
+                          _saveColorToPrefs('darkSidebarTextColor', color);
                         } else {
                           lightSidebarTextColor = color;
+                          _saveColorToPrefs('lightSidebarTextColor', color);
                         }
                       });
                     },
@@ -113,15 +146,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 20),
                   _buildColorPickerRow(
                     'Change Sidebar Icon Color',
-                    widget.isDarkMode
-                        ? darkSidebarIconColor
-                        : lightSidebarIconColor,
+                    widget.isDarkMode ? darkSidebarIconColor : lightSidebarIconColor,
                     (color) {
                       setState(() {
                         if (widget.isDarkMode) {
                           darkSidebarIconColor = color;
+                          _saveColorToPrefs('darkSidebarIconColor', color);
                         } else {
                           lightSidebarIconColor = color;
+                          _saveColorToPrefs('lightSidebarIconColor', color);
                         }
                       });
                     },
@@ -132,9 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Text(
                       'Reset to Default',
                       style: TextStyle(
-                        color: widget.isDarkMode
-                            ? AppTheme.darkText
-                            : AppTheme.lightText,
+                        color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
                       ),
                     ),
                   ),
@@ -147,20 +178,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _resetToDefault() {
-    setState(() {
-      if (widget.isDarkMode) {
-        darkSidebarTextColor = AppTheme.darkSideBarText;
-        darkSidebarIconColor = AppTheme.darkSideBarIconColor;
-      } else {
-        lightSidebarTextColor = AppTheme.lightSideBarText;
-        lightSidebarIconColor = AppTheme.lightSideBarIconColor;
-      }
-    });
+  Future<void> _clearPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('lightSidebarTextColor');
+    await prefs.remove('lightSidebarIconColor');
+    await prefs.remove('darkSidebarTextColor');
+    await prefs.remove('darkSidebarIconColor');
   }
 
-  Widget _buildColorPickerRow(
-      String text, Color color, ValueChanged<Color> onColorChanged) {
+  Widget _buildColorPickerRow(String text, Color color, ValueChanged<Color> onColorChanged) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -186,8 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showColorPickerDialog(
-      Color currentColor, ValueChanged<Color> onColorChanged) {
+  void _showColorPickerDialog(Color currentColor, ValueChanged<Color> onColorChanged) {
     showDialog(
       context: context,
       builder: (context) {
@@ -216,6 +241,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  IconButton _buildOpenPaneButton() {
+    return IconButton(
+      icon: Icon(
+        FluentIcons.global_nav_button,
+        color: widget.isDarkMode ? darkSidebarIconColor : lightSidebarIconColor,
+      ),
+      onPressed: () {
+        // Handle the open navigation pane action
+      },
+    );
+  }
+
   PaneItem _buildPaneItem({
     required IconData icon,
     required String title,
@@ -229,8 +266,7 @@ class _HomeScreenState extends State<HomeScreen> {
       title: Text(
         title,
         style: TextStyle(
-          color:
-              widget.isDarkMode ? darkSidebarTextColor : lightSidebarTextColor,
+          color: widget.isDarkMode ? darkSidebarTextColor : lightSidebarTextColor,
         ),
       ),
       body: body,
