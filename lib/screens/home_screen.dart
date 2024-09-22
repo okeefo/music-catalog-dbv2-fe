@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadColorsFromPrefs();
+    _loadPreferences();
   }
 
   Future<void> _saveColorToPrefs(String key, Color color) async {
@@ -40,13 +40,23 @@ class _HomeScreenState extends State<HomeScreen> {
     prefs.setInt(key, color.value);
   }
 
-  Future<void> _loadColorsFromPrefs() async {
+  Future<void> _saveThemeToPrefs(bool isDarkMode) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isDarkMode', isDarkMode);
+  }
+
+  Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      darkSidebarTextColor = Color(prefs.getInt('darkSidebarTextColor') ?? AppTheme.darkSideBarText.value);
-      darkSidebarIconColor = Color(prefs.getInt('darkSidebarIconColor') ?? AppTheme.darkSideBarIconColor.value);
-      lightSidebarTextColor = Color(prefs.getInt('lightSidebarTextColor') ?? AppTheme.lightSideBarText.value);
-      lightSidebarIconColor = Color(prefs.getInt('lightSidebarIconColor') ?? AppTheme.lightSideBarIconColor.value);
+      darkSidebarTextColor = Color(prefs.getInt('darkSidebarTextColor') ??
+          AppTheme.darkSideBarText.value);
+      darkSidebarIconColor = Color(prefs.getInt('darkSidebarIconColor') ??
+          AppTheme.darkSideBarIconColor.value);
+      lightSidebarTextColor = Color(prefs.getInt('lightSidebarTextColor') ??
+          AppTheme.lightSideBarText.value);
+      lightSidebarIconColor = Color(prefs.getInt('lightSidebarIconColor') ??
+          AppTheme.lightSideBarIconColor.value);
+      widget.onThemeChanged(prefs.getBool('isDarkMode') ?? widget.isDarkMode);
     });
   }
 
@@ -59,7 +69,8 @@ class _HomeScreenState extends State<HomeScreen> {
       _saveColorToPrefs('darkSidebarTextColor', AppTheme.darkSideBarText);
       _saveColorToPrefs('darkSidebarIconColor', AppTheme.darkSideBarIconColor);
       _saveColorToPrefs('lightSidebarTextColor', AppTheme.lightSideBarText);
-      _saveColorToPrefs('lightSidebarIconColor', AppTheme.lightSideBarIconColor);
+      _saveColorToPrefs(
+          'lightSidebarIconColor', AppTheme.lightSideBarIconColor);
     });
   }
 
@@ -119,18 +130,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   ToggleSwitch(
                     checked: widget.isDarkMode,
-                    onChanged: widget.onThemeChanged,
+                    onChanged: (isDarkMode) {
+                      widget.onThemeChanged(isDarkMode);
+                      _saveThemeToPrefs(isDarkMode);
+                    },
                     content: Text(
                       widget.isDarkMode ? 'Dark Mode' : 'Light Mode',
                       style: TextStyle(
-                        color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
+                        color: widget.isDarkMode
+                            ? AppTheme.darkText
+                            : AppTheme.lightText,
                       ),
                     ),
                   ),
                   const SizedBox(height: 20),
                   _buildColorPickerRow(
                     'Change Sidebar Text Color',
-                    widget.isDarkMode ? darkSidebarTextColor : lightSidebarTextColor,
+                    widget.isDarkMode
+                        ? darkSidebarTextColor
+                        : lightSidebarTextColor,
                     (color) {
                       setState(() {
                         if (widget.isDarkMode) {
@@ -146,7 +164,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 20),
                   _buildColorPickerRow(
                     'Change Sidebar Icon Color',
-                    widget.isDarkMode ? darkSidebarIconColor : lightSidebarIconColor,
+                    widget.isDarkMode
+                        ? darkSidebarIconColor
+                        : lightSidebarIconColor,
                     (color) {
                       setState(() {
                         if (widget.isDarkMode) {
@@ -165,7 +185,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Text(
                       'Reset to Default',
                       style: TextStyle(
-                        color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
+                        color: widget.isDarkMode
+                            ? AppTheme.darkText
+                            : AppTheme.lightText,
                       ),
                     ),
                   ),
@@ -186,7 +208,8 @@ class _HomeScreenState extends State<HomeScreen> {
     await prefs.remove('darkSidebarIconColor');
   }
 
-  Widget _buildColorPickerRow(String text, Color color, ValueChanged<Color> onColorChanged) {
+  Widget _buildColorPickerRow(
+      String text, Color color, ValueChanged<Color> onColorChanged) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -212,7 +235,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showColorPickerDialog(Color currentColor, ValueChanged<Color> onColorChanged) {
+  void _showColorPickerDialog(
+      Color currentColor, ValueChanged<Color> onColorChanged) {
     showDialog(
       context: context,
       builder: (context) {
@@ -266,7 +290,8 @@ class _HomeScreenState extends State<HomeScreen> {
       title: Text(
         title,
         style: TextStyle(
-          color: widget.isDarkMode ? darkSidebarTextColor : lightSidebarTextColor,
+          color:
+              widget.isDarkMode ? darkSidebarTextColor : lightSidebarTextColor,
         ),
       ),
       body: body,
