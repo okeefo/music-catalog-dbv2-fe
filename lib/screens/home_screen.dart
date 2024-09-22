@@ -34,96 +34,107 @@ class _HomeScreenState extends State<HomeScreen> {
       pane: NavigationPane(
         selected: _selectedIndex,
         onChanged: (index) => setState(() => _selectedIndex = index),
-        displayMode: PaneDisplayMode.compact, // Set to compact mode
-        items: [
-          _buildPaneItem(
-            icon: FluentIcons.settings,
-            title: 'Settings',
-            body: const SettingsPage(),
-          ),
-          _buildPaneItem(
-            icon: FluentIcons.database,
-            title: 'DB Browser',
-            body: const DbBrowserPage(),
-          ),
-          _buildPaneItem(
-            icon: FluentIcons.database_view,
-            title: 'DB Connections',
-            body: const DbConnectionsPage(),
-          ),
-        ],
-        footerItems: [
-          _buildPaneItem(
-            icon: FluentIcons.light,
-            title: 'Light/Dark Mode',
-            body: Center(
+        displayMode: PaneDisplayMode.compact,
+        items: _buildPaneItems(),
+        footerItems: _buildFooterItems(),
+      ),
+    );
+  }
+
+  List<NavigationPaneItem> _buildPaneItems() {
+    return [
+      _buildPaneItem(
+        icon: FluentIcons.settings,
+        title: 'Settings',
+        body: const SettingsPage(),
+      ),
+      _buildPaneItem(
+        icon: FluentIcons.database,
+        title: 'DB Browser',
+        body: const DbBrowserPage(),
+      ),
+      _buildPaneItem(
+        icon: FluentIcons.database_view,
+        title: 'DB Connections',
+        body: const DbConnectionsPage(),
+      ),
+    ];
+  }
+
+  List<NavigationPaneItem> _buildFooterItems() {
+    return [
+      PaneItemSeparator(), // Add a separator
+      _buildPaneItem(
+        icon: FluentIcons.light,
+        title: 'Light/Dark Mode',
+        body: _buildLightDarkModeBody(),
+      ),
+    ];
+  }
+
+  Widget _buildLightDarkModeBody() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ToggleSwitch(
-                            checked: widget.isDarkMode,
-                            onChanged: widget.onThemeChanged,
-                            content: Text(
-                              widget.isDarkMode ? 'Dark Mode' : 'Light Mode',
-                              style: TextStyle(
-                                color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          _buildColorPickerRow(
-                            'Change Sidebar Text Color',
-                            widget.isDarkMode ? darkSidebarTextColor : lightSidebarTextColor,
-                            (color) {
-                              setState(() {
-                                if (widget.isDarkMode) {
-                                  darkSidebarTextColor = color;
-                                } else {
-                                  lightSidebarTextColor = color;
-                                }
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 20),
-                          _buildColorPickerRow(
-                            'Change Sidebar Icon Color',
-                            widget.isDarkMode ? darkSidebarIconColor : lightSidebarIconColor,
-                            (color) {
-                              setState(() {
-                                if (widget.isDarkMode) {
-                                  darkSidebarIconColor = color;
-                                } else {
-                                  lightSidebarIconColor = color;
-                                }
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 20),
-                          Button(
-                            child: Text(
-                              'Reset to Default',
-                              style: TextStyle(
-                                color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
-                              ),
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                if (widget.isDarkMode) {
-                                  darkSidebarTextColor = AppTheme.darkSideBarText;
-                                  darkSidebarIconColor = AppTheme.darkSideBarIconColor;
-                                } else {
-                                  lightSidebarTextColor = AppTheme.lightSideBarText;
-                                  lightSidebarIconColor = AppTheme.lightSideBarIconColor;
-                                }
-                              });
-                            },
-                          ),
-                        ],
+                  ToggleSwitch(
+                    checked: widget.isDarkMode,
+                    onChanged: widget.onThemeChanged,
+                    content: Text(
+                      widget.isDarkMode ? 'Dark Mode' : 'Light Mode',
+                      style: TextStyle(
+                        color: widget.isDarkMode
+                            ? AppTheme.darkText
+                            : AppTheme.lightText,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  _buildColorPickerRow(
+                    'Change Sidebar Text Color',
+                    widget.isDarkMode
+                        ? darkSidebarTextColor
+                        : lightSidebarTextColor,
+                    (color) {
+                      setState(() {
+                        if (widget.isDarkMode) {
+                          darkSidebarTextColor = color;
+                        } else {
+                          lightSidebarTextColor = color;
+                        }
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  _buildColorPickerRow(
+                    'Change Sidebar Icon Color',
+                    widget.isDarkMode
+                        ? darkSidebarIconColor
+                        : lightSidebarIconColor,
+                    (color) {
+                      setState(() {
+                        if (widget.isDarkMode) {
+                          darkSidebarIconColor = color;
+                        } else {
+                          lightSidebarIconColor = color;
+                        }
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  Button(
+                    onPressed: _resetToDefault,
+                    child: Text(
+                      'Reset to Default',
+                      style: TextStyle(
+                        color: widget.isDarkMode
+                            ? AppTheme.darkText
+                            : AppTheme.lightText,
                       ),
                     ),
                   ),
@@ -136,7 +147,20 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildColorPickerRow(String text, Color color, ValueChanged<Color> onColorChanged) {
+  void _resetToDefault() {
+    setState(() {
+      if (widget.isDarkMode) {
+        darkSidebarTextColor = AppTheme.darkSideBarText;
+        darkSidebarIconColor = AppTheme.darkSideBarIconColor;
+      } else {
+        lightSidebarTextColor = AppTheme.lightSideBarText;
+        lightSidebarIconColor = AppTheme.lightSideBarIconColor;
+      }
+    });
+  }
+
+  Widget _buildColorPickerRow(
+      String text, Color color, ValueChanged<Color> onColorChanged) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -162,19 +186,20 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showColorPickerDialog(Color currentColor, ValueChanged<Color> onColorChanged) {
+  void _showColorPickerDialog(
+      Color currentColor, ValueChanged<Color> onColorChanged) {
     showDialog(
       context: context,
       builder: (context) {
         return material.Dialog(
-          backgroundColor: widget.isDarkMode ? AppTheme.dark : AppTheme.grey, // Set background color with transparency
+          backgroundColor: widget.isDarkMode ? AppTheme.dark : AppTheme.grey,
           child: material.AlertDialog(
             title: const Text('Pick a color'),
             content: SingleChildScrollView(
               child: ColorPicker(
                 pickerColor: currentColor,
                 onColorChanged: onColorChanged,
-                enableAlpha: false, // Disable alpha to avoid opacity issues
+                enableAlpha: false,
               ),
             ),
             actions: <Widget>[
@@ -204,7 +229,8 @@ class _HomeScreenState extends State<HomeScreen> {
       title: Text(
         title,
         style: TextStyle(
-          color: widget.isDarkMode ? darkSidebarTextColor : lightSidebarTextColor,
+          color:
+              widget.isDarkMode ? darkSidebarTextColor : lightSidebarTextColor,
         ),
       ),
       body: body,
