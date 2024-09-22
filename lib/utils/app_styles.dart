@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
+  
+  //default font
+  static const String fontFamily = 'Roboto';
+  static const double defaultTextSize = 16.0;
+  static const double titleTextSize = 24.0;
+
+  // default colour theme
   static const Color dark = Color(0xff1e1e1e);
   static const Color light = Color(0xffffffff);
   static const Color grey = Color.fromARGB(255, 76, 75, 75); // Black color for light mode sidebar icon

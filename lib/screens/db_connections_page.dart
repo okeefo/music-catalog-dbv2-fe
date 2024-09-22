@@ -6,15 +6,24 @@ class DbConnectionsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        'DB Connections Page',
-        style: TextStyle(
-          color: FluentTheme.of(context).brightness == Brightness.dark
-              ? AppTheme.darkText
-              : AppTheme.lightText,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            'DB Connections Page',
+            style: TextStyle(
+              fontSize: AppTheme.titleTextSize, // Title text size
+              fontFamily: AppTheme.fontFamily, // Modern font
+              color: FluentTheme.of(context).brightness == Brightness.dark
+                  ? AppTheme.darkText
+                  : AppTheme.lightText,
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 }
