@@ -3,6 +3,11 @@ import 'package:flutter/material.dart' as material;
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/app_styles.dart';
+import 'settings_page.dart';
+import 'color_picker_row.dart';
+import 'navigation_items.dart';
+import 'db_browser_page.dart';
+import 'db_connections_page.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -74,35 +79,37 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return NavigationView(
-      pane: NavigationPane(
-        selected: _selectedIndex,
-        onChanged: (index) => setState(() => _selectedIndex = index),
-        displayMode: PaneDisplayMode.compact,
-        items: _buildPaneItems(),
-        footerItems: _buildFooterItems(),
-      ),
-    );
-  }
-
   List<NavigationPaneItem> _buildPaneItems() {
     return [
-      _buildPaneItem(
+      NavigationItems.buildPaneItem(
         icon: FluentIcons.settings,
         title: 'Settings',
         body: const SettingsPage(),
+        isDarkMode: widget.isDarkMode,
+        darkSidebarIconColor: darkSidebarIconColor,
+        lightSidebarIconColor: lightSidebarIconColor,
+        darkSidebarTextColor: darkSidebarTextColor,
+        lightSidebarTextColor: lightSidebarTextColor,
       ),
-      _buildPaneItem(
+      NavigationItems.buildPaneItem(
         icon: FluentIcons.database,
         title: 'DB Browser',
         body: const DbBrowserPage(),
+        isDarkMode: widget.isDarkMode,
+        darkSidebarIconColor: darkSidebarIconColor,
+        lightSidebarIconColor: lightSidebarIconColor,
+        darkSidebarTextColor: darkSidebarTextColor,
+        lightSidebarTextColor: lightSidebarTextColor,
       ),
-      _buildPaneItem(
+      NavigationItems.buildPaneItem(
         icon: FluentIcons.database_view,
         title: 'DB Connections',
         body: const DbConnectionsPage(),
+        isDarkMode: widget.isDarkMode,
+        darkSidebarIconColor: darkSidebarIconColor,
+        lightSidebarIconColor: lightSidebarIconColor,
+        darkSidebarTextColor: darkSidebarTextColor,
+        lightSidebarTextColor: lightSidebarTextColor,
       ),
     ];
   }
@@ -110,10 +117,15 @@ class _HomeScreenState extends State<HomeScreen> {
   List<NavigationPaneItem> _buildFooterItems() {
     return [
       PaneItemSeparator(),
-      _buildPaneItem(
+      NavigationItems.buildPaneItem(
         icon: FluentIcons.light,
         title: 'Light/Dark Mode',
         body: _buildLightDarkModeBody(),
+        isDarkMode: widget.isDarkMode,
+        darkSidebarIconColor: darkSidebarIconColor,
+        lightSidebarIconColor: lightSidebarIconColor,
+        darkSidebarTextColor: darkSidebarTextColor,
+        lightSidebarTextColor: lightSidebarTextColor,
       ),
     ];
   }
@@ -144,12 +156,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  _buildColorPickerRow(
-                    'Change Sidebar Text Color',
-                    widget.isDarkMode
+                  ColorPickerRow(
+                    text: 'Change Sidebar Text Color',
+                    color: widget.isDarkMode
                         ? darkSidebarTextColor
                         : lightSidebarTextColor,
-                    (color) {
+                    onColorChanged: (color) {
                       setState(() {
                         if (widget.isDarkMode) {
                           darkSidebarTextColor = color;
@@ -160,14 +172,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         }
                       });
                     },
+                    isDarkMode: widget.isDarkMode,
                   ),
                   const SizedBox(height: 20),
-                  _buildColorPickerRow(
-                    'Change Sidebar Icon Color',
-                    widget.isDarkMode
+                  ColorPickerRow(
+                    text: 'Change Sidebar Icon Color',
+                    color: widget.isDarkMode
                         ? darkSidebarIconColor
                         : lightSidebarIconColor,
-                    (color) {
+                    onColorChanged: (color) {
                       setState(() {
                         if (widget.isDarkMode) {
                           darkSidebarIconColor = color;
@@ -178,6 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         }
                       });
                     },
+                    isDarkMode: widget.isDarkMode,
                   ),
                   const SizedBox(height: 20),
                   Button(
@@ -200,154 +214,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> _clearPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('lightSidebarTextColor');
-    await prefs.remove('lightSidebarIconColor');
-    await prefs.remove('darkSidebarTextColor');
-    await prefs.remove('darkSidebarIconColor');
-  }
-
-  Widget _buildColorPickerRow(
-      String text, Color color, ValueChanged<Color> onColorChanged) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          text,
-          style: TextStyle(
-            color: widget.isDarkMode ? AppTheme.darkText : AppTheme.lightText,
-          ),
-        ),
-        const SizedBox(width: 10),
-        GestureDetector(
-          onTap: () {
-            _showColorPickerDialog(color, onColorChanged);
-          },
-          child: Container(
-            width: 24,
-            height: 24,
-            color: color,
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _showColorPickerDialog(
-      Color currentColor, ValueChanged<Color> onColorChanged) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return material.Dialog(
-          backgroundColor: widget.isDarkMode ? AppTheme.dark : AppTheme.grey,
-          child: material.AlertDialog(
-            title: const Text('Pick a color'),
-            content: SingleChildScrollView(
-              child: ColorPicker(
-                pickerColor: currentColor,
-                onColorChanged: onColorChanged,
-                enableAlpha: false,
-              ),
-            ),
-            actions: <Widget>[
-              material.TextButton(
-                child: const Text('Done'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  IconButton _buildOpenPaneButton() {
-    return IconButton(
-      icon: Icon(
-        FluentIcons.global_nav_button,
-        color: widget.isDarkMode ? darkSidebarIconColor : lightSidebarIconColor,
-      ),
-      onPressed: () {
-        // Handle the open navigation pane action
-      },
-    );
-  }
-
-  PaneItem _buildPaneItem({
-    required IconData icon,
-    required String title,
-    required Widget body,
-  }) {
-    return PaneItem(
-      icon: Icon(
-        icon,
-        color: widget.isDarkMode ? darkSidebarIconColor : lightSidebarIconColor,
-      ),
-      title: Text(
-        title,
-        style: TextStyle(
-          color:
-              widget.isDarkMode ? darkSidebarTextColor : lightSidebarTextColor,
-        ),
-      ),
-      body: body,
-    );
-  }
-}
-
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        'Settings Page',
-        style: TextStyle(
-          color: FluentTheme.of(context).brightness == Brightness.dark
-              ? AppTheme.darkText
-              : AppTheme.lightText,
-        ),
-      ),
-    );
-  }
-}
-
-class DbBrowserPage extends StatelessWidget {
-  const DbBrowserPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        'DB Browser Page',
-        style: TextStyle(
-          color: FluentTheme.of(context).brightness == Brightness.dark
-              ? AppTheme.darkText
-              : AppTheme.lightText,
-        ),
-      ),
-    );
-  }
-}
-
-class DbConnectionsPage extends StatelessWidget {
-  const DbConnectionsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        'DB Connections Page',
-        style: TextStyle(
-          color: FluentTheme.of(context).brightness == Brightness.dark
-              ? AppTheme.darkText
-              : AppTheme.lightText,
-        ),
+    return NavigationView(
+      pane: NavigationPane(
+        selected: _selectedIndex,
+        onChanged: (index) => setState(() => _selectedIndex = index),
+        displayMode: PaneDisplayMode.compact,
+        items: _buildPaneItems(),
+        footerItems: _buildFooterItems(),
       ),
     );
   }
