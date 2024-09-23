@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart' as path;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import '../utils/app_styles.dart';
 
@@ -23,6 +25,24 @@ class _DbConnectionsPageState extends State<DbConnectionsPage> {
     // Initialize the database factory for sqflite_common_ffi
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
+    _loadDatabases();
+  }
+
+  Future<void> _loadDatabases() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? databasesString = prefs.getString('databases');
+    if (databasesString != null) {
+      setState(() {
+        databases = List<Map<String, String>>.from(
+          json.decode(databasesString).map((item) => Map<String, String>.from(item))
+        );
+      });
+    }
+  }
+
+  Future<void> _saveDatabases() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('databases', json.encode(databases));
   }
 
   Future<void> _createDatabase() async {
@@ -59,6 +79,7 @@ class _DbConnectionsPageState extends State<DbConnectionsPage> {
                     setState(() {
                       databases.add({'Path': dbPath, 'Name': dbName});
                     });
+                    await _saveDatabases();
                     Navigator.pop(context);
                   }
                 },
@@ -83,13 +104,15 @@ class _DbConnectionsPageState extends State<DbConnectionsPage> {
       setState(() {
         databases.add({'Path': dbPath, 'Name': dbName});
       });
+      await _saveDatabases();
     }
   }
 
-  void _removeDatabase(int index) {
+  void _removeDatabase(int index) async {
     setState(() {
       databases.removeAt(index);
     });
+    await _saveDatabases();
   }
 
   @override
