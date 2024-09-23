@@ -8,6 +8,8 @@ class ColorPickerRow extends StatelessWidget {
   final Color color;
   final ValueChanged<Color> onColorChanged;
   final bool isDarkMode;
+  final Color darkFontColor;
+  final Color lightFontColor;
 
   const ColorPickerRow({
     super.key,
@@ -15,6 +17,8 @@ class ColorPickerRow extends StatelessWidget {
     required this.color,
     required this.onColorChanged,
     required this.isDarkMode,
+    required this.darkFontColor,
+    required this.lightFontColor,
   });
 
   @override
@@ -25,7 +29,7 @@ class ColorPickerRow extends StatelessWidget {
         Text(
           text,
           style: TextStyle(
-            color: isDarkMode ? AppTheme.darkText : AppTheme.lightText,
+            color: isDarkMode ? darkFontColor : lightFontColor,
           ),
         ),
         const SizedBox(width: 10),
