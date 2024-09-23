@@ -2,7 +2,10 @@ import 'package:fluent_ui/fluent_ui.dart';
 import '../utils/app_styles.dart';
 
 class DbConnectionsPage extends StatelessWidget {
-  const DbConnectionsPage({super.key});
+  final Color darkFontColor;
+  final Color lightFontColor;
+
+  DbConnectionsPage({super.key, required this.darkFontColor, required this.lightFontColor});
 
   @override
   Widget build(BuildContext context) {
@@ -17,9 +20,7 @@ class DbConnectionsPage extends StatelessWidget {
             style: TextStyle(
               fontSize: AppTheme.titleTextSize, // Title text size
               fontFamily: AppTheme.fontFamily, // Modern font
-              color: FluentTheme.of(context).brightness == Brightness.dark
-                  ? AppTheme.darkText
-                  : AppTheme.lightText,
+              color: FluentTheme.of(context).brightness == Brightness.dark ? darkFontColor : lightFontColor,
             ),
           ),
         ),

@@ -32,10 +32,12 @@ class _HomeScreenState extends State<HomeScreen> {
   // Light mode colors
   Color lightSidebarTextColor = AppTheme.lightSideBarText;
   Color lightSidebarIconColor = AppTheme.lightSideBarIconColor;
+  Color lightFontColor = AppTheme.lightFontColor;
 
   // Dark mode colors
   Color darkSidebarTextColor = AppTheme.darkSideBarText;
   Color darkSidebarIconColor = AppTheme.darkSideBarIconColor;
+  Color darkFontColor = AppTheme.darkFontColor;
 
   @override
   void initState() {
@@ -60,16 +62,24 @@ class _HomeScreenState extends State<HomeScreen> {
       darkSidebarIconColor = Color(prefs.getInt('darkSidebarIconColor') ?? AppTheme.darkSideBarIconColor.value);
       lightSidebarTextColor = Color(prefs.getInt('lightSidebarTextColor') ?? AppTheme.lightSideBarText.value);
       lightSidebarIconColor = Color(prefs.getInt('lightSidebarIconColor') ?? AppTheme.lightSideBarIconColor.value);
+
+      darkFontColor = Color(prefs.getInt('darkFontColor') ?? AppTheme.darkFontColor.value);
+      lightFontColor = Color(prefs.getInt('lightFontColor') ?? AppTheme.lightFontColor.value);
+
       widget.onThemeChanged(prefs.getBool('isDarkMode') ?? widget.isDarkMode);
     });
   }
 
   void _resetToDefault() {
     setState(() {
+      darkFontColor = AppTheme.darkFontColor;
+      lightFontColor = AppTheme.lightFontColor;
       darkSidebarTextColor = AppTheme.darkSideBarText;
       darkSidebarIconColor = AppTheme.darkSideBarIconColor;
       lightSidebarTextColor = AppTheme.lightSideBarText;
       lightSidebarIconColor = AppTheme.lightSideBarIconColor;
+      _saveColorToPrefs('darkFontColor', AppTheme.darkFontColor);
+      _saveColorToPrefs('lightFontColor', AppTheme.lightFontColor);
       _saveColorToPrefs('darkSidebarTextColor', AppTheme.darkSideBarText);
       _saveColorToPrefs('darkSidebarIconColor', AppTheme.darkSideBarIconColor);
       _saveColorToPrefs('lightSidebarTextColor', AppTheme.lightSideBarText);
@@ -80,29 +90,36 @@ class _HomeScreenState extends State<HomeScreen> {
   List<NavigationPaneItem> _buildPaneItems() {
     return [
       NavigationItems.buildPaneItem(
-        icon: FluentIcons.settings,
-        title: 'Settings',
-        body: const SettingsPage(),
-        isDarkMode: widget.isDarkMode,
-        darkSidebarIconColor: darkSidebarIconColor,
-        lightSidebarIconColor: lightSidebarIconColor,
-        darkSidebarTextColor: darkSidebarTextColor,
-        lightSidebarTextColor: lightSidebarTextColor,
-      ),
+          icon: FluentIcons.settings,
+          title: 'Settings',
+          body: SettingsPage(darkFontColor: darkFontColor, lightFontColor: lightFontColor),
+          isDarkMode: widget.isDarkMode,
+          darkSidebarIconColor: darkSidebarIconColor,
+          lightSidebarIconColor: lightSidebarIconColor,
+          darkSidebarTextColor: darkSidebarTextColor,
+          lightSidebarTextColor: lightSidebarTextColor),
+      
       NavigationItems.buildPaneItem(
         icon: FluentIcons.database,
         title: 'DB Browser',
-        body: const DbBrowserPage(),
+        body: DbBrowserPage(
+          darkFontColor: darkFontColor,
+          lightFontColor: lightFontColor,
+        ),
         isDarkMode: widget.isDarkMode,
         darkSidebarIconColor: darkSidebarIconColor,
         lightSidebarIconColor: lightSidebarIconColor,
         darkSidebarTextColor: darkSidebarTextColor,
         lightSidebarTextColor: lightSidebarTextColor,
       ),
+      
       NavigationItems.buildPaneItem(
         icon: FluentIcons.database_view,
         title: 'DB Connections',
-        body: const DbConnectionsPage(),
+        body: DbConnectionsPage(
+          darkFontColor: darkFontColor,
+          lightFontColor: lightFontColor,
+        ),
         isDarkMode: widget.isDarkMode,
         darkSidebarIconColor: darkSidebarIconColor,
         lightSidebarIconColor: lightSidebarIconColor,
@@ -125,6 +142,8 @@ class _HomeScreenState extends State<HomeScreen> {
           lightSidebarTextColor: lightSidebarTextColor,
           darkSidebarIconColor: darkSidebarIconColor,
           lightSidebarIconColor: lightSidebarIconColor,
+          darkFontColor: darkFontColor,
+          lightFontColor: lightFontColor,
         ),
         isDarkMode: widget.isDarkMode,
         darkSidebarIconColor: darkSidebarIconColor,
