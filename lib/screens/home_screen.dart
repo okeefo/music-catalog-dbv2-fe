@@ -50,10 +50,6 @@ class _HomeScreenState extends State<HomeScreen> {
     prefs.setInt(key, color.value);
   }
 
-  Future<void> _saveThemeToPrefs(bool isDarkMode) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setBool('isDarkMode', isDarkMode);
-  }
 
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
@@ -67,23 +63,6 @@ class _HomeScreenState extends State<HomeScreen> {
       lightFontColor = Color(prefs.getInt('lightFontColor') ?? AppTheme.lightFontColor.value);
 
       widget.onThemeChanged(prefs.getBool('isDarkMode') ?? widget.isDarkMode);
-    });
-  }
-
-  void _resetToDefault() {
-    setState(() {
-      darkFontColor = AppTheme.darkFontColor;
-      lightFontColor = AppTheme.lightFontColor;
-      darkSidebarTextColor = AppTheme.darkSideBarText;
-      darkSidebarIconColor = AppTheme.darkSideBarIconColor;
-      lightSidebarTextColor = AppTheme.lightSideBarText;
-      lightSidebarIconColor = AppTheme.lightSideBarIconColor;
-      _saveColorToPrefs('darkFontColor', AppTheme.darkFontColor);
-      _saveColorToPrefs('lightFontColor', AppTheme.lightFontColor);
-      _saveColorToPrefs('darkSidebarTextColor', AppTheme.darkSideBarText);
-      _saveColorToPrefs('darkSidebarIconColor', AppTheme.darkSideBarIconColor);
-      _saveColorToPrefs('lightSidebarTextColor', AppTheme.lightSideBarText);
-      _saveColorToPrefs('lightSidebarIconColor', AppTheme.lightSideBarIconColor);
     });
   }
 

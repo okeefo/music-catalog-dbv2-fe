@@ -53,9 +53,9 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
     prefs.setInt(key, color.value);
   }
 
-  Future<void> _saveDarkModeToPrefs(int value) async {
+  Future<void> _saveDarkModeToPrefs(bool value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setInt('isDarkMode', value);
+    prefs.setBool('isDarkMode', value);
   }
 
   void _resetToDefault() {
@@ -90,7 +90,7 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                     checked: widget.isDarkMode,
                     onChanged: (isDarkMode) {
                       widget.onThemeChanged(isDarkMode);
-                      _saveDarkModeToPrefs(isDarkMode ? 1 : 0);
+                      _saveDarkModeToPrefs(isDarkMode);
                     },
                     content: Text(
                       widget.isDarkMode ? 'Dark Mode' : 'Light Mode',
