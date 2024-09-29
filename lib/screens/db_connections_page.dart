@@ -5,6 +5,7 @@ import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../utils/app_styles.dart';
 import '../utils/endpoints.dart';
 
@@ -33,7 +34,6 @@ class _DbConnectionsPageState extends State<DbConnectionsPage> {
   }
 
   Future<void> _fetchActiveDatabase() async {
-    
     String uri = Endpoints.activeDatabaseUri;
     final response = await http.get(Uri.parse(uri));
 
@@ -56,9 +56,7 @@ class _DbConnectionsPageState extends State<DbConnectionsPage> {
     final String? databasesString = prefs.getString('databases');
     if (databasesString != null) {
       setState(() {
-        databases = List<Map<String, String>>.from(
-          json.decode(databasesString).map((item) => Map<String, String>.from(item))
-        );
+        databases = List<Map<String, String>>.from(json.decode(databasesString).map((item) => Map<String, String>.from(item)));
       });
     }
   }
@@ -201,9 +199,33 @@ class _DbConnectionsPageState extends State<DbConnectionsPage> {
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Icon(
-                          isConnected ? FluentIcons.check_mark : FluentIcons.cancel,
-                          color: isConnected ? Colors.green : Colors.red,
+                        child: Tooltip(
+                          message: 'Click to ${isConnected ? 'Deactivate' : 'Activate'}',
+                          child: GestureDetector(
+                            onTap: () async {
+                              if (!isConnected) {
+                                final response = await http.post(
+                                  Uri.parse(Endpoints.activeDatabaseUri),
+                                  headers: {'Content-Type': 'application/json'},
+                                  body: jsonEncode({'name': db['Name'], 'path': db['Path']}),
+                                );
+
+                                if (response.statusCode == 200) {
+                                  // Refresh the page to update the status table
+                                  setState(() {
+                                    activeDatabase = db['Name'];
+                                  });
+                                } else {
+                                  // Handle error
+                                  print('Failed to set active database');
+                                }
+                              }
+                            },
+                            child: Icon(
+                              isConnected ? FluentIcons.check_mark : FluentIcons.cancel,
+                              color: isConnected ? Colors.green : Colors.red,
+                            ),
+                          ),
                         ),
                       ),
                       Padding(
