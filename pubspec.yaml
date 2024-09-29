@@ -71,6 +71,7 @@ flutter:
   assets:
     - assets/headphones.svg
     - assets/fonts/
+    - assets/config.json
   
   fonts:
     - family: Roboto  # Replace with your font family name

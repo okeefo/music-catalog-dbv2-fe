@@ -4,7 +4,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:http/http.dart' as http;
 import '../utils/app_styles.dart';
+import '../utils/endpoints.dart';
 
 class DbConnectionsPage extends StatefulWidget {
   final Color darkFontColor;
@@ -18,6 +20,7 @@ class DbConnectionsPage extends StatefulWidget {
 
 class _DbConnectionsPageState extends State<DbConnectionsPage> {
   List<Map<String, String>> databases = [];
+  String? activeDatabase;
 
   @override
   void initState() {
@@ -26,6 +29,26 @@ class _DbConnectionsPageState extends State<DbConnectionsPage> {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
     _loadDatabases();
+    _fetchActiveDatabase();
+  }
+
+  Future<void> _fetchActiveDatabase() async {
+    
+    String uri = Endpoints.activeDatabaseUri;
+    final response = await http.get(Uri.parse(uri));
+
+    print('Request URI: $uri,  Response status: ${response.statusCode}');
+    if (response.statusCode == 200) {
+      setState(() {
+        activeDatabase = json.decode(response.body)['name'];
+      });
+    } else {
+      print(response.body);
+      setState(() {
+        activeDatabase = null;
+      });
+    }
+    print('active db=$activeDatabase');
   }
 
   Future<void> _loadDatabases() async {
@@ -140,6 +163,7 @@ class _DbConnectionsPageState extends State<DbConnectionsPage> {
               columnWidths: const {
                 0: FlexColumnWidth(3),
                 1: FlexColumnWidth(2),
+                2: FlexColumnWidth(1),
               },
               children: [
                 const TableRow(
@@ -154,12 +178,17 @@ class _DbConnectionsPageState extends State<DbConnectionsPage> {
                     ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
+                      child: Text('Status', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
                       child: Text('Remove', style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
                 ...databases.map((db) {
                   int index = databases.indexOf(db);
+                  bool isConnected = db['Name'] == activeDatabase;
                   return TableRow(
                     children: [
                       Padding(
@@ -169,6 +198,13 @@ class _DbConnectionsPageState extends State<DbConnectionsPage> {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(db['Name']!),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(
+                          isConnected ? FluentIcons.check_mark : FluentIcons.cancel,
+                          color: isConnected ? Colors.green : Colors.red,
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),

@@ -1,13 +1,24 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'screens/home_screen.dart';
 import 'utils/app_styles.dart';
+import 'utils/config.dart';
+import 'utils/endpoints.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Load the configuration
+  Config config = await loadConfig();
+
+  // Initialize the endpoints
+  Endpoints.initialize(config.baseUri);
+
+  runApp(MyApp(config: config));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final Config config;
+  const MyApp({super.key, required this.config});
 
   @override
   State<MyApp> createState() => _MyAppState();
