@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -13,7 +14,7 @@ class DbService {
   }
 
   Future<String?> fetchActiveDatabase() async {
-    String uri = Endpoints.activeDatabaseUri;
+    String uri = Endpoints.getActiveDatabaseUri();
     final response = await http.get(Uri.parse(uri));
 
     if (response.statusCode == 200) {
@@ -56,7 +57,59 @@ class DbService {
     return null;
   }
 
-  Future<String?> pickDirectory() async {
-    return await FilePicker.platform.getDirectoryPath(dialogTitle: 'Select Folder for Database');
+  Future<String?> createDatabasePrompt() async {
+      String? result = await FilePicker.platform.saveFile(
+        dialogTitle: 'Save Database As',
+        fileName: 'database.db', // Default file name
+        type: FileType.custom,
+        allowedExtensions: ['db'],
+      );
+  
+      if (result != null) {
+        return result;
+      }
+      return null;
+    }
+
+  Future<Map<String, dynamic>> initialise(String dbName, String dbPath) async {
+    try {
+      print('Initialising database: $dbName at $dbPath');
+      final response = await http
+          .post(
+            Uri.parse(Endpoints.getInitialiseUri(dbName)),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'name': dbName, 'path': dbPath}),
+          )
+          .timeout(const Duration(seconds: 10), onTimeout: () {
+            print('Request timed out');
+            throw TimeoutException('The connection has timed out, please try again later.');
+          });
+
+      if (response.statusCode == 200) {
+        return {'status': 'success', 'message': 'Database initialised successfully'};
+      } else {
+         print('status = error');
+        return {
+          'status': 'error',
+          'message': 'Failed to initialise database: ${response.body}',
+          'statusCode': response.statusCode,
+        };
+      }
+    } catch (error) {
+      if (error is TimeoutException) {
+        print('Caught timeout exception');
+        return {
+          'status': 'error',
+          'message': 'Request timed out',
+          'statusCode': 408, // HTTP status code for request timeout
+        };
+      }
+      print('Error initialising database: $error');
+      return {
+        'status': 'error',
+        'message': 'Error initialising database: $error',
+        'statusCode': 500, // HTTP status code for internal server error
+      };
+    }
   }
 }

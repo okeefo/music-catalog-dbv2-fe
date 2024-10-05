@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
+import 'package:path/path.dart' as path;
 import '../providers/db_provider.dart';
 import '../utils/app_styles.dart';
 
@@ -122,7 +123,8 @@ class DbConnectionsPage extends StatelessWidget {
                           onPressed: () async {
                             String? dbPath = await dbProvider.dbService.pickDatabase();
                             if (dbPath != null) {
-                              await dbProvider.addDatabase(dbPath);
+                              String dbName = path.basenameWithoutExtension(dbPath);
+                              await dbProvider.addDatabase(context, dbPath, dbName);
                             }
                           },
                         ),
@@ -136,43 +138,10 @@ class DbConnectionsPage extends StatelessWidget {
                         IconButton(
                           icon: const Icon(FluentIcons.database),
                           onPressed: () async {
-                            String? selectedDirectory = await dbProvider.dbService.pickDirectory();
+                            String? selectedDirectory = await dbProvider.dbService.createDatabasePrompt();
                             if (selectedDirectory != null) {
-                              TextEditingController nameController = TextEditingController();
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return ContentDialog(
-                                    title: const Text('Create Database'),
-                                    content: SizedBox(
-                                      width: 300,
-                                      child: TextBox(
-                                        controller: nameController,
-                                        placeholder: 'Enter database name',
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                    actions: [
-                                      Button(
-                                        child: const Text('Cancel'),
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                      Button(
-                                        child: const Text('Create'),
-                                        onPressed: () async {
-                                          String dbName = nameController.text;
-                                          if (dbName.isNotEmpty) {
-                                            await dbProvider.createDatabase(dbName, selectedDirectory);
-                                            Navigator.pop(context);
-                                          }
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
+                              String dbName = path.basename(selectedDirectory);
+                              await dbProvider.addDatabase(context, selectedDirectory, dbName);
                             }
                           },
                         ),
