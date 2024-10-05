@@ -82,7 +82,7 @@ class DbConnectionsPage extends StatelessWidget {
                                 child: GestureDetector(
                                   onTap: () async {
                                     if (!isConnected) {
-                                      await dbProvider.setActiveDatabase(db['Name']!, db['Path']!);
+                                      await dbProvider.setActiveDatabase(context, db['Name']!, db['Path']!);
                                     }
                                   },
                                   child: Icon(
@@ -99,7 +99,7 @@ class DbConnectionsPage extends StatelessWidget {
                                 children: [
                                   IconButton(
                                     icon: const Icon(FluentIcons.delete),
-                                    onPressed: () => dbProvider.removeDatabase(index),
+                                    onPressed: () => dbProvider.removeDatabase(context, index),
                                   ),
                                 ],
                               ),
