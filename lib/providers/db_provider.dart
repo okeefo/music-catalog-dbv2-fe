@@ -24,18 +24,37 @@ class DbProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addDatabase(String dbPath) async {
-    String dbName = path.basenameWithoutExtension(dbPath);
-    databases.add({'Path': dbPath, 'Name': dbName});
-    await _dbService.saveDatabases(databases);
-    notifyListeners();
+  Future<void> addDatabase(BuildContext context,  String dbPath, String dbName) async {
+    final result = await _dbService.initialise(dbName, dbPath);
+
+    if (result['status'] == 'success') {
+      databases.add({'Path': dbPath, 'Name': dbName});
+      await _dbService.saveDatabases(databases);
+      notifyListeners();
+      _showPopup(context, 'Success', result['message']);
+    } else {
+      _showPopup(context, 'Error', '${result['message']} (Status code: ${result['statusCode']})');
+    }
   }
 
-  Future<void> createDatabase(String dbName, String selectedDirectory) async {
-    await _dbService.createDatabase(dbName, selectedDirectory);
-    databases.add({'Path': path.join(selectedDirectory, '$dbName.db'), 'Name': dbName});
-    await _dbService.saveDatabases(databases);
-    notifyListeners();
+  void _showPopup(BuildContext context, String title, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> removeDatabase(int index) async {
@@ -46,7 +65,7 @@ class DbProvider with ChangeNotifier {
 
   Future<void> setActiveDatabase(String dbName, String dbPath) async {
     final response = await http.post(
-      Uri.parse(Endpoints.activeDatabaseUri),
+      Uri.parse(Endpoints.getActiveDatabaseUri()),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'name': dbName, 'path': dbPath}),
     );
