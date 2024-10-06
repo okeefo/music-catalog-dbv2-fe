@@ -1,8 +1,8 @@
 class Endpoints {
   static late final String _baseUri;
-  static const String _activeDatabaseUri = '/active-database';
-  static const String _configUri = '/config';
-  static const String _initialiseUri = '/database/{dbName}/initialise';
+  static const String _activeDatabaseUri = 'active-database';
+  static const String _configUri = 'config';
+  static const String _initialiseUri = 'database/{dbName}/initialise';
 
   static void initialize(String baseUri) {
     _baseUri = baseUri;
