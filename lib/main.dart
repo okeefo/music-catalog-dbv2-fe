@@ -44,6 +44,7 @@ class _MyAppState extends State<MyApp> {
             ),
             home: HomeScreen(
               onThemeChanged: (value) {
+                print("home sceen theme changed - $value");
                 themeProvider.setBrightness(value? Brightness.dark : Brightness.light);
               },
             ),
