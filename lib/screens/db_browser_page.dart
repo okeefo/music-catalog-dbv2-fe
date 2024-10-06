@@ -1,21 +1,21 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:front_end/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 import '../utils/app_styles.dart';
 
 class DbBrowserPage extends StatelessWidget {
-  final Color fontColour;
-
-  DbBrowserPage({
+  const DbBrowserPage({
     super.key,
-    required this.fontColour,
   });
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Center(
       child: Text(
         'DB Browser Page',
         style: TextStyle(
-          color: fontColour,
+          color: themeProvider.fontColour,
         ),
       ),
     );

@@ -1,21 +1,20 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import '../utils/app_styles.dart';
+import 'package:front_end/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class SettingsPage extends StatelessWidget {
-  final Color fontColour;
-
   const SettingsPage({
     super.key,
-    required this.fontColour,
   });
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Center(
       child: Text(
         'Settings Page',
         style: TextStyle(
-          color: fontColour,
+          color: themeProvider.fontColour,
         ),
       ),
     );

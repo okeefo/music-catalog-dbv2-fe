@@ -44,23 +44,23 @@ class _HomeScreenState extends State<HomeScreen> {
       NavigationItems.buildPaneItem(
         icon: FluentIcons.settings,
         title: 'Settings',
-        fontColor: themeProvider.fontColor,
-        iconColor: themeProvider.iconColor,
-        body: SettingsPage(fontColour: themeProvider.fontColor),
+        fontColor: themeProvider.fontColour,
+        iconColor: themeProvider.iconColour,
+        body: const SettingsPage(),
       ),
       NavigationItems.buildPaneItem(
         icon: FluentIcons.database,
         title: 'DB Browser',
-        fontColor: themeProvider.fontColor,
-        iconColor: themeProvider.iconColor,
-        body: DbBrowserPage(fontColour: themeProvider.fontColor),
+        fontColor: themeProvider.fontColour,
+        iconColor: themeProvider.iconColour,
+        body: const DbBrowserPage(),
       ),
       NavigationItems.buildPaneItem(
         icon: FluentIcons.database_view,
         title: 'DB Connections',
-        body: DbConnectionsPage(fontColour: themeProvider.fontColor),
-        fontColor: themeProvider.fontColor,
-        iconColor: themeProvider.iconColor,
+        body: const DbConnectionsPage(),
+        fontColor: themeProvider.fontColour,
+        iconColor: themeProvider.iconColour,
       ),
     ];
   }
@@ -72,8 +72,8 @@ class _HomeScreenState extends State<HomeScreen> {
         icon: FluentIcons.light,
         title: 'Light/Dark Mode',
         body: const LightDarkModePage(),
-        fontColor: themeProvider.fontColor,
-        iconColor: themeProvider.iconColor,
+        fontColor: themeProvider.fontColour,
+        iconColor: themeProvider.iconColour,
       ),
     ];
   }

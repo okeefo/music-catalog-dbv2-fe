@@ -2,16 +2,18 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:path/path.dart' as path;
 import '../providers/db_provider.dart';
+import '../providers/theme_provider.dart';
 import '../utils/app_styles.dart';
 
 class DbConnectionsPage extends StatelessWidget {
-  final Color fontColour;
-
-  DbConnectionsPage({super.key, required this.fontColour});
+  const DbConnectionsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final Color fontColor = fontColour;
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final Color fontColour = themeProvider.fontColour;
+    final Color boldFontColour = themeProvider.boldFontColour;
+    final Color iconColour = themeProvider.iconColour;
 
     return ChangeNotifierProvider(
       create: (_) => DbProvider(),
@@ -28,7 +30,7 @@ class DbConnectionsPage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: AppTheme.titleTextSize,
                     fontFamily: AppTheme.fontFamily,
-                    color: fontColor,
+                    color: fontColour,
                   ),
                 ),
               ),
@@ -36,7 +38,7 @@ class DbConnectionsPage extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Table(
-                    border: TableBorder.all(),
+                    border: TableBorder.all(color: iconColour),
                     columnWidths: const {
                       0: FlexColumnWidth(3),
                       1: FlexColumnWidth(2),
@@ -47,19 +49,25 @@ class DbConnectionsPage extends StatelessWidget {
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text('Path', style: TextStyle(fontWeight: FontWeight.bold, color: fontColor)),
+                            child: Text('Path', style: TextStyle(fontWeight: FontWeight.bold, color: boldFontColour)),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text('Name', style: TextStyle(fontWeight: FontWeight.bold, color: fontColor)),
+                            child: Center(
+                              child: Text('Name', style: TextStyle(fontWeight: FontWeight.bold, color: boldFontColour)),
+                            ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text('Status', style: TextStyle(fontWeight: FontWeight.bold, color: fontColor)),
+                            child: Center(
+                              child: Text('Status', style: TextStyle(fontWeight: FontWeight.bold, color: boldFontColour)),
+                            ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text('Remove', style: TextStyle(fontWeight: FontWeight.bold, color: fontColor)),
+                            child: Center(
+                              child: Text('Remove', style: TextStyle(fontWeight: FontWeight.bold, color: boldFontColour)),
+                            ),
                           ),
                         ],
                       ),
@@ -70,11 +78,13 @@ class DbConnectionsPage extends StatelessWidget {
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(db['Path']!, style: TextStyle(color: fontColor)),
+                              child: Text(db['Path']!, style: TextStyle(color: fontColour)),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(db['Name']!, style: TextStyle(color: fontColor)),
+                              child: Center(
+                                child: Text(db['Name']!, style: TextStyle(color: fontColour)),
+                              ),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -99,7 +109,10 @@ class DbConnectionsPage extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   IconButton(
-                                    icon: const Icon(FluentIcons.delete),
+                                    icon: Icon(
+                                      FluentIcons.delete,
+                                      color: themeProvider.iconColour,
+                                    ),
                                     onPressed: () => dbProvider.removeDatabase(context, index),
                                   ),
                                 ],
