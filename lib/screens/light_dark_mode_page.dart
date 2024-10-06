@@ -30,19 +30,20 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                   ToggleSwitch(
                     checked: themeProvider.isDarkMode,
                     onChanged: (isDarkMode) {
-                     themeProvider.setBrightness(isDarkMode ? Brightness.dark : Brightness.light);;
+                      themeProvider.setBrightness(isDarkMode ? Brightness.dark : Brightness.light);
+                      ;
                     },
                     content: Text(
                       themeProvider.isDarkMode ? 'Dark Mode' : 'Light Mode',
                       style: TextStyle(
-                        color: themeProvider.fontColor,
+                        color: themeProvider.fontColour,
                       ),
                     ),
                   ),
                   const SizedBox(height: 20),
                   ColorPickerRow(
                     text: 'Bold Font Color',
-                    color: themeProvider.boldFontColor,
+                    color: themeProvider.boldFontColour,
                     onColorChanged: (color) {
                       if (themeProvider.isDarkMode) {
                         themeProvider.setDarkBoldFontColor(color);
@@ -51,13 +52,13 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                       }
                     },
                     isDarkMode: themeProvider.isDarkMode,
-                    darkFontColor: themeProvider.darkFontColor,
-                    lightFontColor: themeProvider.lightFontColor,
+                    darkFontColor: themeProvider.darkFontColour,
+                    lightFontColor: themeProvider.lightFontColour,
                   ),
                   const SizedBox(height: 20),
                   ColorPickerRow(
                     text: 'Icon Color',
-                    color: themeProvider.iconColor,
+                    color: themeProvider.iconColour,
                     onColorChanged: (color) {
                       if (themeProvider.isDarkMode) {
                         themeProvider.setDarkIconColor(color);
@@ -66,13 +67,13 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                       }
                     },
                     isDarkMode: themeProvider.isDarkMode,
-                    darkFontColor: themeProvider.darkFontColor,
-                    lightFontColor: themeProvider.lightFontColor,
+                    darkFontColor: themeProvider.darkFontColour,
+                    lightFontColor: themeProvider.lightFontColour,
                   ),
                   const SizedBox(height: 20),
                   ColorPickerRow(
                     text: 'Font Color',
-                    color: themeProvider.fontColor,
+                    color: themeProvider.fontColour,
                     onColorChanged: (color) {
                       if (themeProvider.isDarkMode) {
                         themeProvider.setDarkFontColor(color);
@@ -81,15 +82,15 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                       }
                     },
                     isDarkMode: themeProvider.isDarkMode,
-                    darkFontColor: themeProvider.darkFontColor,
-                    lightFontColor: themeProvider.lightFontColor,
+                    darkFontColor: themeProvider.darkFontColour,
+                    lightFontColor: themeProvider.lightFontColour,
                   ),
                   const SizedBox(height: 20),
                   Button(
                     onPressed: () {
                       if (themeProvider.isDarkMode) {
                         themeProvider.setDarkBoldFontColor(AppTheme.defaultDarkBoldFontColor);
-                       themeProvider.setDarkIconColor(AppTheme.defaultDarkIconColor);
+                        themeProvider.setDarkIconColor(AppTheme.defaultDarkIconColor);
                         themeProvider.setDarkFontColor(AppTheme.defaultDarkFontColor);
                       } else {
                         themeProvider.setLightBoldFontColor(AppTheme.defaultLightBoldFontColor);
@@ -99,7 +100,7 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                     },
                     child: Text(
                       'Reset to Default',
-                      style: TextStyle(color: themeProvider.fontColor),
+                      style: TextStyle(color: themeProvider.fontColour),
                     ),
                   ),
                 ],
