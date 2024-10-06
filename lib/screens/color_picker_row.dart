@@ -53,7 +53,7 @@ class ColorPickerRow extends StatelessWidget {
       context: context,
       builder: (context) {
         return material.Dialog(
-          backgroundColor: isDarkMode ? AppTheme.dark : AppTheme.grey,
+          backgroundColor: isDarkMode ? AppTheme.darkBackground : AppTheme.greyBackground,
           child: material.AlertDialog(
             title: const Text('Pick a color'),
             content: SingleChildScrollView(

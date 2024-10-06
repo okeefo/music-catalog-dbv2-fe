@@ -1,10 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' as material;
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../utils/app_styles.dart';
+import 'package:provider/provider.dart';
+import '../providers/theme_provider.dart';
 import 'settings_page.dart';
-import 'color_picker_row.dart';
 import 'navigation_items.dart';
 import 'db_browser_page.dart';
 import 'db_connections_page.dart';
@@ -13,12 +10,10 @@ import 'light_dark_mode_page.dart';
 // lib/screens/home_screen.dart
 
 class HomeScreen extends StatefulWidget {
-  final bool isDarkMode;
   final ValueChanged<bool> onThemeChanged;
 
   const HomeScreen({
     super.key,
-    required this.isDarkMode,
     required this.onThemeChanged,
   });
 
@@ -29,120 +24,63 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  // Light mode colors
-  Color lightSidebarTextColor = AppTheme.lightSideBarText;
-  Color lightSidebarIconColor = AppTheme.lightSideBarIconColor;
-  Color lightFontColor = AppTheme.lightFontColor;
-
-  // Dark mode colors
-  Color darkSidebarTextColor = AppTheme.darkSideBarText;
-  Color darkSidebarIconColor = AppTheme.darkSideBarIconColor;
-  Color darkFontColor = AppTheme.darkFontColor;
-
   @override
-  void initState() {
-    super.initState();
-    _loadPreferences();
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    return NavigationView(
+      pane: NavigationPane(
+        selected: _selectedIndex,
+        onChanged: (index) => setState(() => _selectedIndex = index),
+        displayMode: PaneDisplayMode.compact,
+        items: _buildPaneItems(themeProvider),
+        footerItems: _buildFooterItems(themeProvider),
+      ),
+    );
   }
 
-  Future<void> _saveColorToPrefs(String key, Color color) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setInt(key, color.value);
-  }
-
-
-  Future<void> _loadPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      darkSidebarTextColor = Color(prefs.getInt('darkSidebarTextColor') ?? AppTheme.darkSideBarText.value);
-      darkSidebarIconColor = Color(prefs.getInt('darkSidebarIconColor') ?? AppTheme.darkSideBarIconColor.value);
-      lightSidebarTextColor = Color(prefs.getInt('lightSidebarTextColor') ?? AppTheme.lightSideBarText.value);
-      lightSidebarIconColor = Color(prefs.getInt('lightSidebarIconColor') ?? AppTheme.lightSideBarIconColor.value);
-
-      darkFontColor = Color(prefs.getInt('darkFontColor') ?? AppTheme.darkFontColor.value);
-      lightFontColor = Color(prefs.getInt('lightFontColor') ?? AppTheme.lightFontColor.value);
-
-      widget.onThemeChanged(prefs.getBool('isDarkMode') ?? widget.isDarkMode);
-    });
-  }
-
-  List<NavigationPaneItem> _buildPaneItems() {
+  List<NavigationPaneItem> _buildPaneItems(ThemeProvider themeProvider) {
     return [
       NavigationItems.buildPaneItem(
-          icon: FluentIcons.settings,
-          title: 'Settings',
-          body: SettingsPage(darkFontColor: darkFontColor, lightFontColor: lightFontColor),
-          isDarkMode: widget.isDarkMode,
-          darkSidebarIconColor: darkSidebarIconColor,
-          lightSidebarIconColor: lightSidebarIconColor,
-          darkSidebarTextColor: darkSidebarTextColor,
-          lightSidebarTextColor: lightSidebarTextColor),
-      
+        icon: FluentIcons.settings,
+        title: 'Settings',
+        fontColor: themeProvider.fontColor,
+        iconColor: themeProvider.iconColor,
+        body: SettingsPage(fontColour: themeProvider.fontColor),
+      ),
       NavigationItems.buildPaneItem(
         icon: FluentIcons.database,
         title: 'DB Browser',
-        body: DbBrowserPage(
-          darkFontColor: darkFontColor,
-          lightFontColor: lightFontColor,
-        ),
-        isDarkMode: widget.isDarkMode,
-        darkSidebarIconColor: darkSidebarIconColor,
-        lightSidebarIconColor: lightSidebarIconColor,
-        darkSidebarTextColor: darkSidebarTextColor,
-        lightSidebarTextColor: lightSidebarTextColor,
+        fontColor: themeProvider.fontColor,
+        iconColor: themeProvider.iconColor,
+        body: DbBrowserPage(fontColour: themeProvider.fontColor),
       ),
-      
       NavigationItems.buildPaneItem(
         icon: FluentIcons.database_view,
         title: 'DB Connections',
-        body: DbConnectionsPage(
-          darkFontColor: darkFontColor,
-          lightFontColor: lightFontColor,
-        ),
-        isDarkMode: widget.isDarkMode,
-        darkSidebarIconColor: darkSidebarIconColor,
-        lightSidebarIconColor: lightSidebarIconColor,
-        darkSidebarTextColor: darkSidebarTextColor,
-        lightSidebarTextColor: lightSidebarTextColor,
+        body: DbConnectionsPage(fontColour: themeProvider.fontColor),
+        fontColor: themeProvider.fontColor,
+        iconColor: themeProvider.iconColor,
       ),
     ];
   }
 
-  List<NavigationPaneItem> _buildFooterItems() {
+  List<NavigationPaneItem> _buildFooterItems(ThemeProvider themeProvider) {
     return [
       PaneItemSeparator(),
       NavigationItems.buildPaneItem(
         icon: FluentIcons.light,
         title: 'Light/Dark Mode',
         body: LightDarkModePage(
-          isDarkMode: widget.isDarkMode,
-          onThemeChanged: widget.onThemeChanged,
-          darkSidebarTextColor: darkSidebarTextColor,
-          lightSidebarTextColor: lightSidebarTextColor,
-          darkSidebarIconColor: darkSidebarIconColor,
-          lightSidebarIconColor: lightSidebarIconColor,
-          darkFontColor: darkFontColor,
-          lightFontColor: lightFontColor,
+        onThemeChanged: (isDarkMode) {
+            themeProvider.setBrightness(isDarkMode ? Brightness.dark : Brightness.light);
+            widget.onThemeChanged(isDarkMode);
+        },
+          isDarkMode: themeProvider.isDarkMode,
         ),
-        isDarkMode: widget.isDarkMode,
-        darkSidebarIconColor: darkSidebarIconColor,
-        lightSidebarIconColor: lightSidebarIconColor,
-        darkSidebarTextColor: darkSidebarTextColor,
-        lightSidebarTextColor: lightSidebarTextColor,
+        fontColor: themeProvider.fontColor,
+        iconColor: themeProvider.iconColor,
       ),
     ];
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return NavigationView(
-      pane: NavigationPane(
-        selected: _selectedIndex,
-        onChanged: (index) => setState(() => _selectedIndex = index),
-        displayMode: PaneDisplayMode.compact,
-        items: _buildPaneItems(),
-        footerItems: _buildFooterItems(),
-      ),
-    );
   }
 }
