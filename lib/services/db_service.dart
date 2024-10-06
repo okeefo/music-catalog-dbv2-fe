@@ -99,9 +99,10 @@ class DbService {
 
   Future<String?> createDatabasePrompt() async {
     try {
+      _logger.info('Creating database.. prompt user');
       String? result = await FilePicker.platform.saveFile(
         dialogTitle: 'Save Database As',
-        fileName: 'database.db', // Default file name
+        fileName: 'myMusicKillerDatabase.db', // Default file name
         type: FileType.custom,
         allowedExtensions: ['db'],
       );

@@ -136,7 +136,7 @@ class DbConnectionsPage extends StatelessWidget {
                           icon: const Icon(FluentIcons.add),
                           onPressed: () async {
                             String? dbPath = await dbProvider.dbService.pickDatabase();
-                            if (dbPath != null) {
+                            if (dbPath != null && context.mounted) {
                               String dbName = path.basenameWithoutExtension(dbPath);
                               await dbProvider.addDatabase(context, dbPath, dbName);
                             }
@@ -150,15 +150,13 @@ class DbConnectionsPage extends StatelessWidget {
                     Column(
                       children: [
                         IconButton(
-                          icon: const Icon(FluentIcons.database),
-                          onPressed: () async {
-                            String? selectedDirectory = await dbProvider.dbService.createDatabasePrompt();
-                            if (selectedDirectory != null) {
-                              String dbName = path.basename(selectedDirectory);
-                              await dbProvider.addDatabase(context, selectedDirectory, dbName);
-                            }
-                          },
-                        ),
+                            icon: const Icon(FluentIcons.database),
+                            onPressed: () async {
+                              String? selectedDirectory = await dbProvider.dbService.createDatabasePrompt();
+                              if (selectedDirectory != null && context.mounted) {
+                                await dbProvider.addDatabase(context, selectedDirectory, path.basename(selectedDirectory));
+                              }
+                            }),
                         const SizedBox(height: 4),
                         const Text('Create DB'),
                       ],

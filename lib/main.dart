@@ -1,13 +1,16 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
+import 'package:logging/logging.dart';
 import 'screens/home_screen.dart';
-import 'utils/app_styles.dart';
 import 'utils/config.dart';
 import 'utils/endpoints.dart';
 import 'providers/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+    // Configure the logger
+  _setupLogging();
 
   // Load the configuration
   Config config = await loadConfig();
@@ -17,6 +20,20 @@ void main() async {
 
   runApp(MyApp(config: config));
 }
+
+void _setupLogging() {
+  // Set the log level to INFO
+  Logger.root.level = Level.INFO;
+
+  // Add the custom log handler
+  Logger.root.onRecord.listen(customLogHandler);
+}
+
+void customLogHandler(LogRecord record) {
+  print('${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}');
+}
+
+
 
 class MyApp extends StatefulWidget {
   final Config config;
