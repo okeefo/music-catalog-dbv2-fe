@@ -121,9 +121,11 @@ class DbService {
   Future<Map<String, dynamic>> initialise(String dbName, String dbPath) async {
     try {
       _logger.info('Initialising database: $dbName at $dbPath');
+      Uri uri = Uri.parse(Endpoints.getInitialiseUri(dbName));
+      _logger.info('Initialising database: $uri');
       final response = await http
           .post(
-        Uri.parse(Endpoints.getInitialiseUri(dbName)),
+        uri,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'name': dbName, 'path': dbPath}),
       )

@@ -95,10 +95,11 @@ class DbProvider with ChangeNotifier {
   Future<void> setActiveDatabase(BuildContext context, String dbName, String dbPath) async {
     try {
 
-      _logger.info('Attempting to set active database: $dbName');
+      String uri = Endpoints.getActiveDatabaseUri();
+      _logger.info('Attempting to set active database: $dbName : $uri');
 
       final response = await http.post(
-        Uri.parse(Endpoints.getActiveDatabaseUri()),
+        Uri.parse(uri),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'name': dbName, 'path': dbPath}),
       );
