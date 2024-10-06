@@ -71,13 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
       NavigationItems.buildPaneItem(
         icon: FluentIcons.light,
         title: 'Light/Dark Mode',
-        body: LightDarkModePage(
-        onThemeChanged: (isDarkMode) {
-            themeProvider.setBrightness(isDarkMode ? Brightness.dark : Brightness.light);
-            widget.onThemeChanged(isDarkMode);
-        },
-          isDarkMode: themeProvider.isDarkMode,
-        ),
+        body: const LightDarkModePage(),
         fontColor: themeProvider.fontColor,
         iconColor: themeProvider.iconColor,
       ),
