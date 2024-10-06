@@ -5,13 +5,14 @@ import '../providers/db_provider.dart';
 import '../utils/app_styles.dart';
 
 class DbConnectionsPage extends StatelessWidget {
-  final Color darkFontColor;
-  final Color lightFontColor;
+  final Color fontColour;
 
-  DbConnectionsPage({super.key, required this.darkFontColor, required this.lightFontColor});
+  DbConnectionsPage({super.key, required this.fontColour});
 
   @override
   Widget build(BuildContext context) {
+    final Color fontColor = fontColour;
+
     return ChangeNotifierProvider(
       create: (_) => DbProvider(),
       child: Consumer<DbProvider>(
@@ -27,7 +28,7 @@ class DbConnectionsPage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: AppTheme.titleTextSize,
                     fontFamily: AppTheme.fontFamily,
-                    color: FluentTheme.of(context).brightness == Brightness.dark ? darkFontColor : lightFontColor,
+                    color: fontColor,
                   ),
                 ),
               ),
@@ -42,23 +43,23 @@ class DbConnectionsPage extends StatelessWidget {
                       2: FlexColumnWidth(1),
                     },
                     children: [
-                      const TableRow(
+                      TableRow(
                         children: [
                           Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('Path', style: TextStyle(fontWeight: FontWeight.bold)),
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('Path', style: TextStyle(fontWeight: FontWeight.bold, color: fontColor)),
                           ),
                           Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('Name', style: TextStyle(fontWeight: FontWeight.bold)),
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('Name', style: TextStyle(fontWeight: FontWeight.bold, color: fontColor)),
                           ),
                           Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('Status', style: TextStyle(fontWeight: FontWeight.bold)),
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('Status', style: TextStyle(fontWeight: FontWeight.bold, color: fontColor)),
                           ),
                           Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('Remove', style: TextStyle(fontWeight: FontWeight.bold)),
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('Remove', style: TextStyle(fontWeight: FontWeight.bold, color: fontColor)),
                           ),
                         ],
                       ),
@@ -69,11 +70,11 @@ class DbConnectionsPage extends StatelessWidget {
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(db['Path']!),
+                              child: Text(db['Path']!, style: TextStyle(color: fontColor)),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(db['Name']!),
+                              child: Text(db['Name']!, style: TextStyle(color: fontColor)),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),

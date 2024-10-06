@@ -2,13 +2,11 @@ import 'package:fluent_ui/fluent_ui.dart';
 import '../utils/app_styles.dart';
 
 class DbBrowserPage extends StatelessWidget {
-  final Color darkFontColor;
-  final Color lightFontColor;
+  final Color fontColour;
 
   DbBrowserPage({
     super.key,
-    required this.darkFontColor,
-    required this.lightFontColor,
+    required this.fontColour,
   });
 
   @override
@@ -17,7 +15,7 @@ class DbBrowserPage extends StatelessWidget {
       child: Text(
         'DB Browser Page',
         style: TextStyle(
-          color: FluentTheme.of(context).brightness == Brightness.dark ? darkFontColor : lightFontColor,
+          color: fontColour,
         ),
       ),
     );
