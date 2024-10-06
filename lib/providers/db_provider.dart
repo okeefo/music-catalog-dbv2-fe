@@ -33,6 +33,8 @@ class DbProvider with ChangeNotifier {
 
   Future<void> addDatabase(BuildContext context, String dbPath, String dbName) async {
     try {
+      _logger.info('Attempting to add database: $dbName');
+      //TODO: the initialise method shouw check the version number and if the DB is valid before adding it to the list
       final result = await _dbService.initialise(dbName, dbPath);
 
       if (result['status'] == 'success') {
@@ -77,6 +79,7 @@ class DbProvider with ChangeNotifier {
 
   Future<void> removeDatabase(BuildContext context, int index) async {
     try {
+      _logger.info('Attempting to remove database at index $index');
       databases.removeAt(index);
       await _dbService.saveDatabases(databases);
       notifyListeners();
@@ -91,6 +94,9 @@ class DbProvider with ChangeNotifier {
 
   Future<void> setActiveDatabase(BuildContext context, String dbName, String dbPath) async {
     try {
+
+      _logger.info('Attempting to set active database: $dbName');
+
       final response = await http.post(
         Uri.parse(Endpoints.getActiveDatabaseUri()),
         headers: {'Content-Type': 'application/json'},
