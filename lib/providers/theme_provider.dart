@@ -9,6 +9,8 @@ class ThemeProvider with ChangeNotifier {
   Color _lightBoldFontColour = AppTheme.defaultLightBoldFontColor;
   Color _darkIconColour = AppTheme.defaultDarkIconColor;
   Color _lightIconColour = AppTheme.defaultLightIconColor;
+  Color _lightTableBorderColour = AppTheme.defaultLightTableBorderColour;
+  Color _darkTableBorderColour = AppTheme.defaultDarkTableBorderColour;
   Brightness _brightness = AppTheme.brightness;
 
   ThemeProvider() {
@@ -20,6 +22,8 @@ class ThemeProvider with ChangeNotifier {
   Color get boldFontColour => _isDarkMode() ? _darkBoldFontColour : _lightBoldFontColour;
   Color get iconColour => _isDarkMode() ? _darkIconColour : _lightIconColour;
   Color get backgroundColour => _isDarkMode() ? AppTheme.darkBackground : AppTheme.lightBackground;
+  Color get tableBorderColour => _isDarkMode() ? _darkTableBorderColour : _lightTableBorderColour;
+
   Color get greyBackground => AppTheme.greyBackground;
   Color get darkFontColour => _darkFontColour;
   Color get lightFontColour => _lightFontColour;
@@ -33,44 +37,50 @@ class ThemeProvider with ChangeNotifier {
     return _brightness == Brightness.dark;
   }
 
-  void setDarkFontColor(Color color) {
-    _darkFontColour = color;
+  void setFontColour(Color color) {
+    _isDarkMode() ? _darkFontColour = color : _lightFontColour = color;
     _savePreferences();
     notifyListeners();
   }
 
-  void setLightFontColor(Color color) {
-    _lightFontColour = color;
+  void setBoldFontColor(Color color) {
+    _isDarkMode() ? _darkBoldFontColour = color : _lightBoldFontColour = color;
     _savePreferences();
     notifyListeners();
   }
 
-  void setDarkBoldFontColor(Color color) {
-    _darkBoldFontColour = color;
-    _savePreferences();
-    notifyListeners();
-  }
-
-  void setLightBoldFontColor(Color color) {
-    _lightBoldFontColour = color;
-    _savePreferences();
-    notifyListeners();
-  }
-
-  void setDarkIconColor(Color color) {
-    _darkIconColour = color;
-    _savePreferences();
-    notifyListeners();
-  }
-
-  void setLightIconColor(Color color) {
-    _lightIconColour = color;
+  void setIconColour(Color color) {
+    _isDarkMode() ? _darkIconColour = color : _lightIconColour = color;
     _savePreferences();
     notifyListeners();
   }
 
   void setBrightness(Brightness brightness) {
     _brightness = brightness;
+    _savePreferences();
+    notifyListeners();
+  }
+
+  void setTableBorderColour(Color color) {
+    _isDarkMode() ? _darkTableBorderColour = color : _lightTableBorderColour = color;
+    _savePreferences();
+    notifyListeners();
+  }
+
+  void resetDarkColors() {
+    _darkFontColour = AppTheme.defaultDarkFontColor;
+    _darkBoldFontColour = AppTheme.defaultDarkBoldFontColor;
+    _darkIconColour = AppTheme.defaultDarkIconColor;
+    _darkTableBorderColour = AppTheme.defaultDarkTableBorderColour;
+    _savePreferences();
+    notifyListeners();
+  }
+
+  void resetLightColors() {
+    _lightFontColour = AppTheme.defaultLightFontColor;
+    _lightBoldFontColour = AppTheme.defaultLightBoldFontColor;
+    _lightIconColour = AppTheme.defaultLightIconColor;
+    _lightTableBorderColour = AppTheme.defaultLightTableBorderColour;
     _savePreferences();
     notifyListeners();
   }
@@ -84,6 +94,8 @@ class ThemeProvider with ChangeNotifier {
     _darkIconColour = Color(prefs.getInt('darkIconColor') ?? AppTheme.defaultDarkIconColor.value);
     _lightIconColour = Color(prefs.getInt('lightIconColor') ?? AppTheme.defaultLightIconColor.value);
     _brightness = Brightness.values[prefs.getInt('brightness') ?? Brightness.light.index];
+    _lightTableBorderColour = Color(prefs.getInt('lightTableBorderColour') ?? AppTheme.defaultLightTableBorderColour.value);
+    _darkTableBorderColour = Color(prefs.getInt('darkTableBorderColour') ?? AppTheme.defaultDarkTableBorderColour.value);
     notifyListeners();
   }
 
@@ -96,5 +108,7 @@ class ThemeProvider with ChangeNotifier {
     prefs.setInt('darkIconColor', _darkIconColour.value);
     prefs.setInt('lightIconColor', _lightIconColour.value);
     prefs.setInt('brightness', _brightness.index);
+    prefs.setInt('lightTableBorderColour', _lightTableBorderColour.value);
+    prefs.setInt('darkTableBorderColour', _darkTableBorderColour.value);
   }
 }
