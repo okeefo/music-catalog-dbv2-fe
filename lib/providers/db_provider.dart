@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../services/db_service.dart';
 import '../utils/endpoints.dart';
+import '../providers/theme_provider.dart';
 import 'package:logging/logging.dart';
+import 'package:provider/provider.dart';
 
 class DbProvider with ChangeNotifier {
   final DbService _dbService = DbService();
@@ -35,7 +36,7 @@ class DbProvider with ChangeNotifier {
     try {
       _logger.info('Attempting to add database: $dbName');
       //TODO: the initialise method shouw check the version number and if the DB is valid before adding it to the list
-      final result = await _dbService.initialise(dbName, dbPath);
+      final result = await _dbService.createDatabase(dbName, dbPath);
 
       if (result['status'] == 'success') {
         databases.add({'Path': dbPath, 'Name': dbName});
@@ -58,15 +59,17 @@ class DbProvider with ChangeNotifier {
   }
 
   void _showPopup(BuildContext context, String title, String message) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: themeProvider.backgroundColour.withOpacity(1),
           title: Text(title),
           content: Text(message),
           actions: <Widget>[
             TextButton(
-              child: Text('OK'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
               },

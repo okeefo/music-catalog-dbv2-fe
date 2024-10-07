@@ -45,11 +45,7 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                     text: 'Bold Font Color',
                     color: themeProvider.boldFontColour,
                     onColorChanged: (color) {
-                      if (themeProvider.isDarkMode) {
-                        themeProvider.setDarkBoldFontColor(color);
-                      } else {
-                        themeProvider.setLightBoldFontColor(color);
-                      }
+                     themeProvider.setBoldFontColor(color);
                     },
                     isDarkMode: themeProvider.isDarkMode,
                     darkFontColor: themeProvider.darkFontColour,
@@ -60,11 +56,7 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                     text: 'Icon Color',
                     color: themeProvider.iconColour,
                     onColorChanged: (color) {
-                      if (themeProvider.isDarkMode) {
-                        themeProvider.setDarkIconColor(color);
-                      } else {
-                        themeProvider.setLightIconColor(color);
-                      }
+                      themeProvider.setIconColour(color);
                     },
                     isDarkMode: themeProvider.isDarkMode,
                     darkFontColor: themeProvider.darkFontColour,
@@ -75,11 +67,18 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                     text: 'Font Color',
                     color: themeProvider.fontColour,
                     onColorChanged: (color) {
-                      if (themeProvider.isDarkMode) {
-                        themeProvider.setDarkFontColor(color);
-                      } else {
-                        themeProvider.setLightFontColor(color);
-                      }
+                      themeProvider.setFontColour(color);
+                    },
+                    isDarkMode: themeProvider.isDarkMode,
+                    darkFontColor: themeProvider.darkFontColour,
+                    lightFontColor: themeProvider.lightFontColour,
+                  ),
+                  const SizedBox(height: 20),
+                  ColorPickerRow(
+                    text: 'Table Border Color',
+                    color: themeProvider.tableBorderColour,
+                    onColorChanged: (color) {
+                      themeProvider.setTableBorderColour(color);
                     },
                     isDarkMode: themeProvider.isDarkMode,
                     darkFontColor: themeProvider.darkFontColour,
@@ -89,13 +88,9 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                   Button(
                     onPressed: () {
                       if (themeProvider.isDarkMode) {
-                        themeProvider.setDarkBoldFontColor(AppTheme.defaultDarkBoldFontColor);
-                        themeProvider.setDarkIconColor(AppTheme.defaultDarkIconColor);
-                        themeProvider.setDarkFontColor(AppTheme.defaultDarkFontColor);
+                        themeProvider.resetDarkColors();
                       } else {
-                        themeProvider.setLightBoldFontColor(AppTheme.defaultLightBoldFontColor);
-                        themeProvider.setLightIconColor(AppTheme.defaultLightIconColor);
-                        themeProvider.setLightFontColor(AppTheme.defaultLightFontColor);
+                        themeProvider.resetLightColors();
                       }
                     },
                     child: Text(

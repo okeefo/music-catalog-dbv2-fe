@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
-import 'package:path/path.dart' as path;
 import '../utils/endpoints.dart';
 import 'package:logging/logging.dart';
 
@@ -21,7 +20,6 @@ class DbService {
       // Handle error appropriately
     }
   }
-
 
   Future<String?> fetchActiveDatabase() async {
     try {
@@ -67,17 +65,6 @@ class DbService {
     }
   }
 
-  Future<void> createDatabase(String dbName, String selectedDirectory) async {
-    try {
-      String dbPath = path.join(selectedDirectory, '$dbName.db');
-      await openDatabase(dbPath);
-      _logger.info('Database created at $dbPath');
-    } catch (e) {
-      _logger.severe('Error creating database: $e');
-      // Handle error appropriately
-    }
-  }
-
   Future<String?> pickDatabase() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -118,11 +105,10 @@ class DbService {
     return null;
   }
 
-  Future<Map<String, dynamic>> initialise(String dbName, String dbPath) async {
+  Future<Map<String, dynamic>> createDatabase(String dbName, String dbPath) async {
     try {
-      _logger.info('Initialising database: $dbName at $dbPath');
       Uri uri = Uri.parse(Endpoints.getInitialiseUri(dbName));
-      _logger.info('Initialising database: $uri');
+      _logger.info('Calling backed to create database: $uri');
       final response = await http
           .post(
         uri,

@@ -14,6 +14,7 @@ class DbConnectionsPage extends StatelessWidget {
     final Color fontColour = themeProvider.fontColour;
     final Color boldFontColour = themeProvider.boldFontColour;
     final Color iconColour = themeProvider.iconColour;
+    final Color borderColor = themeProvider.tableBorderColour;
 
     return ChangeNotifierProvider(
       create: (_) => DbProvider(),
@@ -38,7 +39,7 @@ class DbConnectionsPage extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Table(
-                    border: TableBorder.all(color: iconColour),
+                    border: TableBorder.all(color: borderColor),
                     columnWidths: const {
                       0: FlexColumnWidth(3),
                       1: FlexColumnWidth(2),
@@ -78,12 +79,12 @@ class DbConnectionsPage extends StatelessWidget {
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(db['Path']!, style: TextStyle(color: fontColour)),
+                              child: Text(db['Path']!, style: TextStyle(fontWeight: FontWeight.bold, color: fontColour)),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Center(
-                                child: Text(db['Name']!, style: TextStyle(color: fontColour)),
+                                child: Text(db['Name']!, style: TextStyle(fontWeight: FontWeight.bold, color: fontColour)),
                               ),
                             ),
                             Padding(
@@ -133,7 +134,7 @@ class DbConnectionsPage extends StatelessWidget {
                     Column(
                       children: [
                         IconButton(
-                          icon: const Icon(FluentIcons.add),
+                          icon: Icon(FluentIcons.add, color: themeProvider.iconColour),
                           onPressed: () async {
                             String? dbPath = await dbProvider.dbService.pickDatabase();
                             if (dbPath != null && context.mounted) {
@@ -143,14 +144,14 @@ class DbConnectionsPage extends StatelessWidget {
                           },
                         ),
                         const SizedBox(height: 4),
-                        const Text('Add'),
+                        Text('Add', style: TextStyle(color: fontColour)),
                       ],
                     ),
                     const SizedBox(width: 16),
                     Column(
                       children: [
                         IconButton(
-                            icon: const Icon(FluentIcons.database),
+                            icon: Icon(FluentIcons.database, color: themeProvider.iconColour),
                             onPressed: () async {
                               String? selectedDirectory = await dbProvider.dbService.createDatabasePrompt();
                               if (selectedDirectory != null && context.mounted) {
@@ -158,7 +159,7 @@ class DbConnectionsPage extends StatelessWidget {
                               }
                             }),
                         const SizedBox(height: 4),
-                        const Text('Create DB'),
+                        Text('Create DB', style: TextStyle(color: fontColour)),
                       ],
                     ),
                   ],
