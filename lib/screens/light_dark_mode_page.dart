@@ -31,7 +31,6 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                     checked: themeProvider.isDarkMode,
                     onChanged: (isDarkMode) {
                       themeProvider.setBrightness(isDarkMode ? Brightness.dark : Brightness.light);
-                      ;
                     },
                     content: Text(
                       themeProvider.isDarkMode ? 'Dark Mode' : 'Light Mode',

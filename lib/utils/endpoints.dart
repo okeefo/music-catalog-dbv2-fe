@@ -16,8 +16,7 @@ class Endpoints {
     return '$_baseUri/$_configUri';
   }
 
-  static String getInitialiseUri(String dbName) {
-    String uri = _initialiseUri.replaceAll('{dbName}', dbName);
-    return '$_baseUri/$uri';
+  static String postCreateDataBaseUri() {
+    return '$_baseUri/$_initialiseUri';
   }
 }

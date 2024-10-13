@@ -2,7 +2,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
-import '../utils/app_styles.dart';
 import '../providers/theme_provider.dart';
 
 class ColorPickerRow extends StatelessWidget {
