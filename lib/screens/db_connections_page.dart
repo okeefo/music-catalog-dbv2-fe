@@ -121,7 +121,7 @@ class DbConnectionsPage extends StatelessWidget {
                             ),
                           ],
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
                 ),

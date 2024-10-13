@@ -95,6 +95,10 @@ class DbService {
       );
 
       if (result != null) {
+        //if doesn't end with the file extension .db then add it
+        if (!result.endsWith('.db')) {
+          result = '$result.db';
+        }
         _logger.info('Database save path selected: $result');
         return result;
       }
@@ -107,7 +111,7 @@ class DbService {
 
   Future<Map<String, dynamic>> createDatabase(String dbName, String dbPath) async {
     try {
-      Uri uri = Uri.parse(Endpoints.getInitialiseUri(dbName));
+      Uri uri = Uri.parse(Endpoints.postCreateDataBaseUri());
       _logger.info('Calling backed to create database: $uri');
       final response = await http
           .post(

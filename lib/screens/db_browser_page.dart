@@ -1,7 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:front_end/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
-import '../utils/app_styles.dart';
 
 class DbBrowserPage extends StatelessWidget {
   const DbBrowserPage({
