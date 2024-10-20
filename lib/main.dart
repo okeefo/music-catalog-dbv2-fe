@@ -5,11 +5,12 @@ import 'screens/home_screen.dart';
 import 'utils/config.dart';
 import 'utils/endpoints.dart';
 import 'providers/theme_provider.dart';
+import 'providers/db_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-    // Configure the logger
+  // Configure the logger
   _setupLogging();
 
   // Load the configuration
@@ -33,8 +34,6 @@ void customLogHandler(LogRecord record) {
   print('${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}');
 }
 
-
-
 class MyApp extends StatefulWidget {
   final Config config;
   const MyApp({super.key, required this.config});
@@ -48,8 +47,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => DbProvider()),
+      ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
           return FluentApp(
@@ -62,8 +64,8 @@ class _MyAppState extends State<MyApp> {
             ),
             home: HomeScreen(
               onThemeChanged: (value) {
-                print("home sceen theme changed - $value");
-                themeProvider.setBrightness(value? Brightness.dark : Brightness.light);
+                print("home screen theme changed - $value");
+                themeProvider.setBrightness(value ? Brightness.dark : Brightness.light);
               },
             ),
           );
