@@ -3,6 +3,8 @@ class Endpoints {
   static const String _activeDatabaseUri = 'databases/active';
   static const String _configUri = 'config';
   static const String _initialiseUri = 'databases';
+  static const String _mediaScanUri = 'media/scan';
+
 
   static void initialize(String baseUri) {
     _baseUri = baseUri;
@@ -18,5 +20,9 @@ class Endpoints {
 
   static String postCreateDataBaseUri() {
     return '$_baseUri/$_initialiseUri';
+  }
+
+  static String scanForMusicUri() {
+    return '$_baseUri/$_mediaScanUri';
   }
 }

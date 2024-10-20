@@ -152,4 +152,22 @@ class DbService {
       };
     }
   }
+
+  Future<http.Response> scanForMusic(String directoryPath) async {
+    Uri uri = Uri.parse(Endpoints.scanForMusicUri());
+    String body = jsonEncode({'path': directoryPath});
+
+    _logger.info('CAlling backend to scan for music files: $uri, $body');
+    final response = await http.post(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: body,
+    );
+    if (response.statusCode == 200) {
+      _logger.info('Music file scan adn DB updated successfully initiated');
+    } else {
+      _logger.severe('Failed to initiate scan for music files: ${response.body}');
+    }
+    return response;
+  }
 }
