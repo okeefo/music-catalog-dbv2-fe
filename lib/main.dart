@@ -54,6 +54,7 @@ class _MyAppState extends State<MyApp> {
         builder: (context, themeProvider, child) {
           return FluentApp(
             title: 'Fluent UI App',
+            debugShowCheckedModeBanner: false,
             theme: FluentThemeData(
               brightness: themeProvider.brightness,
               accentColor: Colors.blue,
