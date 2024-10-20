@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:logging/logging.dart';
+import 'package:window_manager/window_manager.dart';
 import 'screens/home_screen.dart';
 import 'utils/config.dart';
 import 'utils/endpoints.dart';
@@ -9,6 +10,14 @@ import 'providers/db_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize window manager
+  await windowManager.ensureInitialized();
+
+  // Set the window title
+  windowManager.setTitle('Music DB Killer');
+  windowManager.setIcon('assets/headphones.ico');
+  windowManager.setTitleBarStyle(TitleBarStyle.normal);
 
   // Configure the logger
   _setupLogging();
