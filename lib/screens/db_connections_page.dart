@@ -13,7 +13,6 @@ class DbConnectionsPage extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final Color fontColour = themeProvider.fontColour;
     final Color boldFontColour = themeProvider.boldFontColour;
-    final Color iconColour = themeProvider.iconColour;
     final Color borderColor = themeProvider.tableBorderColour;
 
     return Consumer<DbProvider>(

@@ -1,23 +1,47 @@
-import 'dart:developer';
-
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:front_end/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:web_socket_channel/status.dart' as status;
 import '../providers/db_provider.dart';
-import '../utils/endpoints.dart';
 import '../services/db_service.dart';
 
-class DbBrowserPage extends StatelessWidget {
+class DbBrowserPage extends StatefulWidget {
   const DbBrowserPage({
     super.key,
   });
 
+  @override
+  DbBrowserPageState createState() => DbBrowserPageState();
+}
+
+class DbBrowserPageState extends State<DbBrowserPage> {
+  WebSocketChannel? _channel;
+  final List<String> _statusUpdates = [];
+
+  @override
+  void dispose() {
+    _channel?.sink.close(status.goingAway);
+    super.dispose();
+  }
+
   Future<void> _scanForMusic(BuildContext context) async {
     String? directoryPath = await FilePicker.platform.getDirectoryPath();
     if (directoryPath != null) {
+      // Establish WebSocket connection if it doesn't exist
+      if (_channel == null) {
+        _channel = WebSocketChannel.connect(
+          Uri.parse('ws://localhost:8080/ws'),
+        );
+
+        _channel!.stream.listen((message) {
+          setState(() {
+            _statusUpdates.add(message.toString());
+          });
+        });
+      }
+
       // Make a REST call to the backend to perform the scan
       final dbService = DbService();
       final response = await dbService.scanForMusic(directoryPath);
@@ -27,8 +51,8 @@ class DbBrowserPage extends StatelessWidget {
         showDialog(
           context: context,
           builder: (context) => ContentDialog(
-            title: const Text('Scan Complete'),
-            content: const Text('The music files have been successfully scanned and added to the database.'),
+            title: const Text('Scan Initiated'),
+            content: const Text('Scanning successfully initiated.'),
             actions: [
               Button(
                 child: const Text('OK'),
@@ -43,7 +67,7 @@ class DbBrowserPage extends StatelessWidget {
           context: context,
           builder: (context) => ContentDialog(
             title: const Text('Error'),
-            content: Text('Failed to scan music files: ${response.body}'),
+            content: Text('Failed to initiate scan: ${response.body}'),
             actions: [
               Button(
                 child: const Text('OK'),
@@ -136,6 +160,16 @@ class DbBrowserPage extends StatelessWidget {
       content: Center(
         child: Text(
           'DB Browser Content',
+          style: TextStyle(
+            color: themeProvider.fontColour,
+          ),
+        ),
+      ),
+      bottomBar: Container(
+        padding: const EdgeInsets.all(8.0),
+        color: themeProvider.backgroundColour,
+        child: Text(
+          _statusUpdates.isNotEmpty ? _statusUpdates.last : 'No updates yet',
           style: TextStyle(
             color: themeProvider.fontColour,
           ),
