@@ -9,6 +9,11 @@ class AppTheme {
   static const double defaultTextSize = 16.0;
   static const double titleTextSize = 24.0;
 
+    //Default Icon Size
+  static const double iconSizeSmall = 8.0;
+  static const double iconSizeMedium = 16.0;
+  static const double iconSizeLarge = 24.0;
+
   // Default colour theme
   static const Color darkBackground = Color(0xff1e1e1e);
   static const Color lightBackground = Color(0xffffffff);
