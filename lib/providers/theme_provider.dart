@@ -33,6 +33,10 @@ class ThemeProvider with ChangeNotifier {
   Color get lightIconColour => _lightIconColour;
   bool get isDarkMode => _brightness == Brightness.dark;
 
+  double  get iconSize => AppTheme.iconSizeSmall;
+  double get  iconSizeMedium => AppTheme.iconSizeMedium;
+  double get  iconSizeLarge => AppTheme.iconSizeLarge;
+
   bool _isDarkMode() {
     return _brightness == Brightness.dark;
   }
@@ -111,4 +115,5 @@ class ThemeProvider with ChangeNotifier {
     prefs.setInt('lightTableBorderColour', _lightTableBorderColour.value);
     prefs.setInt('darkTableBorderColour', _darkTableBorderColour.value);
   }
+
 }

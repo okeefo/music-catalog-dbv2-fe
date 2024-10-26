@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:front_end/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -28,6 +29,8 @@ class DbBrowserPageState extends State<DbBrowserPage> {
 
   Future<void> _scanForMusic(BuildContext context) async {
     String? directoryPath = await FilePicker.platform.getDirectoryPath();
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+
     if (directoryPath != null) {
       // Establish WebSocket connection if it doesn't exist
       if (_channel == null) {
@@ -36,9 +39,61 @@ class DbBrowserPageState extends State<DbBrowserPage> {
         );
 
         _channel!.stream.listen((message) {
-          setState(() {
-            _statusUpdates.add(message.toString());
-          });
+          final decodedMessage = jsonDecode(message);
+          final code = decodedMessage['code'];
+          final msg = decodedMessage['message'];
+
+          if (code == 'UPDATE') {
+            setState(() {
+              _statusUpdates.add(msg);
+            });
+          } else if (code == 'INFO') {
+            setState(() {
+              _statusUpdates.add(msg.replaceAll('\n', ' - '));
+            });
+            showDialog(
+              context: context,
+              builder: (context) => ContentDialog(
+                title: Row(
+                  children: [
+                    Icon(FluentIcons.info, color: themeProvider.iconColour, size: themeProvider.iconSizeLarge),
+                    const SizedBox(width: 8),
+                    const Text('Scan Completed'),
+                  ],
+                ),
+                content: Text(msg),
+                actions: [
+                  Button(
+                    child: const Text('OK'),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            );
+          } else if (code == 'ERROR') {
+            setState(() {
+              _statusUpdates.add(msg.replaceAll('\n', ' - '));
+            });
+            showDialog(
+              context: context,
+              builder: (context) => ContentDialog(
+                title: Row(
+                  children: [
+                    Icon(FluentIcons.error, color: themeProvider.iconColour, size: themeProvider.iconSizeLarge),
+                    const SizedBox(width: 8),
+                    const Text('Error'),
+                  ],
+                ),
+                content: Text(msg),
+                actions: [
+                  Button(
+                    child: const Text('OK'),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            );
+          }
         });
       }
 
@@ -51,7 +106,13 @@ class DbBrowserPageState extends State<DbBrowserPage> {
         showDialog(
           context: context,
           builder: (context) => ContentDialog(
-            title: const Text('Scan Initiated'),
+            title: Row(
+              children: [
+                Icon(FluentIcons.accept, color: themeProvider.iconColour, size: themeProvider.iconSizeLarge),
+                const SizedBox(width: 8),
+                const Text('Scan Initiated'),
+              ],
+            ),
             content: const Text('Scanning successfully initiated.'),
             actions: [
               Button(
@@ -66,7 +127,13 @@ class DbBrowserPageState extends State<DbBrowserPage> {
         showDialog(
           context: context,
           builder: (context) => ContentDialog(
-            title: const Text('Error'),
+            title: Row(
+              children: [
+                Icon(FluentIcons.error, color: themeProvider.iconColour, size: themeProvider.iconSizeLarge),
+                const SizedBox(width: 8),
+                const Text('Error'),
+              ],
+            ),
             content: Text('Failed to initiate scan: ${response.body}'),
             actions: [
               Button(
@@ -128,7 +195,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                       Tooltip(
                         message: 'Scan for music',
                         child: IconButton(
-                          icon: const Icon(FluentIcons.music_in_collection_fill),
+                          icon: Icon(FluentIcons.music_in_collection_fill, size: themeProvider.iconSizeLarge),
                           onPressed: () => _scanForMusic(context),
                         ),
                       ),
