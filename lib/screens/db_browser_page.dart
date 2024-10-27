@@ -101,28 +101,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
       final dbService = DbService();
       final response = await dbService.scanForMusic(directoryPath);
 
-      if (response.statusCode == 200) {
-        // Handle success
-        showDialog(
-          context: context,
-          builder: (context) => ContentDialog(
-            title: Row(
-              children: [
-                Icon(FluentIcons.accept, color: themeProvider.iconColour, size: themeProvider.iconSizeLarge),
-                const SizedBox(width: 8),
-                const Text('Scan Initiated'),
-              ],
-            ),
-            content: const Text('Scanning successfully initiated.'),
-            actions: [
-              Button(
-                child: const Text('OK'),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
-          ),
-        );
-      } else {
+      if (response.statusCode != 200) {
         // Handle error
         showDialog(
           context: context,
