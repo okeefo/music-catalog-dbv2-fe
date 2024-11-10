@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' as material;
 import 'track_model.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'resizable_table.dart';
 
 class TrackTable extends StatelessWidget {
   final List<Track> tracks;
@@ -14,73 +15,71 @@ class TrackTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const rowStyle = material.TextStyle(fontWeight: material.FontWeight.w300, fontFamily: 'JetBrainsMono Nerd Font', fontSize: 11);
-    const headerStyle = material.TextStyle(fontWeight: material.FontWeight.bold, fontFamily: 'JetBrainsMono Nerd Font', fontSize: 12);
+    const rowStyle = material.TextStyle(fontWeight: material.FontWeight.w300,
+        fontFamily: 'JetBrainsMono Nerd Font',
+        fontSize: 11);
+    const headerStyle = material.TextStyle(fontWeight: material.FontWeight.bold,
+        fontFamily: 'JetBrainsMono Nerd Font',
+        fontSize: 12);
 
     return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-
-        child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-                controller: scrollController,
-
-                child: material.DataTable(
-                  dividerThickness: 0.1,
-                  columnSpacing: 40,
-                  headingRowHeight: 40,
-                  dataRowMaxHeight: 30,
-                  dataRowMinHeight: 20,
-                  columns: _getHeader(headerStyle),
-                  rows: _getRowData(rowStyle),
-
-                )));
-  }
-
-  List<material.DataRow> _getRowData(material.TextStyle textStyle) {
-    return tracks.map((track) {
-      return material.DataRow(cells: [
-        material.DataCell(
-          Text(track.id.toString(), style: textStyle),
+        child: ResizableTable(
+          headers: _getHeaders(),
+          data: _getData(),
+          rowStyle: rowStyle,
+          headerStyle: headerStyle,
         ),
-        material.DataCell(Text(track.catalogNumber, style: textStyle)),
-        material.DataCell(Text(track.label, style: textStyle)),
-        material.DataCell(Text(track.albumTitle, style: textStyle)),
-        material.DataCell(Text(track.discNumber, style: textStyle)),
-        material.DataCell(Text(track.artist, style: textStyle)),
-        material.DataCell(Text(track.title, style: textStyle)),
-        material.DataCell(Text(track.format, style: textStyle)),
-        material.DataCell(Text(track.trackNumber, style: textStyle)),
-        material.DataCell(Text(track.discogsId, style: textStyle)),
-        material.DataCell(Text(track.year, style: textStyle)),
-        material.DataCell(Text(track.country, style: textStyle)),
-        material.DataCell(Text(track.discogsUrl, style: textStyle)),
-        material.DataCell(Text(track.albumArtist, style: textStyle)),
-        material.DataCell(Text(track.fileLocation, style: textStyle)),
-        material.DataCell(Text(track.style, style: textStyle)),
-        material.DataCell(Text(track.genre, style: textStyle)),
-      ]);
-    }).toList();
+      ),
+    );
   }
 
-  List<material.DataColumn> _getHeader(material.TextStyle headerStyle) {
+  List<String> _getHeaders() {
     return [
-      material.DataColumn(label: Text(TrackColumns.trackId, style: headerStyle), numeric: true),
-      material.DataColumn(label: Text(TrackColumns.catalogNumber, style: headerStyle)),
-      material.DataColumn(label: Text(TrackColumns.label, style: headerStyle, overflow: TextOverflow.ellipsis)),
-      material.DataColumn(label: Text(TrackColumns.albumTitle, style: headerStyle, overflow: TextOverflow.visible)),
-      material.DataColumn(label: Text(TrackColumns.discNumber, style: headerStyle)),
-      material.DataColumn(label: Text(TrackColumns.artist, style: headerStyle)),
-      material.DataColumn(label: Text(TrackColumns.title, style: headerStyle, overflow: TextOverflow.ellipsis)),
-      material.DataColumn(label: Text(TrackColumns.format, style: headerStyle)),
-      material.DataColumn(label: Text(TrackColumns.trackNumber, style: headerStyle), numeric: true),
-      material.DataColumn(label: Text(TrackColumns.discogsId, style: headerStyle)),
-      material.DataColumn(label: Text(TrackColumns.year, style: headerStyle)),
-      material.DataColumn(label: Text(TrackColumns.country, style: headerStyle)),
-      material.DataColumn(label: Text(TrackColumns.discogsUrl, style: headerStyle)),
-      material.DataColumn(label: Text(TrackColumns.albumArtist, style: headerStyle)),
-      material.DataColumn(label: Text(TrackColumns.fileLocation, style: headerStyle)),
-      material.DataColumn(label: Text(TrackColumns.style, style: headerStyle)),
-      material.DataColumn(label: Text(TrackColumns.genre, style: headerStyle)),
+      TrackColumns.trackId,
+      TrackColumns.catalogNumber,
+      TrackColumns.label,
+      TrackColumns.albumTitle,
+      TrackColumns.discNumber,
+      TrackColumns.artist,
+      TrackColumns.title,
+      TrackColumns.format,
+      TrackColumns.trackNumber,
+      TrackColumns.discogsId,
+      TrackColumns.year,
+      TrackColumns.country,
+      TrackColumns.discogsUrl,
+      TrackColumns.albumArtist,
+      TrackColumns.fileLocation,
+      TrackColumns.style,
+      TrackColumns.genre,
     ];
   }
+
+  List<List<String>> _getData() {
+    return tracks.map((track) {
+      return [
+        track.id.toString(),
+        track.catalogNumber,
+        track.label,
+        track.albumTitle,
+        track.discNumber,
+        track.artist,
+        track.title,
+        track.format,
+        track.trackNumber,
+        track.discogsId,
+        track.year,
+        track.country,
+        track.discogsUrl,
+        track.albumArtist,
+        track.fileLocation,
+        track.style,
+        track.genre,
+      ];
+    }).toList();
+  }
 }
+
