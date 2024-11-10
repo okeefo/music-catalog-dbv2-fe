@@ -157,7 +157,7 @@ class DbService {
     Uri uri = Uri.parse(Endpoints.scanForMusicUri());
     String body = jsonEncode({'path': directoryPath});
 
-    _logger.info('CAlling backend to scan for music files: $uri, $body');
+    _logger.info('Calling backend to scan for music files: $uri, $body');
     final response = await http.post(
       uri,
       headers: {'Content-Type': 'application/json'},
@@ -169,5 +169,31 @@ class DbService {
       _logger.severe('Failed to initiate scan for music files: ${response.body}');
     }
     return response;
+  }
+
+  Future<http.Response> getTracks(int offset, int limit, {String? searchTerm, String? searchFields}) async {
+    
+    Uri uri = Uri.parse(Endpoints.getTracksUri()).replace(
+      queryParameters: {
+        'searchTerm': searchTerm ?? '',
+        'searchFields': searchFields ?? '',
+        'offset': offset.toString(),
+        'limit': limit.toString(),
+      },
+    );
+
+    _logger.info('Calling backend to get tracks: $uri');
+    // time the call for the backend response
+    final stopwatch = Stopwatch()..start();
+    final response = await http.get(uri);
+    stopwatch.stop();
+
+    if (response.statusCode == 200) {
+       _logger.info('retrieve tracks took: ${stopwatch.elapsedMilliseconds}ms');  
+      return response;
+    } else {
+      _logger.severe('Failed to get tracks: ${response.body}');
+      throw Exception('Failed to load tracks');
+    }
   }
 }

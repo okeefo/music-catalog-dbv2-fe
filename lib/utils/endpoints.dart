@@ -4,7 +4,7 @@ class Endpoints {
   static const String _configUri = 'config';
   static const String _initialiseUri = 'databases';
   static const String _mediaScanUri = 'media/scan';
-
+  static const String _tracks = 'tracks';
 
   static void initialize(String baseUri) {
     _baseUri = baseUri;
@@ -24,5 +24,9 @@ class Endpoints {
 
   static String scanForMusicUri() {
     return '$_baseUri/$_mediaScanUri';
+  }
+
+  static String getTracksUri() {
+    return '$_baseUri/$_tracks';
   }
 }
