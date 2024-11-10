@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 import 'settings_page.dart';
 import 'navigation_items.dart';
-import 'db_browser_page.dart';
+import 'db-browser/db_browser_page.dart';
 import 'db_connections_page.dart';
 import 'light_dark_mode_page.dart';
 
