@@ -50,9 +50,9 @@ Here are some of the features currently in development, along with a TODO list o
 
 ### Part 1: Music Catalog Management (https://github.com/okeefo/music-catalogue)
 
-A Python and Qt-based application for managing music files on the filesystem, with two primary functions:
+A Python and QT-based application for managing music files on the filesystem, with two primary functions:
 - **Track Splitting and Tagging:** Takes a vinyl record recording file, splits it into individual tracks, and tags each track with information from Discogs (title, artist, genre, etc.).
-- **File System Browser:** Features dual tree views for easy file movement and copying, with options to retag or play files. Uses Mp3TagEditor for in-depth tag editing.
+- **File System Browser:** Features dual tree views for easy file movement and copying, with options to re tag or play files. Uses Mp3TagEditor for in-depth tag editing.
 
 ### Part 2: Backend Music Catalog Database (https://github.com/okeefo/music-catalog-dbv2-be)
 
@@ -63,32 +63,32 @@ A Golang and MySQL-based web service designed to handle music catalog management
 --- 
 
 
-My TODO LIST - 
+My TODO LIST
 
-TODO: BugFix - infinte scrolling
-TODO: BugFix - streaming update while scanning not working
-TODO: Imporvement - when clicking to another page - table - re-renders
-TODO: Improvement - allow data froma table to be coppied to clipboard - either a cell or entire row, or entire table??
-TODO: improve styling
-TODO: Show the hyperlink address when hovering over the Release Id cell
-TODO: Hide the ID column replace with row number
-TODO: replace MP3/WAV/FLAC with icons
-TODO: Do add total number of records summary
-TODO: Hide file location and hyper link from title cell
-TODO: Add a filter to show only MP3/WAV/FLAC
-TODO: Add album art
-TODO: add column show/hide selector
-TODO: Add column sort
-TODO: Add a search bar
-TODO: add a tree view to list by artist/album/label
-TODO: When selecting a folder in the treeview show the tracks in the main view
-TODO: Add a stereo bar to load tracks, show progress, with a playlist button
-TODO: Show wave file in stereo bar - and be able to click on it to jump to that part of the track
-TODO: Add volume control to stereo bar
-TODO: Add a stop button to stereo bar
-TODO: Add a pause button to stereo bar
-TODO: Add a next track button to stereo bar
-TODO: the initialise method shouw check the version number and if the DB is valid before adding it to the list
+<br>//TODO: BugFix - infinite scrolling
+<br>//TODO: BugFix - streaming update while scanning not working
+<br>//TODO: Improvement - when clicking to another page - table - re-renders
+<br>//TODO: Improvement - allow data from a table to be copied to the clipboard - either a cell or entire row, or entire table??
+<br>//TODO: improve styling
+<br>//TODO: Show the hyperlink address when hovering over the Release Id cell
+<br>//TODO: Hide the ID column replace with row number
+<br>//TODO: replace MP3/WAV/FLAC with icons
+<br>//TODO: Do add total number of records summary
+<br>//TODO: Hide file location and hyper link from title cell
+<br>//TODO: Add a filter to show only MP3/WAV/FLAC
+<br>//TODO: Add album art
+<br>//TODO: add column show/hide selector
+<br>//TODO: Add column sort
+<br>//TODO: Add a search bar
+<br>//TODO: add a tree view to list by artist/album/label
+<br>//TODO: When selecting a folder in the tree-view show the tracks in the main view
+<br>//TODO: Add a stereo bar to load tracks, show progress, with a playlist button
+<br>//TODO: Show wave file in stereo bar - and be able to click on it to jump to that part of the track
+<br>//TODO: Add volume control to stereo bar
+<br>//TODO: Add a stop button to stereo bar
+<br>//TODO: Add a pause button to stereo bar
+<br>//TODO: Add a next track button to stereo bar
+<br>//TODO: the initialise method show check the version number and if the DB is valid before adding it to the list
 
 
 

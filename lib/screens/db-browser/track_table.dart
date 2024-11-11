@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart' as material;
+import 'package:provider/provider.dart';
 import 'track_model.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'resizable_table.dart';
+import 'package:front_end/providers/theme_provider.dart';
 
 class TrackTable extends StatelessWidget {
   final List<Track> tracks;
@@ -15,8 +17,20 @@ class TrackTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const rowStyle = material.TextStyle(fontWeight: material.FontWeight.w300, fontFamily: 'JetBrainsMono Nerd Font', fontSize: 11);
-    const headerStyle = material.TextStyle(fontWeight: material.FontWeight.bold, fontFamily: 'JetBrainsMono Nerd Font', fontSize: 12);
+    final theme = Provider.of<ThemeProvider>(context);
+
+    final rowStyle = material.TextStyle(
+      fontWeight: theme.dataTableFontWeightNormal, 
+      fontFamily: theme.fontStyleDataTable, 
+      fontSize: theme.fontSizeDataTableRow,
+      color: theme.fontColour,);
+    
+    final headerStyle = material.TextStyle(
+      fontWeight: theme.dataTableFontWeightBold,
+      fontFamily: theme.fontStyleDataTable,
+      fontSize: theme.fontSizeDataTableHeader,
+      color: theme.boldFontColour,
+    );
 
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
@@ -34,10 +48,6 @@ class TrackTable extends StatelessWidget {
 
   List<TrackColumn> _getHeaders() {
     return TrackColumns.getAllColumnsByIndex();
-  }
-
-  List<String> _getHeadersOrig() {
-    return TrackColumns.getAllColumnsByIndex().map((column) => column.name).toList();
   }
 
   List<List<String>> _getData() {
