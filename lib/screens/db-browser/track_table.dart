@@ -15,12 +15,8 @@ class TrackTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const rowStyle = material.TextStyle(fontWeight: material.FontWeight.w300,
-        fontFamily: 'JetBrainsMono Nerd Font',
-        fontSize: 11);
-    const headerStyle = material.TextStyle(fontWeight: material.FontWeight.bold,
-        fontFamily: 'JetBrainsMono Nerd Font',
-        fontSize: 12);
+    const rowStyle = material.TextStyle(fontWeight: material.FontWeight.w300, fontFamily: 'JetBrainsMono Nerd Font', fontSize: 11);
+    const headerStyle = material.TextStyle(fontWeight: material.FontWeight.bold, fontFamily: 'JetBrainsMono Nerd Font', fontSize: 12);
 
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
@@ -36,50 +32,18 @@ class TrackTable extends StatelessWidget {
     );
   }
 
-  List<String> _getHeaders() {
-    return [
-      TrackColumns.trackId,
-      TrackColumns.catalogNumber,
-      TrackColumns.label,
-      TrackColumns.albumTitle,
-      TrackColumns.discNumber,
-      TrackColumns.artist,
-      TrackColumns.title,
-      TrackColumns.format,
-      TrackColumns.trackNumber,
-      TrackColumns.discogsId,
-      TrackColumns.year,
-      TrackColumns.country,
-      TrackColumns.discogsUrl,
-      TrackColumns.albumArtist,
-      TrackColumns.fileLocation,
-      TrackColumns.style,
-      TrackColumns.genre,
-    ];
+  List<TrackColumn> _getHeaders() {
+    return TrackColumns.getAllColumnsByIndex();
+  }
+
+  List<String> _getHeadersOrig() {
+    return TrackColumns.getAllColumnsByIndex().map((column) => column.name).toList();
   }
 
   List<List<String>> _getData() {
+    List<TrackColumn> columnOrder = TrackColumns.getAllColumnsByIndex();
     return tracks.map((track) {
-      return [
-        track.id.toString(),
-        track.catalogNumber,
-        track.label,
-        track.albumTitle,
-        track.discNumber,
-        track.artist,
-        track.title,
-        track.format,
-        track.trackNumber,
-        track.discogsId,
-        track.year,
-        track.country,
-        track.discogsUrl,
-        track.albumArtist,
-        track.fileLocation,
-        track.style,
-        track.genre,
-      ];
+      return track.toList(columnOrder).map((item) => item.toString()).toList();
     }).toList();
   }
 }
-
