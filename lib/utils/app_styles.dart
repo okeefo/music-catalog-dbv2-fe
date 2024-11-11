@@ -9,7 +9,16 @@ class AppTheme {
   static const double defaultTextSize = 16.0;
   static const double titleTextSize = 24.0;
 
-    //Default Icon Size
+  //Default DataTable font
+  static const String dataTableFontFamily = 'JetBrainsMono Nerd Font';
+  static const double dataTableFontHeaderSize = 12.0;
+  static const double dataTableFontRowSize = 11.0;
+  static const FontWeight dataTableFontWeight = FontWeight.w300;
+  static const FontWeight dataTableFontWeightThin = FontWeight.w200;
+  static const FontWeight dataTableFontWeightBold = FontWeight.bold;
+  static const FontWeight dataTableFontWeightNormal = FontWeight.normal;
+
+  //Default Icon Size
   static const double iconSizeSmall = 8.0;
   static const double iconSizeMedium = 16.0;
   static const double iconSizeLarge = 24.0;

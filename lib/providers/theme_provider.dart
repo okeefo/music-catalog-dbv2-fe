@@ -33,9 +33,18 @@ class ThemeProvider with ChangeNotifier {
   Color get lightIconColour => _lightIconColour;
   bool get isDarkMode => _brightness == Brightness.dark;
 
-  double  get iconSize => AppTheme.iconSizeSmall;
-  double get  iconSizeMedium => AppTheme.iconSizeMedium;
-  double get  iconSizeLarge => AppTheme.iconSizeLarge;
+  double get iconSize => AppTheme.iconSizeSmall;
+  double get iconSizeMedium => AppTheme.iconSizeMedium;
+  double get iconSizeLarge => AppTheme.iconSizeLarge;
+
+  // Data Table Font
+  String get fontStyleDataTable => AppTheme.dataTableFontFamily;
+  double get fontSizeDataTableHeader => AppTheme.dataTableFontHeaderSize;
+  double get fontSizeDataTableRow => AppTheme.dataTableFontRowSize;
+  FontWeight get dataTableFontWeight => AppTheme.dataTableFontWeight;
+  FontWeight get dataTableFontWeightThin => AppTheme.dataTableFontWeightThin;
+  FontWeight get dataTableFontWeightBold => AppTheme.dataTableFontWeightBold;
+  FontWeight get dataTableFontWeightNormal => AppTheme.dataTableFontWeightNormal;
 
   bool _isDarkMode() {
     return _brightness == Brightness.dark;
@@ -115,5 +124,4 @@ class ThemeProvider with ChangeNotifier {
     prefs.setInt('lightTableBorderColour', _lightTableBorderColour.value);
     prefs.setInt('darkTableBorderColour', _darkTableBorderColour.value);
   }
-
 }
