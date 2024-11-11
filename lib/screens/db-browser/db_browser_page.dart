@@ -11,8 +11,9 @@ import 'package:web_socket_channel/status.dart' as status;
 import 'package:logging/logging.dart';
 
 //TODO: BugFix - infinte scrolling
+//TODO: BugFix - streaming update while scanning not working
 //TODO: Imporvement - when clicking to another page - table - re-renders
-//TODO: BugFix - missing tack data on some tracks but the data is there
+//TODO: Improvement - allow data froma table to be coppied to clipboard - either a cell or entire row, or entire table??
 //TODO: improve styling
 //TODO: Show the hyperlink address when hovering over the Release Id cell
 //TODO: Hide the ID column replace with row number
