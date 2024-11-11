@@ -35,7 +35,7 @@ class DbProvider with ChangeNotifier {
   Future<void> addDatabase(BuildContext context, String dbPath, String dbName) async {
     try {
       _logger.info("Attempting to add database: name='$dbName' path='$dbPath'");
-      //TODO: the initialise method shouw check the version number and if the DB is valid before adding it to the list
+      
       final result = await _dbService.createDatabase(dbName, dbPath);
 
       if (result['status'] == 'success') {
