@@ -18,7 +18,6 @@ class DbBrowserPage extends StatefulWidget {
 }
 
 class DbBrowserPageState extends State<DbBrowserPage> {
-
   WebSocketChannel? _channel;
   final List<String> _statusUpdates = [];
   final List<String> _selectedFilters = [];
@@ -29,11 +28,12 @@ class DbBrowserPageState extends State<DbBrowserPage> {
 
   bool _isLoading = false;
   int _offset = 0;
-  final int _limit = 30;
+  final int _limit = 24;
+  int _totalTracks = 0;
 
   @override
   void initState() {
-    _logger.info("initstate"  );
+    _logger.info("initstate");
     super.initState();
     _loadTracks();
 
@@ -52,7 +52,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   }
 
   Future<void> _loadTracks() async {
-    _logger.info("loading tracks"  );
+    _logger.info("loading tracks");
     setState(() {
       _isLoading = true;
       _offset = 0;
@@ -60,13 +60,15 @@ class DbBrowserPageState extends State<DbBrowserPage> {
     });
 
     try {
-      final newTracks = await TrackService.fetchTracks(_offset, _limit);
-      _logger.info("loaded ${newTracks.length} tracks"  );
+      final trackQueryResponse = await TrackService.fetchTracks(_offset, _limit);
+      final newTracks = trackQueryResponse.tracks;
+      _totalTracks = trackQueryResponse.totalTracks;
+
+      _logger.info("loaded ${newTracks.length} tracks, total tracks: $_totalTracks");
       setState(() {
         _tracks.addAll(newTracks);
         _offset += _limit;
       });
-
     } catch (e) {
       _logger.severe("Failed to fetch tracks: $e");
     } finally {
@@ -77,20 +79,36 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   }
 
   Future<void> _loadMoreTracks() async {
-    if (_isLoading) return;
-    _logger.info("loading more tracks"  );
+    if (_isLoading) {
+      _logger.info("Still loading more tracks skipping");
+      return;
+    }
+
+    if (_offset >= _totalTracks) {
+      _logger.info("No more tracks to load offset: $_offset total: $_totalTracks");
+      return;
+    }
+
+    _logger.info("loading more tracks");
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final newTracks = await TrackService.fetchTracks(_offset, _limit);
-      _logger.info("loaded ${newTracks.length} more tracks"  );
+      final trackQueryResponse = await TrackService.fetchTracks(_offset, _limit);
+      final newTracks = trackQueryResponse.tracks;
+      _totalTracks = trackQueryResponse.totalTracks;
+
       setState(() {
         _tracks.addAll(newTracks);
         _offset += _limit;
+        if (_offset > _totalTracks) {
+          _offset = _totalTracks;
+        }
       });
+
+      _logger.info("loaded ${newTracks.length} more tracks, loaded  ${_tracks.length} of $_totalTracks");
     } catch (e) {
       _logger.severe("Failed to fetch tracks: $e");
     } finally {
@@ -231,7 +249,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                     flex: 10,
                     child: Align(
                       alignment: Alignment.topCenter,
-                        child: TrackTable(
+                      child: TrackTable(
                         tracks: _tracks,
                         scrollController: _scrollController,
                       ),

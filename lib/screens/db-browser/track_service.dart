@@ -8,14 +8,13 @@ import 'track_model.dart';
 import '../../services/db_service.dart';
 
 class TrackService {
-  static Future<List<Track>> fetchTracks(int offset, int limit) async {
-
+  static Future<TrackQueryResponse> fetchTracks(int offset, int limit) async {
     final dbService = DbService();
     final response = await dbService.getTracks(offset, limit);
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      return data.map((track) => Track.fromJson(track)).toList();
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return TrackQueryResponse.fromJson(data);
     } else {
       throw Exception('Failed to load tracks');
     }

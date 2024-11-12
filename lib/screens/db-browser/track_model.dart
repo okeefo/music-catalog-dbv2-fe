@@ -163,3 +163,29 @@ class TrackColumn {
     );
   }
 }
+
+class TrackQueryResponse {
+  final List<Track> tracks;
+  final int totalTracks;
+  final int offset;
+  final int limit;
+
+  TrackQueryResponse({
+    required this.tracks,
+    required this.totalTracks,
+    required this.offset,
+    required this.limit,
+  });
+  factory TrackQueryResponse.fromJson(Map<String, dynamic> json) {
+    List<Track> tracks = [];
+    for (var trackJson in json['tracks']) {
+      tracks.add(Track.fromJson(trackJson));
+    }
+    return TrackQueryResponse(
+      tracks: tracks,
+      totalTracks: json['totalRecords'],
+      offset: json['offset'],
+      limit: json['limit'],
+    );
+  }
+}
