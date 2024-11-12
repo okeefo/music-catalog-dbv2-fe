@@ -34,6 +34,7 @@ class TrackTable extends StatelessWidget {
 
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
+      controller: scrollController,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: ResizableTable(
