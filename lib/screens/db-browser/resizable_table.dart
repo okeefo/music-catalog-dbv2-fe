@@ -73,33 +73,27 @@ class ResizableTableState extends State<ResizableTable> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Column(
-          children: [
-            Row(
-              children: List.generate(widget.headers.length, (index) {
-                if (!widget.headers[index].isVisible) {
-                  return Container(); // Skip rendering the header if not visible
-                }
-                return _buildResizableColumn(index, widget.headers[index].name);
-              }),
-            ),
-            ...widget.data.map((row) {
-              return Row(
-                children: List.generate(row.length, (index) {
-                  if (!widget.headers[index].isVisible) {
-                    return Container(); // Skip rendering the cell if the column is not visible
-                  }
-                  return _buildCell(index, row[index], row);
-                }).toList(),
-              );
-            }).toList(),
-          ],
+    return Column(
+      children: [
+        Row(
+          children: List.generate(widget.headers.length, (index) {
+            if (!widget.headers[index].isVisible) {
+              return Container(); // Skip rendering the header if not visible
+            }
+            return _buildResizableColumn(index, widget.headers[index].name);
+          }),
         ),
-      ),
+        ...widget.data.map((row) {
+          return Row(
+            children: List.generate(row.length, (index) {
+              if (!widget.headers[index].isVisible) {
+                return Container(); // Skip rendering the cell if the column is not visible
+              }
+              return _buildCell(index, row[index], row);
+            }).toList(),
+          );
+        }),
+      ],
     );
   }
 
