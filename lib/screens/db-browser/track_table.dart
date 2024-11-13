@@ -20,11 +20,12 @@ class TrackTable extends StatelessWidget {
     final theme = Provider.of<ThemeProvider>(context);
 
     final rowStyle = material.TextStyle(
-      fontWeight: theme.dataTableFontWeightNormal, 
-      fontFamily: theme.fontStyleDataTable, 
+      fontWeight: theme.dataTableFontWeightNormal,
+      fontFamily: theme.fontStyleDataTable,
       fontSize: theme.fontSizeDataTableRow,
-      color: theme.fontColour,);
-    
+      color: theme.fontColour,
+    );
+
     final headerStyle = material.TextStyle(
       fontWeight: theme.dataTableFontWeightBold,
       fontFamily: theme.fontStyleDataTable,
@@ -40,6 +41,7 @@ class TrackTable extends StatelessWidget {
         child: ResizableTable(
           headers: _getHeaders(),
           data: _getData(),
+          columnActions: _getColumnBehaviors(),
           rowStyle: rowStyle,
           headerStyle: headerStyle,
         ),
@@ -47,14 +49,22 @@ class TrackTable extends StatelessWidget {
     );
   }
 
-  List<TrackColumn> _getHeaders() {
+  List<ResizeColumn> _getHeaders() {
     return TrackColumns.getAllColumnsByIndex();
   }
 
   List<List<String>> _getData() {
-    List<TrackColumn> columnOrder = TrackColumns.getAllColumnsByIndex();
+    List<ResizeColumn> columnOrder = TrackColumns.getAllColumnsByIndex();
     return tracks.map((track) {
       return track.toList(columnOrder).map((item) => item.toString()).toList();
     }).toList();
+  }
+
+  Map<int, ColumnAction> _getColumnBehaviors() {
+    return {
+      TrackColumns.discogsId.index: ColumnAction(type: ColumnActionType.displayAsUrl, urlColumnIndex: TrackColumns.discogsUrl.index),
+      TrackColumns.title.index: ColumnAction(type: ColumnActionType.displayAsFileUrl, urlColumnIndex: TrackColumns.fileLocation.index),
+      // Add more behaviors as needed
+    };
   }
 }

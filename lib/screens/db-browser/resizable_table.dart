@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart' as material;
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:front_end/screens/db-browser/track_model.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:logging/logging.dart';
 
 class ResizableTable extends StatefulWidget {
-  final List<TrackColumn> headers;
+  final List<ResizeColumn> headers;
   final List<List<String>> data;
   final material.TextStyle rowStyle;
   final material.TextStyle headerStyle;
+  final Map<int, ColumnAction> columnActions;
 
   const ResizableTable({
     super.key,
@@ -15,6 +16,7 @@ class ResizableTable extends StatefulWidget {
     required this.data,
     required this.rowStyle,
     required this.headerStyle,
+    required this.columnActions,
   });
 
   @override
@@ -122,39 +124,45 @@ class ResizableTableState extends State<ResizableTable> {
   }
 
   Widget _buildCell(int index, String text, List<String> row) {
-    if (widget.headers[index] == TrackColumns.discogsId) {
-      final url = row[TrackColumns.discogsUrl.index]; // Get the URL from the corresponding column
-      return Tooltip(
-        message: url,
-        child: GestureDetector(
-          onDoubleTap: () async {
-            final uri = Uri.parse(url);
-            if (await canLaunchUrl(uri)) {
-              await launchUrl(uri);
-            }
-          },
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: Container(
-              width: columnWidths[index],
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                text,
-                style: widget.rowStyle.copyWith(
-                  color: material.Colors.blue,
-                  decoration: material.TextDecoration.underline,
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
+    final action = widget.columnActions[index];
+
+    if (action == null) {
+      return _buildTextCell(index, text);
     }
 
-    if (widget.headers[index] == TrackColumns.title) {
-      final url = row[TrackColumns.fileLocation.index]; // Get the URL from the corresponding column
-      return Tooltip(
-        message: url,
+    switch (action.type) {
+      case ColumnActionType.displayAsUrl:
+      case ColumnActionType.displayAsFileUrl:
+        final url = row[action.urlColumnIndex!];
+        return _buildUrlCell(index, text, url, action.type == ColumnActionType.displayAsUrl);
+      default:
+        return _buildTextCell(index, text);
+    }
+  }
+
+  Widget _buildTextCell(int index, String text) {
+    return Container(
+      width: columnWidths[index],
+      padding: const EdgeInsets.all(8.0),
+      child: Text(
+        text,
+        style: widget.rowStyle,
+      ),
+    );
+  }
+
+  Widget _buildUrlCell(int index, String text, String url, bool isWebUrl) {
+    return Tooltip(
+      message: url,
+      child: GestureDetector(
+        onDoubleTap: isWebUrl
+            ? () async {
+                final uri = Uri.parse(url);
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri);
+                }
+              }
+            : null,
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
           child: Container(
@@ -163,18 +171,51 @@ class ResizableTableState extends State<ResizableTable> {
             child: Text(
               text,
               style: widget.rowStyle.copyWith(
-                color: material.Colors.blue,
                 decoration: material.TextDecoration.underline,
               ),
             ),
           ),
         ),
-      );
-    }
-    return Container(
-      width: columnWidths[index],
-      padding: const EdgeInsets.all(8.0),
-      child: Text(text, style: widget.rowStyle),
+      ),
     );
   }
+}
+
+class ResizeColumn {
+  final String name;
+  final int index;
+  final bool isVisible;
+
+  ResizeColumn({
+    required this.name,
+    required this.index,
+    required this.isVisible,
+  });
+
+  ResizeColumn copyWith({
+    String? displayName,
+    int? index,
+    bool? isVisible,
+  }) {
+    return ResizeColumn(
+      name: displayName ?? this.name,
+      index: index ?? this.index,
+      isVisible: isVisible ?? this.isVisible,
+    );
+  }
+}
+
+enum ColumnActionType {
+  displayAsUrl,
+  displayAsFileUrl,
+}
+
+class ColumnAction {
+  final ColumnActionType type;
+  final int? urlColumnIndex;
+
+  ColumnAction({
+    required this.type,
+    this.urlColumnIndex,
+  });
 }
