@@ -1,3 +1,5 @@
+import 'package:front_end/screens/db-browser/resizable_table.dart';
+
 class Track {
   final int id;
   final String catalogNumber;
@@ -18,7 +20,7 @@ class Track {
   final String genre;
   final bool fileExists;
 
-  late final Map<TrackColumn, dynamic> columnMap;
+  late final Map<ResizeColumn, dynamic> columnMap;
 
   Track({
     required this.id,
@@ -86,39 +88,39 @@ class Track {
   }
 
   // Method to get a single item by column name using the pre-built map
-  dynamic getItem(TrackColumn columnName) {
+  dynamic getItem(ResizeColumn columnName) {
     return columnMap[columnName];
   }
 
   // Method to return track data as a list of values in the specified order
-  List<dynamic> toList(List<TrackColumn> columnOrder) {
+  List<dynamic> toList(List<ResizeColumn> columnOrder) {
     return columnOrder.map((column) => getItem(column)).toList();
   }
 }
 
 class TrackColumns {
-  static TrackColumn trackId = TrackColumn(name: 'Id', index: 0, isVisible: false);
-  static TrackColumn discogsId = TrackColumn(name: 'Discogs Id', index: 1, isVisible: true);
-  static TrackColumn catalogNumber = TrackColumn(name: 'Catalog No', index: 2, isVisible: true);
-  static TrackColumn label = TrackColumn(name: 'Label', index: 3, isVisible: true);
-  static TrackColumn albumTitle = TrackColumn(name: 'Album', index: 4, isVisible: true);
-  static TrackColumn discNumber = TrackColumn(name: 'Disc', index: 5, isVisible: true);
-  static TrackColumn artist = TrackColumn(name: 'Artist', index: 6, isVisible: true);
-  static TrackColumn title = TrackColumn(name: 'Title', index: 7, isVisible: true);
-  static TrackColumn format = TrackColumn(name: 'Format', index: 8, isVisible: true);
-  static TrackColumn trackNumber = TrackColumn(name: 'Track', index: 9, isVisible: true);
+  static ResizeColumn trackId = ResizeColumn(name: 'Id', index: 0, isVisible: false);
+  static ResizeColumn discogsId = ResizeColumn(name: 'Discogs Id', index: 1, isVisible: true);
+  static ResizeColumn catalogNumber = ResizeColumn(name: 'Catalog No', index: 2, isVisible: true);
+  static ResizeColumn label = ResizeColumn(name: 'Label', index: 3, isVisible: true);
+  static ResizeColumn albumTitle = ResizeColumn(name: 'Album', index: 4, isVisible: true);
+  static ResizeColumn discNumber = ResizeColumn(name: 'Disc', index: 5, isVisible: true);
+  static ResizeColumn artist = ResizeColumn(name: 'Artist', index: 6, isVisible: true);
+  static ResizeColumn title = ResizeColumn(name: 'Title', index: 7, isVisible: true);
+  static ResizeColumn format = ResizeColumn(name: 'Format', index: 8, isVisible: true);
+  static ResizeColumn trackNumber = ResizeColumn(name: 'Track', index: 9, isVisible: true);
 
-  static TrackColumn year = TrackColumn(name: 'Year', index: 10, isVisible: true);
-  static TrackColumn country = TrackColumn(name: 'Country', index: 11, isVisible: true);
-  static TrackColumn discogsUrl = TrackColumn(name: 'Discogs Url', index: 12, isVisible: false);
-  static TrackColumn albumArtist = TrackColumn(name: 'Album Artist', index: 13, isVisible: true);
-  static TrackColumn fileLocation = TrackColumn(name: 'File Location', index: 14, isVisible: false);
-  static TrackColumn style = TrackColumn(name: 'Style', index: 15, isVisible: true);
-  static TrackColumn genre = TrackColumn(name: 'Genre', index: 16, isVisible: true);
-  static TrackColumn fileExists = TrackColumn(name: 'found', index: 17, isVisible: false);
+  static ResizeColumn year = ResizeColumn(name: 'Year', index: 10, isVisible: true);
+  static ResizeColumn country = ResizeColumn(name: 'Country', index: 11, isVisible: true);
+  static ResizeColumn discogsUrl = ResizeColumn(name: 'Discogs Url', index: 12, isVisible: false);
+  static ResizeColumn albumArtist = ResizeColumn(name: 'Album Artist', index: 13, isVisible: true);
+  static ResizeColumn fileLocation = ResizeColumn(name: 'File Location', index: 14, isVisible: false);
+  static ResizeColumn style = ResizeColumn(name: 'Style', index: 15, isVisible: true);
+  static ResizeColumn genre = ResizeColumn(name: 'Genre', index: 16, isVisible: true);
+  static ResizeColumn fileExists = ResizeColumn(name: 'found', index: 17, isVisible: false);
 
-  static List<TrackColumn> getAllColumnsByIndex() {
-    return List<TrackColumn>.filled(18, TrackColumn(name: '', index: 0, isVisible: false))
+  static List<ResizeColumn> getAllColumnsByIndex() {
+    return List<ResizeColumn>.filled(18, ResizeColumn(name: '', index: 0, isVisible: false))
       ..[TrackColumns.trackId.index] = TrackColumns.trackId
       ..[TrackColumns.catalogNumber.index] = TrackColumns.catalogNumber
       ..[TrackColumns.label.index] = TrackColumns.label
@@ -137,30 +139,6 @@ class TrackColumns {
       ..[TrackColumns.style.index] = TrackColumns.style
       ..[TrackColumns.genre.index] = TrackColumns.genre
       ..[TrackColumns.fileExists.index] = TrackColumns.fileExists;
-  }
-}
-
-class TrackColumn {
-  final String name;
-  final int index;
-  final bool isVisible;
-
-  TrackColumn({
-    required this.name,
-    required this.index,
-    required this.isVisible,
-  });
-
-  TrackColumn copyWith({
-    String? displayName,
-    int? index,
-    bool? isVisible,
-  }) {
-    return TrackColumn(
-      name: displayName ?? this.name,
-      index: index ?? this.index,
-      isVisible: isVisible ?? this.isVisible,
-    );
   }
 }
 
