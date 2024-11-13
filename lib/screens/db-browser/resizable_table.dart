@@ -130,13 +130,37 @@ class ResizableTableState extends State<ResizableTable> {
   Widget _buildCell(int index, String text, List<String> row) {
     if (widget.headers[index] == TrackColumns.discogsId) {
       final url = row[TrackColumns.discogsUrl.index]; // Get the URL from the corresponding column
-      return GestureDetector(
-        onDoubleTap: () async {
-          final uri = Uri.parse(url);
-          if (await canLaunchUrl(uri)) {
-            await launchUrl(uri);
-          }
-        },
+      return Tooltip(
+        message: url,
+        child: GestureDetector(
+          onDoubleTap: () async {
+            final uri = Uri.parse(url);
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri);
+            }
+          },
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: Container(
+              width: columnWidths[index],
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                text,
+                style: widget.rowStyle.copyWith(
+                  color: material.Colors.blue,
+                  decoration: material.TextDecoration.underline,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (widget.headers[index] == TrackColumns.title) {
+      final url = row[TrackColumns.fileLocation.index]; // Get the URL from the corresponding column
+      return Tooltip(
+        message: url,
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
           child: Container(

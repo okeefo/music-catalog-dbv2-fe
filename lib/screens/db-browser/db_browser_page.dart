@@ -1,10 +1,13 @@
+import 'dart:convert';
+
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:front_end/providers/theme_provider.dart';
 import 'package:front_end/screens/db-browser/filters.dart';
+import 'package:front_end/screens/popups.dart';
 import 'package:provider/provider.dart';
 import '../../providers/db_provider.dart';
 import 'track_table.dart';
-import 'track_service.dart';
+import 'track_provider.dart';
 import 'track_model.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
@@ -22,23 +25,23 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   final List<String> _statusUpdates = [];
   final List<String> _selectedFilters = [];
   final List<String> _availableFilters = ['Label', 'Album', 'Artist', 'Year', 'Country', 'Style', 'Genre'];
-  final List<Track> _tracks = [];
   final ScrollController _scrollController = ScrollController();
+  final ValueNotifier<String> _statusNotifier = ValueNotifier<String>('No updates yet');
+  final TrackProviderState _trackProviderState = TrackProviderState();
+
   final Logger _logger = Logger('DbBrowserPageState');
 
-  bool _isLoading = false;
-  int _offset = 0;
-  final int _limit = 24;
   int _totalTracks = 0;
 
   @override
   void initState() {
-    _logger.info("initstate");
+    _logger.info("initState");
     super.initState();
     _loadTracks();
+    _initializeWebSocket();
 
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent && !_isLoading) {
+      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent && !_trackProviderState.isLoading) {
         _loadMoreTracks();
       }
     });
@@ -48,74 +51,62 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   void dispose() {
     _channel?.sink.close(status.goingAway);
     _scrollController.dispose();
+    _statusNotifier.dispose();
     super.dispose();
   }
 
-  Future<void> _loadTracks() async {
-    _logger.info("loading tracks");
-    setState(() {
-      _isLoading = true;
-      _offset = 0;
-      _tracks.clear();
+  void _initializeWebSocket() {
+    _channel = WebSocketChannel.connect(Uri.parse('ws://localhost:8080/ws'));
+
+    _channel!.stream.listen((message) {
+      final decodedMessage = jsonDecode(message);
+      final code = decodedMessage['code'];
+      final msg = decodedMessage['message'];
+      final upd = msg.replaceAll('\n', '-');
+      _logger.info('Received message: $code : $upd');
+
+      _statusNotifier.value = upd;
+
+      if (code == 'UPDATE') {
+        _statusUpdates.add(msg);
+      } else if (code == 'INFO') {
+        showInfoDialog(context, msg, 'Scan Complete!');
+      } else if (code == 'ERROR') {
+        showErrorDialog(context, msg, 'Scan failed!');
+      } else {
+        _logger.warning('Unknown message code: $code');
+      }
     });
-
-    try {
-      final trackQueryResponse = await TrackService.fetchTracks(_offset, _limit);
-      final newTracks = trackQueryResponse.tracks;
-      _totalTracks = trackQueryResponse.totalTracks;
-
-      _logger.info("loaded ${newTracks.length} tracks, total tracks: $_totalTracks");
-      setState(() {
-        _tracks.addAll(newTracks);
-        _offset += _limit;
-      });
-    } catch (e) {
-      _logger.severe("Failed to fetch tracks: $e");
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
   }
 
-  Future<void> _loadMoreTracks() async {
-    if (_isLoading) {
-      _logger.info("Still loading more tracks skipping");
-      return;
-    }
+  void _loadTracks() {
+    TrackProvider.loadTracks(
+      state: _trackProviderState,
+      onSuccess: (newTracks, totalTracks) {
+        setState(() {
+          _trackProviderState.addTracks(newTracks);
+          _trackProviderState.setTotalTracks(totalTracks);
+        });
+      },
+      onError: (error) {
+        _logger.severe("Failed to fetch tracks: $error");
+      },
+    );
+  }
 
-    if (_offset >= _totalTracks) {
-      _logger.info("No more tracks to load offset: $_offset total: $_totalTracks");
-      return;
-    }
-
-    _logger.info("loading more tracks");
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final trackQueryResponse = await TrackService.fetchTracks(_offset, _limit);
-      final newTracks = trackQueryResponse.tracks;
-      _totalTracks = trackQueryResponse.totalTracks;
-
-      setState(() {
-        _tracks.addAll(newTracks);
-        _offset += _limit;
-        if (_offset > _totalTracks) {
-          _offset = _totalTracks;
-        }
-      });
-
-      _logger.info("loaded ${newTracks.length} more tracks, loaded  ${_tracks.length} of $_totalTracks");
-    } catch (e) {
-      _logger.severe("Failed to fetch tracks: $e");
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+  void _loadMoreTracks() {
+    TrackProvider.loadMoreTracks(
+      state: _trackProviderState,
+      onSuccess: (newTracks, totalTracks) {
+        setState(() {
+          _trackProviderState.addTracks(newTracks);
+          _trackProviderState.setTotalTracks(totalTracks);
+        });
+      },
+      onError: (error) {
+        _logger.severe("Failed to fetch tracks: $error");
+      },
+    );
   }
 
   void _onFilterDoubleTap(String filter) {
@@ -172,7 +163,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                         message: 'Scan for music',
                         child: IconButton(
                           icon: Icon(FluentIcons.music_in_collection_fill, size: themeProvider.iconSizeLarge),
-                          onPressed: () => TrackService.scanForMusic(context, _statusUpdates, _channel),
+                          onPressed: () => TrackProvider.scanForMusic(context, _channel),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -250,7 +241,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                     child: Align(
                       alignment: Alignment.topCenter,
                       child: TrackTable(
-                        tracks: _tracks,
+                        tracks: _trackProviderState.tracks,
                         scrollController: _scrollController,
                       ),
                     ),
@@ -264,11 +255,16 @@ class DbBrowserPageState extends State<DbBrowserPage> {
       bottomBar: Container(
         padding: const EdgeInsets.all(8.0),
         color: themeProvider.backgroundColour,
-        child: Text(
-          _statusUpdates.isNotEmpty ? _statusUpdates.last : 'No updates yet',
-          style: TextStyle(
-            color: themeProvider.fontColour,
-          ),
+        child: ValueListenableBuilder<String>(
+          valueListenable: _statusNotifier,
+          builder: (context, value, child) {
+            return Text(
+              value,
+              style: TextStyle(
+                color: themeProvider.fontColour,
+              ),
+            );
+          },
         ),
       ),
     );
