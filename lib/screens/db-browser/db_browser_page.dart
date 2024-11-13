@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import '../../providers/db_provider.dart';
 import 'track_table.dart';
 import 'track_provider.dart';
-import 'track_model.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import 'package:logging/logging.dart';
@@ -131,66 +130,79 @@ class DbBrowserPageState extends State<DbBrowserPage> {
           children: [
             Align(
               alignment: Alignment.centerLeft,
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Consumer<DbProvider>(
-                    builder: (context, dbProvider, child) {
-                      if (dbProvider.databases.isEmpty) {
-                        return const ProgressRing();
-                      } else {
-                        return ComboBox<String>(
-                          items: dbProvider.databases.map((db) {
-                            return ComboBoxItem<String>(
-                              value: db['Name'],
-                              child: Text(db['Name']!),
+                  Text(
+                    'Total Tracks: ${_trackProviderState.totalTracks}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: themeProvider.fontColour,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Consumer<DbProvider>(
+                        builder: (context, dbProvider, child) {
+                          if (dbProvider.databases.isEmpty) {
+                            return const ProgressRing();
+                          } else {
+                            return ComboBox<String>(
+                              items: dbProvider.databases.map((db) {
+                                return ComboBoxItem<String>(
+                                  value: db['Name'],
+                                  child: Text(db['Name']!),
+                                );
+                              }).toList(),
+                              value: dbProvider.activeDatabase,
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  final selectedDb = dbProvider.databases.firstWhere((db) => db['Name'] == newValue);
+                                  dbProvider.setActiveDatabase(context, selectedDb['Name']!, selectedDb['Path']!);
+                                }
+                              },
                             );
-                          }).toList(),
-                          value: dbProvider.activeDatabase,
-                          onChanged: (String? newValue) {
-                            if (newValue != null) {
-                              final selectedDb = dbProvider.databases.firstWhere((db) => db['Name'] == newValue);
-                              dbProvider.setActiveDatabase(context, selectedDb['Name']!, selectedDb['Path']!);
-                            }
-                          },
-                        );
-                      }
-                    },
-                  ),
-                  const SizedBox(width: 16),
-                  Column(
-                    children: [
-                      Tooltip(
-                        message: 'Scan for music',
-                        child: IconButton(
-                          icon: Icon(FluentIcons.music_in_collection_fill, size: themeProvider.iconSizeLarge),
-                          onPressed: () => TrackProvider.scanForMusic(context, _channel),
-                        ),
+                          }
+                        },
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Scan',
-                        style: TextStyle(
-                          color: themeProvider.fontColour,
-                        ),
+                      const SizedBox(width: 16),
+                      Column(
+                        children: [
+                          Tooltip(
+                            message: 'Scan for music',
+                            child: IconButton(
+                              icon: Icon(FluentIcons.music_in_collection_fill, size: themeProvider.iconSizeLarge),
+                              onPressed: () => TrackProvider.scanForMusic(context, _channel),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Scan',
+                            style: TextStyle(
+                              color: themeProvider.fontColour,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  const SizedBox(width: 16),
-                  Column(
-                    children: [
-                      Tooltip(
-                        message: 'Reload tracks',
-                        child: IconButton(
-                          icon: Icon(FluentIcons.refresh, size: themeProvider.iconSizeLarge),
-                          onPressed: _loadTracks,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Reload',
-                        style: TextStyle(
-                          color: themeProvider.fontColour,
-                        ),
+                      const SizedBox(width: 16),
+                      Column(
+                        children: [
+                          Tooltip(
+                            message: 'Reload tracks',
+                            child: IconButton(
+                              icon: Icon(FluentIcons.refresh, size: themeProvider.iconSizeLarge),
+                              onPressed: _loadTracks,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Reload',
+                            style: TextStyle(
+                              color: themeProvider.fontColour,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
