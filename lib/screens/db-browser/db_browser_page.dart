@@ -46,7 +46,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
 
   @override
   void dispose() {
-    _channel?.sink.close(status.goingAway);
+    _channel?.sink.close(status.normalClosure);
     _scrollController.dispose();
     _statusNotifier.dispose();
     super.dispose();
