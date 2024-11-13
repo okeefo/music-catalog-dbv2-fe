@@ -97,7 +97,7 @@ class Track {
 }
 
 class TrackColumns {
-  static TrackColumn trackId = TrackColumn(name: 'Id', index: 0, isVisible: true);
+  static TrackColumn trackId = TrackColumn(name: 'Id', index: 0, isVisible: false);
   static TrackColumn discogsId = TrackColumn(name: 'Discogs Id', index: 1, isVisible: true);
   static TrackColumn catalogNumber = TrackColumn(name: 'Catalog No', index: 2, isVisible: true);
   static TrackColumn label = TrackColumn(name: 'Label', index: 3, isVisible: true);
@@ -112,7 +112,7 @@ class TrackColumns {
   static TrackColumn country = TrackColumn(name: 'Country', index: 11, isVisible: true);
   static TrackColumn discogsUrl = TrackColumn(name: 'Discogs Url', index: 12, isVisible: false);
   static TrackColumn albumArtist = TrackColumn(name: 'Album Artist', index: 13, isVisible: true);
-  static TrackColumn fileLocation = TrackColumn(name: 'File Location', index: 14, isVisible: true);
+  static TrackColumn fileLocation = TrackColumn(name: 'File Location', index: 14, isVisible: false);
   static TrackColumn style = TrackColumn(name: 'Style', index: 15, isVisible: true);
   static TrackColumn genre = TrackColumn(name: 'Genre', index: 16, isVisible: true);
   static TrackColumn fileExists = TrackColumn(name: 'found', index: 17, isVisible: false);

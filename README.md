@@ -65,7 +65,7 @@ A Golang and MySQL-based web service designed to handle music catalog management
 
 My TODO LIST
 
-<br>//TODO: BugFix - streaming update while scanning not working
+<br>//TODO: BugFix - disc number not correct for tracks with the same name on an album checkout Ars Musica - episode 5
 <br>//TODO: Improvement - when clicking to another page - table - re-renders
 <br>//TODO: Improvement - allow data from a table to be copied to the clipboard - either a cell or entire row, or entire table??
 <br>//TODO: improve styling
