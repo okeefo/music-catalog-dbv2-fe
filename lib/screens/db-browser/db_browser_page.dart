@@ -30,8 +30,6 @@ class DbBrowserPageState extends State<DbBrowserPage> {
 
   final Logger _logger = Logger('DbBrowserPageState');
 
-  int _totalTracks = 0;
-
   @override
   void initState() {
     _logger.info("initState");
