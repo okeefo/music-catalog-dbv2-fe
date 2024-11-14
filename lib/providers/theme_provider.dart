@@ -12,10 +12,10 @@ class ThemeProvider with ChangeNotifier {
   Color _lightTableBorderColour = AppTheme.defaultLightTableBorderColour;
   Color _darkTableBorderColour = AppTheme.defaultDarkTableBorderColour;
   Brightness _brightness = AppTheme.brightness;
+  double _windowWidth = 800.0;
+  double _windowHeight = 600.0;
 
-  ThemeProvider() {
-    _loadPreferences();
-  }
+  ThemeProvider();
 
   Brightness get brightness => _brightness;
   Color get fontColour => _isDarkMode() ? _darkFontColour : _lightFontColour;
@@ -36,6 +36,9 @@ class ThemeProvider with ChangeNotifier {
   double get iconSize => AppTheme.iconSizeSmall;
   double get iconSizeMedium => AppTheme.iconSizeMedium;
   double get iconSizeLarge => AppTheme.iconSizeLarge;
+
+  double get windowWidth => _windowWidth;
+  double get windowHeight => _windowHeight;
 
   // Data Table Font
   String get fontStyleDataTable => AppTheme.dataTableFontFamily;
@@ -80,6 +83,13 @@ class ThemeProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void setWindowSize(double width, double height) {
+    _windowWidth = width;
+    _windowHeight = height;
+    _savePreferences();
+    notifyListeners();
+  }
+
   void resetDarkColors() {
     _darkFontColour = AppTheme.defaultDarkFontColor;
     _darkBoldFontColour = AppTheme.defaultDarkBoldFontColor;
@@ -98,7 +108,7 @@ class ThemeProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _loadPreferences() async {
+  Future<void> loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     _darkFontColour = Color(prefs.getInt('darkFontColor') ?? AppTheme.defaultDarkFontColor.value);
     _lightFontColour = Color(prefs.getInt('lightFontColor') ?? AppTheme.defaultLightFontColor.value);
@@ -109,6 +119,8 @@ class ThemeProvider with ChangeNotifier {
     _brightness = Brightness.values[prefs.getInt('brightness') ?? Brightness.light.index];
     _lightTableBorderColour = Color(prefs.getInt('lightTableBorderColour') ?? AppTheme.defaultLightTableBorderColour.value);
     _darkTableBorderColour = Color(prefs.getInt('darkTableBorderColour') ?? AppTheme.defaultDarkTableBorderColour.value);
+    _windowWidth = prefs.getDouble('windowWidth') ?? 800.0;
+    _windowHeight = prefs.getDouble('windowHeight') ?? 600.0;
     notifyListeners();
   }
 
@@ -123,5 +135,7 @@ class ThemeProvider with ChangeNotifier {
     prefs.setInt('brightness', _brightness.index);
     prefs.setInt('lightTableBorderColour', _lightTableBorderColour.value);
     prefs.setInt('darkTableBorderColour', _darkTableBorderColour.value);
+    prefs.setDouble('windowWidth', _windowWidth);
+    prefs.setDouble('windowHeight', _windowHeight);
   }
 }
