@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart' as material;
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:logging/logging.dart';
 
 class ResizableTable extends StatefulWidget {
   final List<ResizeColumn> headers;
@@ -58,14 +57,14 @@ class ResizableTableState extends State<ResizableTable> {
       // Measure header width
       textPainter.text = material.TextSpan(text: widget.headers[i].name, style: widget.headerStyle);
       textPainter.layout();
-      widths[i] = textPainter.width + 20.0; // 8.0 padding on each side
+      widths[i] = (textPainter.width + 25.0).ceilToDouble(); // 8.0 padding on each side
 
       // Measure each cell in the column
       for (var row in widget.data) {
         textPainter.text = material.TextSpan(text: row[i], style: widget.rowStyle);
         textPainter.layout();
-        if (textPainter.width + 16.0 > widths[i]) {
-          widths[i] = textPainter.width + 16.0; // 8.0 padding on each side
+        if (textPainter.width + 25.0 > widths[i]) {
+          widths[i] = (textPainter.width + 25.0).ceilToDouble(); // 8.0 padding on each side
         }
       }
     }
@@ -111,7 +110,7 @@ class ResizableTableState extends State<ResizableTable> {
         padding: const EdgeInsets.all(8.0),
         child: Row(
           children: [
-            Expanded(child: Text(header, style: widget.headerStyle)),
+            Expanded(child: SelectableText(header, style: widget.headerStyle)),
             Container(
               width: 2.0,
               height: 10.0,
@@ -144,7 +143,7 @@ class ResizableTableState extends State<ResizableTable> {
     return Container(
       width: columnWidths[index],
       padding: const EdgeInsets.all(8.0),
-      child: Text(
+      child: SelectableText(
         text,
         style: widget.rowStyle,
       ),
@@ -168,7 +167,7 @@ class ResizableTableState extends State<ResizableTable> {
           child: Container(
             width: columnWidths[index],
             padding: const EdgeInsets.all(8.0),
-            child: Text(
+            child: SelectableText(
               text,
               style: widget.rowStyle.copyWith(
                 decoration: material.TextDecoration.underline,
