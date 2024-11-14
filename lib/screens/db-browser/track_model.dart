@@ -100,7 +100,7 @@ class Track {
 
 class TrackColumns {
   static ResizeColumn trackId = ResizeColumn(name: 'Id', index: 0, isVisible: false);
-  static ResizeColumn discogsId = ResizeColumn(name: 'Discogs Id', index: 1, isVisible: true);
+  static ResizeColumn discogsId = ResizeColumn(name: 'Release', index: 1, isVisible: true);
   static ResizeColumn catalogNumber = ResizeColumn(name: 'Catalog No', index: 2, isVisible: true);
   static ResizeColumn label = ResizeColumn(name: 'Label', index: 3, isVisible: true);
   static ResizeColumn albumTitle = ResizeColumn(name: 'Album', index: 4, isVisible: true);
