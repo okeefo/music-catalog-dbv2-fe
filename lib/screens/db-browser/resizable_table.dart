@@ -8,6 +8,7 @@ class ResizableTable extends StatefulWidget {
   final material.TextStyle rowStyle;
   final material.TextStyle headerStyle;
   final Map<int, ColumnAction> columnActions;
+  final bool showAutoNumbering;
 
   const ResizableTable({
     super.key,
@@ -16,6 +17,7 @@ class ResizableTable extends StatefulWidget {
     required this.rowStyle,
     required this.headerStyle,
     required this.columnActions,
+    this.showAutoNumbering = true,
   });
 
   @override
@@ -28,14 +30,14 @@ class ResizableTableState extends State<ResizableTable> {
   @override
   void initState() {
     super.initState();
-    columnWidths = List<double>.filled(widget.headers.length, 0.0);
+    columnWidths = List<double>.filled(widget.headers.length + (widget.showAutoNumbering ? 1 : 0), 0.0);
     columnWidths = _calculateColumnWidths();
   }
 
   @override
   void didUpdateWidget(covariant ResizableTable oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.data != widget.data) {
+    if (oldWidget.data != widget.data || oldWidget.showAutoNumbering != widget.showAutoNumbering) {
       setState(() {
         columnWidths = _calculateColumnWidths();
       });
@@ -47,24 +49,31 @@ class ResizableTableState extends State<ResizableTable> {
       textDirection: material.TextDirection.ltr,
     );
 
-    List<double> widths = List<double>.filled(widget.headers.length, 0.0);
+    List<double> widths = List<double>.filled(widget.headers.length + (widget.showAutoNumbering ? 1 : 0), 0.0);
+
+    if (widget.showAutoNumbering) {
+      // Measure auto-numbering column width
+      textPainter.text = material.TextSpan(text: '#', style: widget.headerStyle);
+      textPainter.layout();
+      widths[0] = (textPainter.width + 25.0).ceilToDouble(); // 8.0 padding on each side
+    }
 
     for (int i = 0; i < widget.headers.length; i++) {
       if (!widget.headers[i].isVisible) {
-        widths[i] = 0.0;
+        widths[i + (widget.showAutoNumbering ? 1 : 0)] = 0.0;
         continue;
       }
       // Measure header width
       textPainter.text = material.TextSpan(text: widget.headers[i].name, style: widget.headerStyle);
       textPainter.layout();
-      widths[i] = (textPainter.width + 25.0).ceilToDouble(); // 8.0 padding on each side
+      widths[i + (widget.showAutoNumbering ? 1 : 0)] = (textPainter.width + 25.0).ceilToDouble(); // 8.0 padding on each side
 
       // Measure each cell in the column
       for (var row in widget.data) {
         textPainter.text = material.TextSpan(text: row[i], style: widget.rowStyle);
         textPainter.layout();
-        if (textPainter.width + 25.0 > widths[i]) {
-          widths[i] = (textPainter.width + 25.0).ceilToDouble(); // 8.0 padding on each side
+        if (textPainter.width + 25.0 > widths[i + (widget.showAutoNumbering ? 1 : 0)]) {
+          widths[i + (widget.showAutoNumbering ? 1 : 0)] = (textPainter.width + 25.0).ceilToDouble(); // 8.0 padding on each side
         }
       }
     }
@@ -74,27 +83,63 @@ class ResizableTableState extends State<ResizableTable> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          children: List.generate(widget.headers.length, (index) {
-            if (!widget.headers[index].isVisible) {
-              return Container(); // Skip rendering the header if not visible
-            }
-            return _buildResizableColumn(index, widget.headers[index].name);
-          }),
-        ),
-        ...widget.data.map((row) {
-          return Row(
-            children: List.generate(row.length, (index) {
-              if (!widget.headers[index].isVisible) {
-                return Container(); // Skip rendering the cell if the column is not visible
-              }
-              return _buildCell(index, row[index], row);
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: [
+            Row(
+              children: List.generate(widget.headers.length + (widget.showAutoNumbering ? 1 : 0), (index) {
+                if (widget.showAutoNumbering && index == 0) {
+                  return _buildAutoNumberingHeader();
+                }
+                if (!widget.headers[index - (widget.showAutoNumbering ? 1 : 0)].isVisible) {
+                  return Container(); // Skip rendering the header if not visible
+                }
+                return _buildResizableColumn(index - (widget.showAutoNumbering ? 1 : 0), widget.headers[index - (widget.showAutoNumbering ? 1 : 0)].name);
+              }),
+            ),
+            ...widget.data.asMap().entries.map((entry) {
+              int rowIndex = entry.key;
+              List<String> row = entry.value;
+              return Row(
+                children: List.generate(row.length + (widget.showAutoNumbering ? 1 : 0), (index) {
+                  if (widget.showAutoNumbering && index == 0) {
+                    return _buildAutoNumberingCell(rowIndex);
+                  }
+                  if (!widget.headers[index - (widget.showAutoNumbering ? 1 : 0)].isVisible) {
+                    return Container(); // Skip rendering the cell if the column is not visible
+                  }
+                  return _buildCell(index - (widget.showAutoNumbering ? 1 : 0), row[index - (widget.showAutoNumbering ? 1 : 0)], row);
+                }).toList(),
+              );
             }).toList(),
-          );
-        }),
-      ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAutoNumberingHeader() {
+    return Container(
+      width: columnWidths[0],
+      padding: const EdgeInsets.all(8.0),
+      child: SelectableText(
+        '#',
+        style: widget.headerStyle,
+      ),
+    );
+  }
+
+  Widget _buildAutoNumberingCell(int rowIndex) {
+    return Container(
+      width: columnWidths[0],
+      padding: const EdgeInsets.all(8.0),
+      child: SelectableText(
+        (rowIndex + 1).toString(),
+        style: widget.rowStyle,
+      ),
     );
   }
 
@@ -102,11 +147,11 @@ class ResizableTableState extends State<ResizableTable> {
     return GestureDetector(
       onHorizontalDragUpdate: (details) {
         setState(() {
-          columnWidths[index] += details.delta.dx;
+          columnWidths[index + (widget.showAutoNumbering ? 1 : 0)] += details.delta.dx;
         });
       },
       child: Container(
-        width: columnWidths[index],
+        width: columnWidths[index + (widget.showAutoNumbering ? 1 : 0)],
         padding: const EdgeInsets.all(8.0),
         child: Row(
           children: [
@@ -141,7 +186,7 @@ class ResizableTableState extends State<ResizableTable> {
 
   Widget _buildTextCell(int index, String text) {
     return Container(
-      width: columnWidths[index],
+      width: columnWidths[index + (widget.showAutoNumbering ? 1 : 0)],
       padding: const EdgeInsets.all(8.0),
       child: SelectableText(
         text,
@@ -165,7 +210,7 @@ class ResizableTableState extends State<ResizableTable> {
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
           child: Container(
-            width: columnWidths[index],
+            width: columnWidths[index + (widget.showAutoNumbering ? 1 : 0)],
             padding: const EdgeInsets.all(8.0),
             child: SelectableText(
               text,
