@@ -1,9 +1,9 @@
+import 'dart:async';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:logging/logging.dart';
 import 'package:window_manager/window_manager.dart';
 import 'screens/home_screen.dart';
-import 'utils/config.dart';
 import 'utils/endpoints.dart';
 import 'providers/theme_provider.dart';
 import 'providers/db_provider.dart';
@@ -14,21 +14,34 @@ void main() async {
   // Initialize window manager
   await windowManager.ensureInitialized();
 
+  // Configure the logger
+  _setupLogging();
+
+  // Create ThemeProvider and load preferences
+  final themeProvider = ThemeProvider();
+  await themeProvider.loadPreferences();
+
+  // Set the window size
+  await windowManager.setSize(Size(themeProvider.windowWidth, themeProvider.windowHeight));
+  await windowManager.center(animate: true);
+
   // Set the window title
   windowManager.setTitle('Music DB Killer');
   windowManager.setIcon('assets/headphones.ico');
   windowManager.setTitleBarStyle(TitleBarStyle.normal);
 
-  // Configure the logger
-  _setupLogging();
-
-  // Load the configuration
-  Config config = await loadConfig();
-
   // Initialize the endpoints
-  Endpoints.initialize(config.baseUri);
+  Endpoints.initialize('http://localhost:8080');
 
-  runApp(MyApp(config: config));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => themeProvider),
+        ChangeNotifierProvider(create: (_) => DbProvider()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 void _setupLogging() {
@@ -44,42 +57,59 @@ void customLogHandler(LogRecord record) {
 }
 
 class MyApp extends StatefulWidget {
-  final Config config;
-  const MyApp({super.key, required this.config});
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
-  bool isDarkMode = false;
+class _MyAppState extends State<MyApp> with WindowListener {
+  static final Logger _logger = Logger('_MyAppState');
+  Timer? _resizeTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    windowManager.addListener(this);
+  }
+
+  @override
+  void dispose() {
+    windowManager.removeListener(this);
+    _resizeTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void onWindowResize() {
+    _resizeTimer?.cancel();
+    _resizeTimer = Timer(const Duration(seconds: 3), () async {
+      final size = await windowManager.getSize();
+      final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+      _logger.info('Window resized to ${size.width}x${size.height}');
+      themeProvider.setWindowSize(size.width, size.height);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => DbProvider()),
-      ],
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, child) {
-          return FluentApp(
-            title: 'Fluent UI App',
-            debugShowCheckedModeBanner: false,
-            theme: FluentThemeData(
-              brightness: themeProvider.brightness,
-              accentColor: Colors.blue,
-              scaffoldBackgroundColor: themeProvider.backgroundColour,
-            ),
-            home: HomeScreen(
-              onThemeChanged: (value) {
-                print("home screen theme changed - $value");
-                themeProvider.setBrightness(value ? Brightness.dark : Brightness.light);
-              },
-            ),
-          );
-        },
-      ),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return FluentApp(
+          title: 'Fluent UI App',
+          debugShowCheckedModeBanner: false,
+          theme: FluentThemeData(
+            brightness: themeProvider.brightness,
+            accentColor: Colors.blue,
+            scaffoldBackgroundColor: themeProvider.backgroundColour,
+          ),
+          home: HomeScreen(
+            onThemeChanged: (value) {
+              themeProvider.setBrightness(value ? Brightness.dark : Brightness.light);
+            },
+          ),
+        );
+      },
     );
   }
 }

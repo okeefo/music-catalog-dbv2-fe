@@ -55,7 +55,7 @@ class ResizableTableState extends State<ResizableTable> {
       // Measure auto-numbering column width
       textPainter.text = material.TextSpan(text: '#', style: widget.headerStyle);
       textPainter.layout();
-      widths[0] = (textPainter.width + 25.0).ceilToDouble(); // 8.0 padding on each side
+      widths[0] = (textPainter.width + 50.0).ceilToDouble(); // 8.0 padding on each side
     }
 
     for (int i = 0; i < widget.headers.length; i++) {
