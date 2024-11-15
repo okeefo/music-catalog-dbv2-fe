@@ -10,6 +10,7 @@ class ResizableTable extends StatefulWidget {
   final Map<int, ColumnAction> columnActions;
   final bool showAutoNumbering;
   final void Function(BuildContext context, Offset position, int columnIndex, int rowIndex)? onRightClick;
+  final ScrollController infiniteScrollController;
 
   const ResizableTable({
     super.key,
@@ -20,6 +21,7 @@ class ResizableTable extends StatefulWidget {
     required this.columnActions,
     this.showAutoNumbering = true,
     this.onRightClick,
+    required this.infiniteScrollController,
   });
   @override
   ResizableTableState createState() => ResizableTableState();
@@ -98,48 +100,44 @@ class ResizableTableState extends State<ResizableTable> {
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Column(
-          children: [
-            Row(
-              children: List.generate(widget.headers.length + 1, (colIndex) {
-                // +1 for the auto numbering column
-
-                if (colIndex == 0) {
-                  if (showAutoNumbering) {
-                    return _buildAutoNumberingHeader();
-                  } else {
-                    return Container();
-                  }
-                } else if (!widget.headers[colIndex - 1].isVisible) {
-                  return Container(); // Skip rendering the header if not visible
-                }
-
-                return _buildResizableColumnHeader(colIndex - 1, widget.headers[colIndex - 1].name);
-              }),
-            ),
-            ...widget.data.asMap().entries.map((entry) {
-              int rowIndex = entry.key;
-              List<String> row = entry.value;
-              return Row(
-                children: List.generate(row.length + 1, (colIndex) {
-                  // +1 for the auto numbering column
-                  if (colIndex == 0) {
-                    if (showAutoNumbering) {
-                      return _buildAutoNumberingCell(rowIndex);
-                    } else {
-                      return Container();
-                    }
-                  } else if (!widget.headers[colIndex - 1].isVisible) {
-                    return Container(); // Skip rendering the cell if the column is not visible
-                  }
-                  return _buildCell(colIndex - 1, row[colIndex - 1], row, rowIndex);
-                }).toList(),
-              );
+      child: Column(
+        children: [
+          // Header Row
+          Row(
+            children: List.generate(widget.headers.length + 1, (colIndex) {
+              // Existing code for building header cells
+              if (colIndex == 0) {
+                return showAutoNumbering ? _buildAutoNumberingHeader() : Container();
+              } else if (!widget.headers[colIndex - 1].isVisible) {
+                return Container();
+              }
+              return _buildResizableColumnHeader(colIndex - 1, widget.headers[colIndex - 1].name);
             }),
-          ],
-        ),
+          ),
+          // Scrollable Data Rows
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              controller: widget.infiniteScrollController,
+              child: Column(
+                children: widget.data.asMap().entries.map((entry) {
+                  int rowIndex = entry.key;
+                  List<String> row = entry.value;
+                  return Row(
+                    children: List.generate(row.length + 1, (colIndex) {
+                      if (colIndex == 0) {
+                        return showAutoNumbering ? _buildAutoNumberingCell(rowIndex) : Container();
+                      } else if (!widget.headers[colIndex - 1].isVisible) {
+                        return Container();
+                      }
+                      return _buildCell(colIndex - 1, row[colIndex - 1], row, rowIndex);
+                    }),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
