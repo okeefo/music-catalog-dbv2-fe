@@ -9,6 +9,7 @@ class ResizableTable extends StatefulWidget {
   final material.TextStyle headerStyle;
   final Map<int, ColumnAction> columnActions;
   final bool showAutoNumbering;
+  final void Function(BuildContext context, Offset position, int columnIndex, int rowIndex)? onRightClick;
 
   const ResizableTable({
     super.key,
@@ -18,6 +19,7 @@ class ResizableTable extends StatefulWidget {
     required this.headerStyle,
     required this.columnActions,
     this.showAutoNumbering = true,
+    this.onRightClick,
   });
 
   @override
@@ -55,7 +57,7 @@ class ResizableTableState extends State<ResizableTable> {
       // Measure auto-numbering column width
       textPainter.text = material.TextSpan(text: '#', style: widget.headerStyle);
       textPainter.layout();
-      widths[0] = (textPainter.width + 50.0).ceilToDouble(); // 8.0 padding on each side
+      widths[0] = (textPainter.width + 25.0).ceilToDouble(); // 8.0 padding on each side
     }
 
     for (int i = 0; i < widget.headers.length; i++) {
@@ -111,7 +113,7 @@ class ResizableTableState extends State<ResizableTable> {
                   if (!widget.headers[index - (widget.showAutoNumbering ? 1 : 0)].isVisible) {
                     return Container(); // Skip rendering the cell if the column is not visible
                   }
-                  return _buildCell(index - (widget.showAutoNumbering ? 1 : 0), row[index - (widget.showAutoNumbering ? 1 : 0)], row);
+                  return _buildCell(index - (widget.showAutoNumbering ? 1 : 0), row[index - (widget.showAutoNumbering ? 1 : 0)], row, rowIndex);
                 }).toList(),
               );
             }).toList(),
@@ -167,55 +169,76 @@ class ResizableTableState extends State<ResizableTable> {
     );
   }
 
-  Widget _buildCell(int index, String text, List<String> row) {
+  Widget _buildCell(int index, String text, List<String> row, int rowIndex) {
     final action = widget.columnActions[index];
 
     if (action == null) {
-      return _buildTextCell(index, text);
+      return _buildTextCell(index, text, rowIndex);
     }
 
     switch (action.type) {
       case ColumnActionType.displayAsUrl:
       case ColumnActionType.displayAsFileUrl:
         final url = row[action.urlColumnIndex!];
-        return _buildUrlCell(index, text, url, action.type == ColumnActionType.displayAsUrl);
+        return _buildUrlCell(index, text, url, action.type == ColumnActionType.displayAsUrl, rowIndex);
       default:
-        return _buildTextCell(index, text);
+        return _buildTextCell(index, text, rowIndex);
     }
   }
 
-  Widget _buildTextCell(int index, String text) {
-    return Container(
-      width: columnWidths[index + (widget.showAutoNumbering ? 1 : 0)],
-      padding: const EdgeInsets.all(8.0),
-      child: SelectableText(
-        text,
-        style: widget.rowStyle,
+  Widget _buildTextCell(int index, String text, int rowIndex) {
+    return GestureDetector(
+      onSecondaryTapDown: (details) {
+        if (widget.onRightClick != null) {
+          widget.onRightClick!(context, details.globalPosition, index, rowIndex);
+        }
+      },
+      child: Tooltip(
+        message: text,
+        child: Container(
+          width: columnWidths[index + (widget.showAutoNumbering ? 1 : 0)],
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            text,
+            style: widget.rowStyle,
+            overflow: TextOverflow.ellipsis,
+            softWrap: false,
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildUrlCell(int index, String text, String url, bool isWebUrl) {
-    return Tooltip(
-      message: url,
-      child: GestureDetector(
-        onDoubleTap: isWebUrl
-            ? () async {
-                final uri = Uri.parse(url);
-                if (await canLaunchUrl(uri)) {
-                  await launchUrl(uri);
+  Widget _buildUrlCell(int index, String text, String url, bool isWebUrl, int rowIndex) {
+    return GestureDetector(
+      onSecondaryTapDown: (details) {
+        if (widget.onRightClick != null) {
+          widget.onRightClick!(context, details.globalPosition, index, rowIndex);
+        }
+      },
+      child: Tooltip(
+        message: url,
+        child: GestureDetector(
+          onDoubleTap: isWebUrl
+              ? () async {
+                  final uri = Uri.parse(url);
+                  if (await canLaunchUrl(uri)) {
+                    await launchUrl(uri);
+                  }
                 }
-              }
-            : null,
-        child: MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: Container(
-            width: columnWidths[index + (widget.showAutoNumbering ? 1 : 0)],
-            padding: const EdgeInsets.all(8.0),
-            child: SelectableText(
-              text,
-              style: widget.rowStyle.copyWith(
-                decoration: material.TextDecoration.underline,
+              : null,
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: Container(
+              width: columnWidths[index + (widget.showAutoNumbering ? 1 : 0)],
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                text,
+                style: widget.rowStyle.copyWith(
+                  decoration: material.TextDecoration.underline,
+                ),
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
               ),
             ),
           ),
