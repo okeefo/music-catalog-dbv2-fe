@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' as material;
+import 'package:front_end/screens/popups.dart';
 import 'package:provider/provider.dart';
 import 'track_model.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -44,6 +45,9 @@ class TrackTable extends StatelessWidget {
           columnActions: _getColumnBehaviors(),
           rowStyle: rowStyle,
           headerStyle: headerStyle,
+          onRightClick: (context, position, columnIndex, rowIndex) {
+            _showContextMenu(context, position, columnIndex, rowIndex);
+          },
         ),
       ),
     );
@@ -66,5 +70,73 @@ class TrackTable extends StatelessWidget {
       TrackColumns.title.index: ColumnAction(type: ColumnActionType.displayAsFileUrl, urlColumnIndex: TrackColumns.fileLocation.index),
       // Add more behaviors as needed
     };
+  }
+
+  void _showContextMenu(BuildContext context, Offset position, int columnIndex, int rowIndex) {
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+
+    material.showMenu(
+      context: context,
+      color: themeProvider.greyBackground.withOpacity(0.9),
+      position: RelativeRect.fromRect(
+        position & const Size(40, 40), // smaller rect, the touch area
+        Offset.zero & overlay.size, // Bigger rect, the entire screen
+      ),
+      items: [
+        material.PopupMenuItem(
+          height: 20,
+          child: const Text('Select Text', style: TextStyle(fontSize: 12)),
+          onTap: () {
+            // Select the text within the cell
+            _showNotImplementedDialog(context);
+          },
+        ),
+        material.PopupMenuItem(
+          height: 20,
+          child: const Text('Select Row', style: material.TextStyle(fontSize: 12)),
+          onTap: () {
+            // Select the text for every cell in that row
+            _showNotImplementedDialog(context);
+          },
+        ),
+        material.PopupMenuItem(
+          height: 20,
+          child: const Text('Resize All Columns', style: material.TextStyle(fontSize: 12)),
+          onTap: () {
+            // Implement logic here
+            _showNotImplementedDialog(context);
+          },
+        ),
+        material.PopupMenuItem(
+          height: 20,
+          child: const Text('Resize Column', style: material.TextStyle(fontSize: 12)),
+          onTap: () {
+            // Show "not Implemented" dialog
+            _showNotImplementedDialog(context);
+          },
+        ),
+        material.PopupMenuItem(
+          height: 20,
+          child: const Text('Play', style: material.TextStyle(fontSize: 12)),
+          onTap: () {
+            // Show "not Implemented" dialog
+            _showNotImplementedDialog(context);
+          },
+        ),
+        material.PopupMenuItem(
+          height: 20,
+          child: const Text('Stop', style: material.TextStyle(fontSize: 12)),
+          onTap: () {
+            // Show "not Implemented" dialog
+            _showNotImplementedDialog(context);
+          },
+        ),
+      ],
+    );
+  }
+
+  void _showNotImplementedDialog(BuildContext context) {
+    showErrorDialog(context,  "Nothing to see here", "Not Implemented");
   }
 }

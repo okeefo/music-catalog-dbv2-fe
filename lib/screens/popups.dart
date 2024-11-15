@@ -32,10 +32,11 @@ void showErrorDialog(BuildContext context, String message, String title) {
   showDialog(
     context: context,
     builder: (context) => ContentDialog(
+      constraints: const BoxConstraints(maxWidth: 500),
       title: Row(
         children: [
           Icon(FluentIcons.error, color: themeProvider.iconColour, size: themeProvider.iconSizeLarge),
-          const SizedBox(width: 8),
+          const SizedBox(width:8),
           Text("Error: $title"),
         ],
       ),
