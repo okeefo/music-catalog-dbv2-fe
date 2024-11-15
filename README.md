@@ -69,11 +69,7 @@ My TODO LIST
 <br>//TODO: Improvement - when clicking to another page - table - re-renders
 <br>//TODO: Improvement - allow data from a table to be copied to the clipboard - either a cell or entire row, or entire table??
 <br>//TODO: improve styling
-<br>//TODO: Show the hyperlink address when hovering over the Release Id cell
-<br>//TODO: Hide the ID column replace with row number
 <br>//TODO: replace MP3/WAV/FLAC with icons
-<br>//TODO: Do add total number of records summary
-<br>//TODO: Hide file location and hyper link from title cell
 <br>//TODO: Add a filter to show only MP3/WAV/FLAC
 <br>//TODO: Add album art
 <br>//TODO: add column show/hide selector
