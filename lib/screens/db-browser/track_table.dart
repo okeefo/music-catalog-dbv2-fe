@@ -137,6 +137,6 @@ class TrackTable extends StatelessWidget {
   }
 
   void _showNotImplementedDialog(BuildContext context) {
-    showErrorDialog(context,  "Nothing to see here", "Not Implemented");
+    showErrorDialog(context, "Nothing to see here", "Not Implemented");
   }
 }
