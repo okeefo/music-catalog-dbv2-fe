@@ -34,22 +34,16 @@ class TrackTable extends StatelessWidget {
       color: theme.boldFontColour,
     );
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      controller: scrollController,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: ResizableTable(
-          headers: _getHeaders(),
-          data: _getData(),
-          columnActions: _getColumnBehaviors(),
-          rowStyle: rowStyle,
-          headerStyle: headerStyle,
-          onRightClick: (context, position, columnIndex, rowIndex) {
-            _showContextMenu(context, position, columnIndex, rowIndex);
-          },
-        ),
-      ),
+    return ResizableTable(
+      headers: _getHeaders(),
+      data: _getData(),
+      columnActions: _getColumnBehaviors(),
+      rowStyle: rowStyle,
+      headerStyle: headerStyle,
+      onRightClick: (context, position, columnIndex, rowIndex) {
+        _showContextMenu(context, position, columnIndex, rowIndex);
+      },
+      infiniteScrollController: scrollController,
     );
   }
 
