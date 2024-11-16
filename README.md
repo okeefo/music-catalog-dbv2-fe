@@ -67,7 +67,6 @@ My TODO LIST
 
 <br>//TODO: BugFix - disc number not correct for tracks with the same name on an album checkout Ars Musica - episode 5
 <br>//TODO: Improvement - when clicking to another page - table - re-renders
-<br>//TODO: Improvement - allow data from a table to be copied to the clipboard - either a cell or entire row, or entire table??
 <br>//TODO: improve styling
 <br>//TODO: replace MP3/WAV/FLAC with icons
 <br>//TODO: Add a filter to show only MP3/WAV/FLAC

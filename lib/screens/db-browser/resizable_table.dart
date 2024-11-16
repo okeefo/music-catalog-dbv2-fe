@@ -100,6 +100,7 @@ class ResizableTableState extends State<ResizableTable> {
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
+      
       child: Column(
         children: [
           // Header Row
@@ -119,21 +120,23 @@ class ResizableTableState extends State<ResizableTable> {
             child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               controller: widget.infiniteScrollController,
-              child: Column(
-                children: widget.data.asMap().entries.map((entry) {
-                  int rowIndex = entry.key;
-                  List<String> row = entry.value;
-                  return Row(
-                    children: List.generate(row.length + 1, (colIndex) {
-                      if (colIndex == 0) {
-                        return showAutoNumbering ? _buildAutoNumberingCell(rowIndex) : Container();
-                      } else if (!widget.headers[colIndex - 1].isVisible) {
-                        return Container();
-                      }
-                      return _buildCell(colIndex - 1, row[colIndex - 1], row, rowIndex);
-                    }),
-                  );
-                }).toList(),
+              child: SelectionArea(
+                child: Column(
+                  children: widget.data.asMap().entries.map((entry) {
+                    int rowIndex = entry.key;
+                    List<String> row = entry.value;
+                    return Row(
+                      children: List.generate(row.length + 1, (colIndex) {
+                        if (colIndex == 0) {
+                          return showAutoNumbering ? _buildAutoNumberingCell(rowIndex) : Container();
+                        } else if (!widget.headers[colIndex - 1].isVisible) {
+                          return Container();
+                        }
+                        return _buildCell(colIndex - 1, row[colIndex - 1], row, rowIndex);
+                      }),
+                    );
+                  }).toList(),
+                ),
               ),
             ),
           ),
