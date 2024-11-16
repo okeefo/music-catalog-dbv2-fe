@@ -6,11 +6,14 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'resizable_table.dart';
 import 'package:front_end/providers/theme_provider.dart';
 
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+
 class TrackTable extends StatelessWidget {
   final List<Track> tracks;
   final ScrollController scrollController;
+  final FlyoutController menuController = FlyoutController();
 
-  const TrackTable({
+  TrackTable({
     super.key,
     required this.tracks,
     required this.scrollController,
@@ -34,16 +37,19 @@ class TrackTable extends StatelessWidget {
       color: theme.boldFontColour,
     );
 
-    return ResizableTable(
-      headers: _getHeaders(),
-      data: _getData(),
-      columnActions: _getColumnBehaviors(),
-      rowStyle: rowStyle,
-      headerStyle: headerStyle,
-      onRightClick: (context, position, columnIndex, rowIndex) {
-        _showContextMenu(context, position, columnIndex, rowIndex);
-      },
-      infiniteScrollController: scrollController,
+    return FlyoutTarget(
+      controller: menuController,
+      child: ResizableTable(
+        headers: _getHeaders(),
+        data: _getData(),
+        columnActions: _getColumnBehaviors(),
+        rowStyle: rowStyle,
+        headerStyle: headerStyle,
+        onRightClick: (context, position, columnIndex, rowIndex, d) {
+          _showContextMenu(context, position, columnIndex, rowIndex, d);
+        },
+        infiniteScrollController: scrollController,
+      ),
     );
   }
 
@@ -66,71 +72,79 @@ class TrackTable extends StatelessWidget {
     };
   }
 
-  void _showContextMenu(BuildContext context, Offset position, int columnIndex, int rowIndex) {
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+  void _showContextMenu(BuildContext context, Offset position, int columnIndex, int rowIndex, TapDownDetails d) {
+    // This calculates the position of the flyout according to the parent navigator
 
-    material.showMenu(
-      context: context,
-      color: themeProvider.greyBackground.withOpacity(0.9),
-      position: RelativeRect.fromRect(
-        position & const Size(40, 40), // smaller rect, the touch area
-        Offset.zero & overlay.size, // Bigger rect, the entire screen
-      ),
-      items: [
-        material.PopupMenuItem(
-          height: 20,
-          child: const Text('Select Text', style: TextStyle(fontSize: 12)),
-          onTap: () {
-            // Select the text within the cell
-            _showNotImplementedDialog(context);
-          },
-        ),
-        material.PopupMenuItem(
-          height: 20,
-          child: const Text('Select Row', style: material.TextStyle(fontSize: 12)),
-          onTap: () {
-            // Select the text for every cell in that row
-            _showNotImplementedDialog(context);
-          },
-        ),
-        material.PopupMenuItem(
-          height: 20,
-          child: const Text('Resize All Columns', style: material.TextStyle(fontSize: 12)),
-          onTap: () {
-            // Implement logic here
-            _showNotImplementedDialog(context);
-          },
-        ),
-        material.PopupMenuItem(
-          height: 20,
-          child: const Text('Resize Column', style: material.TextStyle(fontSize: 12)),
-          onTap: () {
-            // Show "not Implemented" dialog
-            _showNotImplementedDialog(context);
-          },
-        ),
-        material.PopupMenuItem(
-          height: 20,
-          child: const Text('Play', style: material.TextStyle(fontSize: 12)),
-          onTap: () {
-            // Show "not Implemented" dialog
-            _showNotImplementedDialog(context);
-          },
-        ),
-        material.PopupMenuItem(
-          height: 20,
-          child: const Text('Stop', style: material.TextStyle(fontSize: 12)),
-          onTap: () {
-            // Show "not Implemented" dialog
-            _showNotImplementedDialog(context);
-          },
-        ),
-      ],
+    menuController.showFlyout(
+      barrierDismissible: true,
+      dismissOnPointerMoveAway: true,
+      dismissWithEsc: true,
+      position: d.globalPosition,
+      navigatorKey: rootNavigatorKey.currentState,
+      builder: (context) {
+        return MenuFlyout(items: [
+          MenuFlyoutItem(
+            leading: const Icon(FluentIcons.share),
+            text: const Text('Share'),
+            onPressed: Flyout.of(context).close,
+          ),
+          MenuFlyoutItem(
+            leading: const Icon(FluentIcons.copy),
+            text: const Text('Select Text', style: TextStyle(fontSize: 12)),
+            onPressed: () => _showNotImplementedDialog(context),
+          ),
+          MenuFlyoutItem(
+            leading: const Icon(FluentIcons.delete),
+            text: const Text('Delete'),
+            onPressed: Flyout.of(context).close,
+          ),
+          const MenuFlyoutSeparator(),
+          MenuFlyoutItem(
+            text: const Text('Rename'),
+            onPressed: Flyout.of(context).close,
+          ),
+          MenuFlyoutItem(
+            text: const Text('Select'),
+            onPressed: Flyout.of(context).close,
+          ),
+          const MenuFlyoutSeparator(),
+          MenuFlyoutSubItem(
+            text: const Text('Send to'),
+            items: (_) => [
+              MenuFlyoutItem(
+                text: const Text('Bluetooth'),
+                onPressed: Flyout.of(context).close,
+              ),
+              MenuFlyoutItem(
+                text: const Text('Desktop (shortcut)'),
+                onPressed: Flyout.of(context).close,
+              ),
+              MenuFlyoutSubItem(
+                text: const Text('Compressed file'),
+                items: (context) => [
+                  MenuFlyoutItem(
+                    text: const Text('Compress and email'),
+                    onPressed: Flyout.of(context).close,
+                  ),
+                  MenuFlyoutItem(
+                    text: const Text('Compress to .7z'),
+                    onPressed: Flyout.of(context).close,
+                  ),
+                  MenuFlyoutItem(
+                    text: const Text('Compress to .zip'),
+                    onPressed: Flyout.of(context).close,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ]);
+      },
     );
   }
 
   void _showNotImplementedDialog(BuildContext context) {
+    Flyout.of(context).close();
     showErrorDialog(context, "Nothing to see here", "Not Implemented");
   }
 }

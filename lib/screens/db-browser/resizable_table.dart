@@ -9,7 +9,7 @@ class ResizableTable extends StatefulWidget {
   final material.TextStyle headerStyle;
   final Map<int, ColumnAction> columnActions;
   final bool showAutoNumbering;
-  final void Function(BuildContext context, Offset position, int columnIndex, int rowIndex)? onRightClick;
+  final void Function(BuildContext context, Offset position, int columnIndex, int rowIndex, TapDownDetails d)? onRightClick;
   final ScrollController infiniteScrollController;
 
   const ResizableTable({
@@ -35,7 +35,6 @@ class ResizableTableState extends State<ResizableTable> {
   @override
   void initState() {
     super.initState();
-
     minColumnWidths = List<double>.generate(widget.headers.length, (i) => _calculateMinColumnWidth(i));
     columnWidths = List<double>.generate(widget.headers.length, (i) => _calculateMaxColumnWidth(i));
     autoNumberColumnWidth = _calculateAutoNumberColumnWidth();
@@ -100,7 +99,6 @@ class ResizableTableState extends State<ResizableTable> {
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      
       child: Column(
         children: [
           // Header Row
@@ -222,7 +220,7 @@ class ResizableTableState extends State<ResizableTable> {
     return GestureDetector(
       onSecondaryTapDown: (details) {
         if (widget.onRightClick != null) {
-          widget.onRightClick!(context, details.globalPosition, index, rowIndex);
+          widget.onRightClick!(context, details.globalPosition, index, rowIndex, details);
         }
       },
       child: Tooltip(
@@ -245,7 +243,7 @@ class ResizableTableState extends State<ResizableTable> {
     return GestureDetector(
       onSecondaryTapDown: (details) {
         if (widget.onRightClick != null) {
-          widget.onRightClick!(context, details.globalPosition, index, rowIndex);
+          widget.onRightClick!(context, details.globalPosition, index, rowIndex, details);
         }
       },
       child: Tooltip(
