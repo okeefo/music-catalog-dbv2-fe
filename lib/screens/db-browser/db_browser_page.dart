@@ -66,8 +66,10 @@ class DbBrowserPageState extends State<DbBrowserPage> {
 
       if (code == 'UPDATE') {
         _statusUpdates.add(msg);
+      } else if (code == 'COMPLETED') {
+        showInfoDialog(context, msg, 'Scan Completed!');
       } else if (code == 'INFO') {
-        showInfoDialog(context, msg, 'Scan Complete!');
+        showInfoDialog(context, msg, 'Scan Info!');
       } else if (code == 'ERROR') {
         showErrorDialog(context, msg, 'Scan failed!');
       } else {
