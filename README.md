@@ -65,7 +65,6 @@ A Golang and MySQL-based web service designed to handle music catalog management
 
 My TODO LIST
 
-<br>//TODO: BugFix - disc number not correct for tracks with the same name on an album checkout Ars Musica - episode 5
 <br>//TODO: Improvement - when clicking to another page - table - re-renders
 <br>//TODO: improve styling
 <br>//TODO: replace MP3/WAV/FLAC with icons

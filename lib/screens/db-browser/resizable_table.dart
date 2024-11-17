@@ -295,7 +295,7 @@ class ResizeColumn {
     bool? isVisible,
   }) {
     return ResizeColumn(
-      name: displayName ?? this.name,
+      name: displayName ?? name,
       index: index ?? this.index,
       isVisible: isVisible ?? this.isVisible,
     );

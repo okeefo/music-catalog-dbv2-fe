@@ -39,7 +39,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => themeProvider),
         ChangeNotifierProvider(create: (_) => DbProvider()),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
