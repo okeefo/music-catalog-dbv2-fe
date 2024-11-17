@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:front_end/providers/theme_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:front_end/screens/popups.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'track_model.dart';
 import '../../services/db_service.dart';
@@ -24,38 +23,23 @@ class TrackProvider {
   }
 
   static Future<void> scanForMusic(BuildContext context, WebSocketChannel? channel) async {
+    
+    if (channel == null) {
+      throw Exception('WebSocket channel is not initialized');
+    }
+
     String? directoryPath = await FilePicker.platform.getDirectoryPath();
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    if (directoryPath == null) {
+      return;
+    }
 
-    if (directoryPath != null) {
-      if (channel == null) {
-        throw Exception('WebSocket channel is not initialized');
-      }
+    final dbService = DbService();
+    final response = await dbService.scanForMusic(directoryPath);
 
-      final dbService = DbService();
-      final response = await dbService.scanForMusic(directoryPath);
-
-      if (response.statusCode != 200) {
-        showDialog(
-          context: context,
-          builder: (context) => ContentDialog(
-            title: Row(
-              children: [
-                Icon(FluentIcons.error, color: themeProvider.iconColour, size: themeProvider.iconSizeLarge),
-                const SizedBox(width: 8),
-                const Text('Error'),
-              ],
-            ),
-            content: Text('Failed to initiate scan: ${response.body}'),
-            actions: [
-              Button(
-                child: const Text('OK'),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
-          ),
-        );
-      }
+    if (response.statusCode != 200) {
+      if (!context.mounted) return; // Check if the context is still valid
+       showErrorDialog(context, 'Failed to initiate scan: ${response.body}', 'Error');
+      
     }
   }
 
