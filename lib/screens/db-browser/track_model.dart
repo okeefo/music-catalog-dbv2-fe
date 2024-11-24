@@ -78,7 +78,7 @@ class Track {
       discogsId: json['discogs_id'] ?? '-',
       year: json['year'] ?? '-',
       country: json['country'] ?? '-',
-      discogsUrl: json['discogs_url'] ?? '-',
+      discogsUrl: "https://www.discogs.com/release/${json['discogs_id'] ?? '-'}",
       albumArtist: json['album_artist'] ?? '-',
       fileLocation: json['file_location'] ?? '-',
       style: json['style'] ?? '-',
