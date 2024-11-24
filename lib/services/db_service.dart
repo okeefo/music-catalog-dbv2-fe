@@ -1,25 +1,24 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import '../utils/endpoints.dart';
 import 'package:logging/logging.dart';
 
 class DbService {
-  final Logger _logger = Logger('DbService');
+  // Private constructor
+  DbService._privateConstructor();
 
-  Future<void> initDatabaseFactory() async {
-    try {
-      sqfliteFfiInit();
-      databaseFactory = databaseFactoryFfi;
-      _logger.info('Database factory initialized successfully');
-    } catch (e) {
-      _logger.severe('Error initializing database factory: $e');
-      // Handle error appropriately
-    }
+  // The single instance of the class
+  static final DbService _instance = DbService._privateConstructor();
+
+  // Factory constructor to return the same instance
+  factory DbService() {
+    return _instance;
   }
+
+  static final Logger _logger = Logger('DbService');
 
   Future<String?> fetchActiveDatabase() async {
     try {
@@ -92,6 +91,7 @@ class DbService {
         fileName: 'myMusicKillerDatabase.db', // Default file name
         type: FileType.custom,
         allowedExtensions: ['db'],
+        lockParentWindow: true,
       );
 
       if (result != null) {
@@ -172,7 +172,6 @@ class DbService {
   }
 
   Future<http.Response> getTracks(int offset, int limit, {String? searchTerm, String? searchFields}) async {
-    
     Uri uri = Uri.parse(Endpoints.getTracksUri()).replace(
       queryParameters: {
         'searchTerm': searchTerm ?? '',
@@ -189,10 +188,28 @@ class DbService {
     stopwatch.stop();
 
     if (response.statusCode == 200) {
-       _logger.info('retrieve tracks took: ${stopwatch.elapsedMilliseconds}ms');  
+      _logger.info('retrieve tracks took: ${stopwatch.elapsedMilliseconds}ms');
       return response;
     } else {
       _logger.severe('Failed to get tracks: ${response.body}');
+      throw Exception('Failed to load tracks');
+    }
+  }
+
+  Future<http.Response> getTotalNumberOfTracks() async {
+    Uri uri = Uri.parse(Endpoints.getTotalTracksUri());
+
+    _logger.info('Calling backend to get tracks: $uri');
+    // time the call for the backend response
+    final stopwatch = Stopwatch()..start();
+    final response = await http.get(uri);
+    stopwatch.stop();
+
+    if (response.statusCode == 200) {
+      _logger.info('retrieve tracks took: ${stopwatch.elapsedMilliseconds}ms');
+      return response;
+    } else {
+      _logger.severe('Failed to get tracks: ${response.body} operation tool ${stopwatch.elapsedMilliseconds}ms');
       throw Exception('Failed to load tracks');
     }
   }

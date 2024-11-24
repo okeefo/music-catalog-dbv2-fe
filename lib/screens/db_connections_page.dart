@@ -133,7 +133,7 @@ class DbConnectionsPage extends StatelessWidget {
                       IconButton(
                         icon: Icon(FluentIcons.add, color: themeProvider.iconColour),
                         onPressed: () async {
-                          String? dbPath = await dbProvider.dbService.pickDatabase();
+                          String? dbPath = await dbProvider.pickDatabase();
                           if (dbPath != null && context.mounted) {
                             String dbName = path.basenameWithoutExtension(dbPath);
                             await dbProvider.addDatabase(context, dbPath, dbName);
@@ -150,7 +150,7 @@ class DbConnectionsPage extends StatelessWidget {
                       IconButton(
                           icon: Icon(FluentIcons.database, color: themeProvider.iconColour),
                           onPressed: () async {
-                            String? selectedDirectory = await dbProvider.dbService.createDatabasePrompt();
+                            String? selectedDirectory = await dbProvider.createDatabasePrompt();
                             if (selectedDirectory != null && context.mounted) {
                               await dbProvider.addDatabase(context, selectedDirectory, path.basename(selectedDirectory));
                             }

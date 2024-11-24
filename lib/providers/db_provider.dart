@@ -17,11 +17,8 @@ class DbProvider with ChangeNotifier {
     _initialize();
   }
 
-  DbService get dbService => _dbService;
-
   Future<void> _initialize() async {
     try {
-      await _dbService.initDatabaseFactory();
       databases = await _dbService.loadDatabases();
       activeDatabase = await _dbService.fetchActiveDatabase();
       notifyListeners();
@@ -35,7 +32,7 @@ class DbProvider with ChangeNotifier {
   Future<void> addDatabase(BuildContext context, String dbPath, String dbName) async {
     try {
       _logger.info("Attempting to add database: name='$dbName' path='$dbPath'");
-      
+
       final result = await _dbService.createDatabase(dbName, dbPath);
 
       if (result['status'] == 'success') {
@@ -97,7 +94,6 @@ class DbProvider with ChangeNotifier {
 
   Future<void> setActiveDatabase(BuildContext context, String dbName, String dbPath) async {
     try {
-
       String uri = Endpoints.getActiveDatabaseUri();
       _logger.info('Attempting to set active database: $dbName : $uri');
 
@@ -123,5 +119,13 @@ class DbProvider with ChangeNotifier {
         _showPopup(context, 'Error', 'Failed to set active database: $e');
       }
     }
+  }
+
+  Future<String?> pickDatabase() async {
+    return _dbService.pickDatabase();
+  }
+  
+  Future<String?> createDatabasePrompt() async {
+    return _dbService.createDatabasePrompt();
   }
 }

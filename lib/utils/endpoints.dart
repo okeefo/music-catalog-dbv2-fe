@@ -5,6 +5,7 @@ class Endpoints {
   static const String _initialiseUri = 'databases';
   static const String _mediaScanUri = 'media/scan';
   static const String _tracks = 'tracks';
+  static const String _tracksCount = 'tracks/count';
 
   static void initialize(String baseUri) {
     _baseUri = baseUri;
@@ -28,5 +29,9 @@ class Endpoints {
 
   static String getTracksUri() {
     return '$_baseUri/$_tracks';
+  }
+  
+  static String getTotalTracksUri() {
+    return '$_baseUri/$_tracksCount';
   }
 }
