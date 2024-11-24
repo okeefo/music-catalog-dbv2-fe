@@ -27,6 +27,8 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<String> _statusNotifier = ValueNotifier<String>('No updates yet');
   final TrackProviderState _trackProviderState = TrackProviderState();
+  final TrackProvider _trackProvider = TrackProvider();
+  
 
   final Logger _logger = Logger('DbBrowserPageState');
 
@@ -68,6 +70,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
         _statusUpdates.add(msg);
       } else if (code == 'COMPLETED') {
         showInfoDialog(context, msg, 'Scan Completed!');
+        _loadMoreTracks();
       } else if (code == 'INFO') {
         showInfoDialog(context, msg, 'Scan Info!');
       } else if (code == 'ERROR') {
@@ -79,7 +82,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   }
 
   void _loadTracks() {
-    TrackProvider.loadTracks(
+    _trackProvider.loadTracks(
       state: _trackProviderState,
       onSuccess: (newTracks, totalTracks) {
         setState(() {
@@ -94,7 +97,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   }
 
   void _loadMoreTracks() {
-    TrackProvider.loadMoreTracks(
+    _trackProvider.loadMoreTracks(
       state: _trackProviderState,
       onSuccess: (newTracks, totalTracks) {
         setState(() {
@@ -156,10 +159,11 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                                 );
                               }).toList(),
                               value: dbProvider.activeDatabase,
-                              onChanged: (String? newValue) {
+                              onChanged: (String? newValue) async {
                                 if (newValue != null) {
                                   final selectedDb = dbProvider.databases.firstWhere((db) => db['Name'] == newValue);
-                                  dbProvider.setActiveDatabase(context, selectedDb['Name']!, selectedDb['Path']!);
+                                  await dbProvider.setActiveDatabase(context, selectedDb['Name']!, selectedDb['Path']!);
+                                  _loadTracks();
                                 }
                               },
                             );
@@ -173,7 +177,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                             message: 'Scan for music',
                             child: IconButton(
                               icon: Icon(FluentIcons.music_in_collection_fill, size: themeProvider.iconSizeLarge),
-                              onPressed: () => TrackProvider.scanForMusic(context, _channel),
+                              onPressed: () => _trackProvider.scanForMusic(context, _channel),
                             ),
                           ),
                           const SizedBox(height: 4),

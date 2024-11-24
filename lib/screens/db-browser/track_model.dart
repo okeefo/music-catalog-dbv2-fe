@@ -156,8 +156,10 @@ class TrackQueryResponse {
   });
   factory TrackQueryResponse.fromJson(Map<String, dynamic> json) {
     List<Track> tracks = [];
-    for (var trackJson in json['tracks']) {
-      tracks.add(Track.fromJson(trackJson));
+    if (json['tracks'] != null) {
+      for (var trackJson in json['tracks']) {
+        tracks.add(Track.fromJson(trackJson));
+      }
     }
     return TrackQueryResponse(
       tracks: tracks,

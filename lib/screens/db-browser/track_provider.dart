@@ -8,13 +8,24 @@ import '../../services/db_service.dart';
 import 'package:logging/logging.dart';
 
 class TrackProvider {
-  static final Logger _logger = Logger('TrackService');
+  // Private constructor
+  TrackProvider._privateConstructor();
 
-  static Future<TrackQueryResponse> fetchTracks(int offset, int limit) async {
-    final dbService = DbService();
-    final response = await dbService.getTracks(offset, limit);
+  // The single instance of the class
+  static final TrackProvider _instance = TrackProvider._privateConstructor();
 
+  // Factory constructor to return the same instance
+  factory TrackProvider() {
+    return _instance;
+  }
+  final DbService _dbService = DbService();
+
+  static final Logger _logger = Logger('TrackProvider');
+
+  Future<TrackQueryResponse> fetchTracks(int offset, int limit) async {
+    final response = await _dbService.getTracks(offset, limit);
     if (response.statusCode == 200) {
+      _logger.info('Got 200 response from Backend decoding response');
       final Map<String, dynamic> data = jsonDecode(response.body);
       return TrackQueryResponse.fromJson(data);
     } else {
@@ -22,8 +33,7 @@ class TrackProvider {
     }
   }
 
-  static Future<void> scanForMusic(BuildContext context, WebSocketChannel? channel) async {
-    
+  Future<void> scanForMusic(BuildContext context, WebSocketChannel? channel) async {
     if (channel == null) {
       throw Exception('WebSocket channel is not initialized');
     }
@@ -33,17 +43,15 @@ class TrackProvider {
       return;
     }
 
-    final dbService = DbService();
-    final response = await dbService.scanForMusic(directoryPath);
+    final response = await _dbService.scanForMusic(directoryPath);
 
     if (response.statusCode != 200) {
       if (!context.mounted) return; // Check if the context is still valid
-       showErrorDialog(context, 'Failed to initiate scan: ${response.body}', 'Error');
-      
+      showErrorDialog(context, 'Failed to initiate scan: ${response.body}', 'Error');
     }
   }
 
-  static Future<void> loadTracks({
+  Future<void> loadTracks({
     required TrackProviderState state,
     required Function(List<Track>, int) onSuccess,
     required Function(String) onError,
@@ -65,7 +73,7 @@ class TrackProvider {
     }
   }
 
-  static Future<void> loadMoreTracks({
+  Future<void> loadMoreTracks({
     required TrackProviderState state,
     required Function(List<Track>, int) onSuccess,
     required Function(String) onError,
@@ -76,8 +84,11 @@ class TrackProvider {
     }
 
     if (state.offset >= state.totalTracks) {
-      _logger.info("No more tracks to load offset: ${state.offset} total: ${state.totalTracks}");
-      return;
+      await refreshTotalNumberOfTracks(state);
+      if (state.offset >= state.totalTracks) {
+        _logger.info("No more tracks to load offset: ${state.offset} total: ${state.totalTracks}");
+        return;
+      }
     }
 
     _logger.info("loading more tracks");
@@ -92,6 +103,16 @@ class TrackProvider {
       onError(e.toString());
     } finally {
       state.setLoading(false);
+    }
+  }
+
+  Future<void> refreshTotalNumberOfTracks(TrackProviderState state) async {
+    final response = await _dbService.getTotalNumberOfTracks();
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      state.setTotalTracks(data['totalRecords']);
+    } else {
+      throw Exception('Failed to load total number of tracks');
     }
   }
 }
@@ -111,8 +132,13 @@ class TrackProviderState {
     offset = 0;
   }
 
+//TODO: improve the state handling of offset and totalTracks
   void incrementOffset() {
-    offset += limit;
+    if (offset + limit > totalTracks) {
+      offset = totalTracks;
+    } else {
+      offset += limit;
+    }
   }
 
   void clearTracks() {
