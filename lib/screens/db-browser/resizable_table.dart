@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart' as material;
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:logging/logging.dart';
 
 class ResizableTable extends StatefulWidget {
   final List<ResizeColumn> headers;

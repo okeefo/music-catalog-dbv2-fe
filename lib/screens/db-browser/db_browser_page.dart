@@ -28,7 +28,6 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   final ValueNotifier<String> _statusNotifier = ValueNotifier<String>('No updates yet');
   final TrackProviderState _trackProviderState = TrackProviderState();
   final TrackProvider _trackProvider = TrackProvider();
-  
 
   final Logger _logger = Logger('DbBrowserPageState');
 
@@ -40,7 +39,10 @@ class DbBrowserPageState extends State<DbBrowserPage> {
     _initializeWebSocket();
 
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent && !_trackProviderState.isLoading) {
+      // Define a threshold value (e.g., 200 pixels) before reaching the end of the list
+      const double threshold = 800.0;
+
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - threshold && !_trackProviderState.isLoading) {
         _loadMoreTracks();
       }
     });
