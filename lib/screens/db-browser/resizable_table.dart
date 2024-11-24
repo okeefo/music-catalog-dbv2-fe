@@ -12,6 +12,7 @@ class ResizableTable extends StatefulWidget {
   final bool showAutoNumbering;
   final void Function(BuildContext context, Offset position, int columnIndex, int rowIndex, TapDownDetails d)? onRightClick;
   final ScrollController infiniteScrollController;
+  final material.BoxDecoration cellDecoration;
 
   const ResizableTable({
     super.key,
@@ -23,13 +24,13 @@ class ResizableTable extends StatefulWidget {
     this.showAutoNumbering = true,
     this.onRightClick,
     required this.infiniteScrollController,
+    required this.cellDecoration,
   });
   @override
   ResizableTableState createState() => ResizableTableState();
 }
 
 class ResizableTableState extends State<ResizableTable> {
-    static final Logger _logger = Logger('ResizableTableState');
   late List<double> minColumnWidths;
   late List<double> columnWidths;
   late double autoNumberColumnWidth;
@@ -149,6 +150,7 @@ class ResizableTableState extends State<ResizableTable> {
     return Container(
       width: autoNumberColumnWidth,
       padding: const EdgeInsets.all(8.0),
+      decoration: widget.cellDecoration,
       child: SelectableText(
         '#',
         textAlign: TextAlign.right,
@@ -161,6 +163,7 @@ class ResizableTableState extends State<ResizableTable> {
     return Container(
       width: autoNumberColumnWidth,
       padding: const EdgeInsets.all(8.0),
+      decoration: widget.cellDecoration,
       child: SelectableText(
         (rowIndex + 1).toString(),
         textAlign: TextAlign.right,
@@ -187,6 +190,7 @@ class ResizableTableState extends State<ResizableTable> {
       child: Container(
         width: columnWidths[index],
         padding: const EdgeInsets.all(8.0),
+        decoration: widget.cellDecoration,
         child: Row(
           children: [
             Expanded(child: SelectableText(header, style: widget.headerStyle)),
@@ -230,6 +234,7 @@ class ResizableTableState extends State<ResizableTable> {
         child: Container(
           width: columnWidths[index],
           padding: const EdgeInsets.all(8.0),
+          decoration: widget.cellDecoration,
           child: Text(
             text,
             style: widget.rowStyle,
@@ -264,6 +269,7 @@ class ResizableTableState extends State<ResizableTable> {
             child: Container(
               width: columnWidths[index],
               padding: const EdgeInsets.all(8.0),
+              decoration: widget.cellDecoration,
               child: Text(
                 text,
                 style: widget.rowStyle.copyWith(

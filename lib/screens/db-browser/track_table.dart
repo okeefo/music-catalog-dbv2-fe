@@ -37,6 +37,11 @@ class TrackTable extends StatelessWidget {
       color: theme.boldFontColour,
     );
 
+    final cellDeco = material.BoxDecoration(
+      border: material.Border.all(color: theme.tableBorderColour, width: 1.0),
+      color: theme.backgroundColour,
+    );
+
     return FlyoutTarget(
       controller: menuController,
       child: ResizableTable(
@@ -49,6 +54,7 @@ class TrackTable extends StatelessWidget {
           _showContextMenu(context, position, columnIndex, rowIndex, d);
         },
         infiniteScrollController: scrollController,
+        cellDecoration: cellDeco
       ),
     );
   }
