@@ -77,7 +77,7 @@ class ResizableTableState extends State<ResizableTable> {
     // Measure header width
     textPainter.text = material.TextSpan(text: widget.headers[index].name, style: widget.headerStyle);
     textPainter.layout();
-    double width = (textPainter.width + 25.0).ceilToDouble(); // extra padding to include the icon for dragging
+    double width = (textPainter.width + 30.0).ceilToDouble(); // extra padding to include the icon for dragging
     return width;
   }
 
@@ -189,15 +189,22 @@ class ResizableTableState extends State<ResizableTable> {
       },
       child: Container(
         width: columnWidths[index],
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.fromLTRB(8.0, 8.0,4.0, 8.0),
         decoration: widget.cellDecoration,
         child: Row(
           children: [
             Expanded(child: SelectableText(header, style: widget.headerStyle)),
-            Container(
-              width: 4.0,
-              height: 10.0,
-              color: material.Colors.indigo,
+            MouseRegion(
+              cursor: SystemMouseCursors.resizeColumn,
+              child: Container(   
+                width: 10.0,
+                color: Colors.transparent,
+                child: Icon(
+                  FluentIcons.gripper_bar_vertical,
+                  size: widget.headerStyle.fontSize,
+                  color: material.Colors.grey,
+                ),
+              ),
             ),
           ],
         ),
