@@ -1,36 +1,219 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/app_styles.dart';
 
 class ThemeProvider with ChangeNotifier {
-  Color _darkFontColour = AppTheme.defaultDarkFontColor;
-  Color _lightFontColour = AppTheme.defaultLightFontColor;
-  Color _darkBoldFontColour = AppTheme.defaultDarkBoldFontColor;
-  Color _lightBoldFontColour = AppTheme.defaultLightBoldFontColor;
-  Color _darkIconColour = AppTheme.defaultDarkIconColor;
-  Color _lightIconColour = AppTheme.defaultLightIconColor;
-  Color _lightTableBorderColour = AppTheme.defaultLightTableBorderColour;
-  Color _darkTableBorderColour = AppTheme.defaultDarkTableBorderColour;
+  late final ThemeColourItem _fontColour;
+  late final ThemeColourItem _boldFontColour;
+  late final ThemeColourItem _iconColour;
+  late final ThemeColourItem _tableBorderColour;
+  late final ThemeColourItem _backgroundColour;
+  late final ThemeColourItem _headerFontColour;
+  late final ThemeColourItem _headerFontBackgroundColour;
+  late final ThemeColourItem _rowFontColour;
+  late final ThemeColourItem _rowFontBackgroundColour;
+  late final ThemeColourItem _rowAltFontColour;
+  late final ThemeColourItem _rowAltFontBackgroundColour;
+  late final ThemeColourItem _toggleSwitchBackgroundColour;
+  late final ThemeColourItem _toggleSwitchKnobColour;
+
+  late List<ThemeColourItem> colourItems;
+
   Brightness _brightness = AppTheme.brightness;
   double _windowWidth = 800.0;
   double _windowHeight = 600.0;
 
-  ThemeProvider();
+  ThemeProvider._internal() {
+    colourItems = <ThemeColourItem>[];
+    _fontColour = ThemeColourItem(
+        key: 'font',
+        defaultDark: AppTheme.fontColourDark,
+        defaultLight: AppTheme.fontColourLight,
+        isDarkMode: () => _isDarkMode(),
+        onChanged: () => _onColorChanged());
+    colourItems.add(_fontColour);
+
+    _boldFontColour = ThemeColourItem(
+        key: 'boldFont',
+        defaultDark: AppTheme.boldFontColourDark,
+        defaultLight: AppTheme.boldFontColourLight,
+        isDarkMode: () => _isDarkMode(),
+        onChanged: () => _onColorChanged());
+    colourItems.add(_boldFontColour);
+
+    _iconColour = ThemeColourItem(
+        key: 'icon',
+        defaultDark: AppTheme.iconColorDark,
+        defaultLight: AppTheme.iconColorLight,
+        isDarkMode: () => _isDarkMode(),
+        onChanged: () => _onColorChanged());
+    colourItems.add(_iconColour);
+
+    _tableBorderColour = ThemeColourItem(
+        key: 'tableBorder',
+        defaultDark: AppTheme.tableBorderColourDark,
+        defaultLight: AppTheme.tableBorderColourLight,
+        isDarkMode: () => _isDarkMode(),
+        onChanged: () => _onColorChanged());
+    colourItems.add(_tableBorderColour);
+
+    _backgroundColour = ThemeColourItem(
+        key: 'background',
+        defaultDark: AppTheme.darkBackground,
+        defaultLight: AppTheme.lightBackground,
+        isDarkMode: () => _isDarkMode(),
+        onChanged: () => _onColorChanged());
+    colourItems.add(_backgroundColour);
+
+    _headerFontColour = ThemeColourItem(
+        key: 'headerFont',
+        defaultDark: AppTheme.fontColourDark,
+        defaultLight: AppTheme.fontColourLight,
+        isDarkMode: () => _isDarkMode(),
+        onChanged: () => _onColorChanged());
+    colourItems.add(_headerFontColour);
+
+    _headerFontBackgroundColour = ThemeColourItem(
+        key: 'headerFontBackground',
+        defaultDark: AppTheme.darkBackground,
+        defaultLight: AppTheme.lightBackground,
+        isDarkMode: () => _isDarkMode(),
+        onChanged: () => _onColorChanged());
+    colourItems.add(_headerFontBackgroundColour);
+
+    _rowFontColour = ThemeColourItem(
+        key: 'rowFont',
+        defaultDark: AppTheme.fontColourDark,
+        defaultLight: AppTheme.fontColourLight,
+        isDarkMode: () => _isDarkMode(),
+        onChanged: () => _onColorChanged());
+    colourItems.add(_rowFontColour);
+
+    _rowFontBackgroundColour = ThemeColourItem(
+        key: 'rowFontBackground',
+        defaultDark: AppTheme.darkBackground,
+        defaultLight: AppTheme.lightBackground,
+        isDarkMode: () => _isDarkMode(),
+        onChanged: () => _onColorChanged());
+    colourItems.add(_rowFontBackgroundColour);
+
+    _rowAltFontColour = ThemeColourItem(
+        key: 'rowAltFont',
+        defaultDark: AppTheme.fontColourDark,
+        defaultLight: AppTheme.fontColourLight,
+        isDarkMode: () => _isDarkMode(),
+        onChanged: () => _onColorChanged());
+    colourItems.add(_rowAltFontColour);
+
+    _rowAltFontBackgroundColour = ThemeColourItem(
+        key: 'rowAltFontBackground',
+        defaultDark: AppTheme.greyBackground,
+        defaultLight: AppTheme.greyBackground,
+        isDarkMode: () => _isDarkMode(),
+        onChanged: () => _onColorChanged());
+    colourItems.add(_fontColour);
+
+    _toggleSwitchBackgroundColour = ThemeColourItem(
+        key: 'toggleSwitch',
+        defaultDark: AppTheme.toggleSwitchBackgroundDark,
+        defaultLight: AppTheme.toggleSwitchBackgroundLight,
+        isDarkMode: () => _isDarkMode(),
+        onChanged: () => _onColorChanged());
+    colourItems.add(_toggleSwitchBackgroundColour);
+
+    _toggleSwitchKnobColour = ThemeColourItem(
+        key: 'toggleSwitch', defaultDark: AppTheme.black, defaultLight: AppTheme.black, isDarkMode: () => _isDarkMode(), onChanged: () => _onColorChanged());
+    colourItems.add(_toggleSwitchBackgroundColour);
+  }
+
+  // Factory constructor
+  static Future<ThemeProvider> create() async {
+    final provider = ThemeProvider._internal();
+    await provider._loadPreferences();
+    return provider;
+  }
 
   Brightness get brightness => _brightness;
-  Color get fontColour => _isDarkMode() ? _darkFontColour : _lightFontColour;
-  Color get boldFontColour => _isDarkMode() ? _darkBoldFontColour : _lightBoldFontColour;
-  Color get iconColour => _isDarkMode() ? _darkIconColour : _lightIconColour;
-  Color get backgroundColour => _isDarkMode() ? AppTheme.darkBackground : AppTheme.lightBackground;
-  Color get tableBorderColour => _isDarkMode() ? _darkTableBorderColour : _lightTableBorderColour;
 
+  // General Fonts
+  Color get fontColour => _fontColour.getColour();
+  void setFontColour(Color color) {
+    _fontColour.setColor(color);
+  }
+
+  Color get boldFontColour => _boldFontColour.getColour();
+  void setBoldFontColor(Color color) {
+    _boldFontColour.setColor(color);
+  }
+
+  Color get iconColour => _iconColour.getColour();
+  void setIconColour(Color color) {
+    _iconColour.setColor(color);
+  }
+
+  Color get backgroundColour => _backgroundColour.getColour();
+  void setBackgroundColour(Color color) {
+    _backgroundColour.setColor(color);
+  }
+
+  Color get headerFontColour => _headerFontColour.getColour();
+  void setHeaderFontColour(Color color) {
+    _headerFontColour.setColor(color);
+  }
+
+  Color get headerBackgroundColour => _headerFontBackgroundColour.getColour();
+  void setHeaderFontBackgroundColour(Color color) {
+    _headerFontBackgroundColour.setColor(color);
+  }
+
+  Color get rowFontColour => _rowFontColour.getColour();
+  void setRowFontColour(Color color) {
+    _rowFontColour.setColor(color);
+  }
+
+  Color get rowBackgroundColour => _rowFontBackgroundColour.getColour();
+  void setRowBackgroundColour(Color color) {
+    _rowFontBackgroundColour.setColor(color);
+  }
+
+  Color get rowAltFontColour => _rowAltFontColour.getColour();
+  void setRowAltFontColour(Color color) {
+    _rowAltFontColour.setColor(color);
+  }
+
+  Color get rowAltBackgroundColour => _rowAltFontBackgroundColour.getColour();
+  void setRowAltBackgroundColour(Color color) {
+    _rowAltFontBackgroundColour.setColor(color);
+  }
+
+  Color get toggleSwitchBackgroundColor => _toggleSwitchBackgroundColour.getColour();
+  void setToggleBackgroundColour(Color color) {
+    _toggleSwitchBackgroundColour.setColor(color);
+  }
+
+  Color get toggleSwitchKnobColor => _toggleSwitchKnobColour.getColour();
+  void setToggleKnobColour(Color color) {
+    _toggleSwitchKnobColour.setColor(color);
+  }
+
+  // Data Table
+  Color get tableBorderColour => _tableBorderColour.getColour();
+  void setTableBorderColour(Color color) {
+    _tableBorderColour.setColor(color);
+  }
+
+  String get fontStyleDataTable => AppTheme.dataTableFontFamily;
+  double get fontSizeDataTableHeader => AppTheme.dataTableFontHeaderSize;
+  double get fontSizeDataTableRow => AppTheme.dataTableFontRowSize;
+  FontWeight get dataTableFontWeight => AppTheme.dataTableFontWeight;
+  FontWeight get dataTableFontWeightThin => AppTheme.dataTableFontWeightThin;
+  FontWeight get dataTableFontWeightBold => AppTheme.dataTableFontWeightBold;
+  FontWeight get dataTableFontWeightNormal => AppTheme.dataTableFontWeightNormal;
+  Color get transparent => Colors.transparent;
+
+//General Settings.
   Color get greyBackground => AppTheme.greyBackground;
-  Color get darkFontColour => _darkFontColour;
-  Color get lightFontColour => _lightFontColour;
-  Color get darkBoldFontColour => _darkBoldFontColour;
-  Color get lightBoldFontColour => _lightBoldFontColour;
-  Color get darkIconColour => _darkIconColour;
-  Color get lightIconColour => _lightIconColour;
+
   bool get isDarkMode => _brightness == Brightness.dark;
 
   double get iconSize => AppTheme.iconSizeSmall;
@@ -40,45 +223,17 @@ class ThemeProvider with ChangeNotifier {
   double get windowWidth => _windowWidth;
   double get windowHeight => _windowHeight;
 
-  // Data Table Font
-  String get fontStyleDataTable => AppTheme.dataTableFontFamily;
-  double get fontSizeDataTableHeader => AppTheme.dataTableFontHeaderSize;
-  double get fontSizeDataTableRow => AppTheme.dataTableFontRowSize;
-  FontWeight get dataTableFontWeight => AppTheme.dataTableFontWeight;
-  FontWeight get dataTableFontWeightThin => AppTheme.dataTableFontWeightThin;
-  FontWeight get dataTableFontWeightBold => AppTheme.dataTableFontWeightBold;
-  FontWeight get dataTableFontWeightNormal => AppTheme.dataTableFontWeightNormal;
-
   bool _isDarkMode() {
     return _brightness == Brightness.dark;
   }
 
-  void setFontColour(Color color) {
-    _isDarkMode() ? _darkFontColour = color : _lightFontColour = color;
-    _savePreferences();
-    notifyListeners();
-  }
-
-  void setBoldFontColor(Color color) {
-    _isDarkMode() ? _darkBoldFontColour = color : _lightBoldFontColour = color;
-    _savePreferences();
-    notifyListeners();
-  }
-
-  void setIconColour(Color color) {
-    _isDarkMode() ? _darkIconColour = color : _lightIconColour = color;
+  void _onColorChanged() {
     _savePreferences();
     notifyListeners();
   }
 
   void setBrightness(Brightness brightness) {
     _brightness = brightness;
-    _savePreferences();
-    notifyListeners();
-  }
-
-  void setTableBorderColour(Color color) {
-    _isDarkMode() ? _darkTableBorderColour = color : _lightTableBorderColour = color;
     _savePreferences();
     notifyListeners();
   }
@@ -90,52 +245,100 @@ class ThemeProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void resetDarkColors() {
-    _darkFontColour = AppTheme.defaultDarkFontColor;
-    _darkBoldFontColour = AppTheme.defaultDarkBoldFontColor;
-    _darkIconColour = AppTheme.defaultDarkIconColor;
-    _darkTableBorderColour = AppTheme.defaultDarkTableBorderColour;
+  void resetDarkColours() {
+    _fontColour._resetDarkColor();
+    _boldFontColour._resetDarkColor();
+    _iconColour._resetDarkColor();
+    _tableBorderColour._resetDarkColor();
     _savePreferences();
     notifyListeners();
   }
 
-  void resetLightColors() {
-    _lightFontColour = AppTheme.defaultLightFontColor;
-    _lightBoldFontColour = AppTheme.defaultLightBoldFontColor;
-    _lightIconColour = AppTheme.defaultLightIconColor;
-    _lightTableBorderColour = AppTheme.defaultLightTableBorderColour;
+  void resetLightColours() {
+    _fontColour._resetLightColor();
+    _boldFontColour._resetLightColor();
+    _iconColour._resetLightColor();
     _savePreferences();
     notifyListeners();
   }
 
-  Future<void> loadPreferences() async {
+  Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    _darkFontColour = Color(prefs.getInt('darkFontColor') ?? AppTheme.defaultDarkFontColor.value);
-    _lightFontColour = Color(prefs.getInt('lightFontColor') ?? AppTheme.defaultLightFontColor.value);
-    _darkBoldFontColour = Color(prefs.getInt('darkBoldFontColor') ?? AppTheme.defaultDarkBoldFontColor.value);
-    _lightBoldFontColour = Color(prefs.getInt('lightBoldFontColor') ?? AppTheme.defaultLightBoldFontColor.value);
-    _darkIconColour = Color(prefs.getInt('darkIconColor') ?? AppTheme.defaultDarkIconColor.value);
-    _lightIconColour = Color(prefs.getInt('lightIconColor') ?? AppTheme.defaultLightIconColor.value);
+
     _brightness = Brightness.values[prefs.getInt('brightness') ?? Brightness.light.index];
-    _lightTableBorderColour = Color(prefs.getInt('lightTableBorderColour') ?? AppTheme.defaultLightTableBorderColour.value);
-    _darkTableBorderColour = Color(prefs.getInt('darkTableBorderColour') ?? AppTheme.defaultDarkTableBorderColour.value);
     _windowWidth = prefs.getDouble('windowWidth') ?? 800.0;
     _windowHeight = prefs.getDouble('windowHeight') ?? 600.0;
+
+    for (var item in colourItems) {
+      item._loadPreferences(prefs);
+    }
+
     notifyListeners();
+  }
+
+  Color? loadColorPreference(SharedPreferences prefs, String key) {
+    return prefs.getInt(key) != null ? Color(prefs.getInt(key)!) : null;
   }
 
   Future<void> _savePreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setInt('darkFontColor', _darkFontColour.value);
-    prefs.setInt('lightFontColor', _lightFontColour.value);
-    prefs.setInt('darkBoldFontColor', _darkBoldFontColour.value);
-    prefs.setInt('lightBoldFontColor', _lightBoldFontColour.value);
-    prefs.setInt('darkIconColor', _darkIconColour.value);
-    prefs.setInt('lightIconColor', _lightIconColour.value);
+
     prefs.setInt('brightness', _brightness.index);
-    prefs.setInt('lightTableBorderColour', _lightTableBorderColour.value);
-    prefs.setInt('darkTableBorderColour', _darkTableBorderColour.value);
     prefs.setDouble('windowWidth', _windowWidth);
     prefs.setDouble('windowHeight', _windowHeight);
+
+    for (var item in colourItems) {
+      item._savePreferences(prefs);
+    }
+  }
+}
+
+class ThemeColourItem {
+  Color dark;
+  Color light;
+  final String key;
+  final String darkKey;
+  final String lightKey;
+  final Color defaultDark;
+  final Color defaultLight;
+  final bool Function() isDarkMode;
+  final VoidCallback onChanged;
+
+  ThemeColourItem({
+    required this.key,
+    required this.defaultDark,
+    required this.defaultLight,
+    required this.isDarkMode,
+    required this.onChanged,
+  })  : darkKey = '$key-dark',
+        lightKey = '$key-light',
+        dark = defaultDark,
+        light = defaultLight;
+
+  void _loadPreferences(SharedPreferences prefs) {
+    dark = Color(prefs.getInt(darkKey) ?? defaultDark.value);
+    light = Color(prefs.getInt(lightKey) ?? defaultLight.value);
+  }
+
+  void _savePreferences(SharedPreferences prefs) {
+    prefs.setInt(darkKey, dark.value);
+    prefs.setInt(lightKey, light.value);
+  }
+
+  void _resetDarkColor() {
+    dark = defaultDark;
+  }
+
+  void _resetLightColor() {
+    light = defaultLight;
+  }
+
+  Color getColour() {
+    return isDarkMode() ? dark : light;
+  }
+
+  void setColor(Color color) {
+    isDarkMode() ? dark = color : light = color;
+    onChanged();
   }
 }
