@@ -18,8 +18,8 @@ void main() async {
   _setupLogging();
 
   // Create ThemeProvider and load preferences
-  final themeProvider = ThemeProvider();
-  await themeProvider.loadPreferences();
+  final themeProvider = await ThemeProvider.create();
+
 
   // Set the window size
   await windowManager.setSize(Size(themeProvider.windowWidth, themeProvider.windowHeight));

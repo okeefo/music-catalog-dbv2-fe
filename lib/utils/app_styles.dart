@@ -23,20 +23,27 @@ class AppTheme {
   static const double iconSizeMedium = 16.0;
   static const double iconSizeLarge = 24.0;
 
+  static const Color black = Color(0xff000000);
+  
   // Default colour theme
   static const Color darkBackground = Color(0xff1e1e1e);
   static const Color lightBackground = Color(0xffffffff);
   static const Color greyBackground = Color.fromARGB(255, 76, 75, 75);
 
-  static const Color defaultDarkFontColor = Color(0xffffa500);
-  static const Color defaultLightFontColor = Color(0xff000000);
+  static const Color fontColourDark = Color(0xffffa500);
+  static const Color fontColourLight = Color(0xff000000);
 
-  static const Color defaultDarkBoldFontColor = Color.fromARGB(255, 219, 218, 218);
-  static const Color defaultLightBoldFontColor = Color(0xff1e1e1e);
+  static const Color boldFontColourDark = Color.fromARGB(255, 219, 218, 218);
+  static const Color boldFontColourLight = Color(0xff1e1e1e);
 
-  static const Color defaultDarkIconColor = Color.fromARGB(255, 219, 218, 218);
-  static const Color defaultLightIconColor = Color(0xff1e1e1e);
+  static const Color iconColorDark = Color.fromARGB(255, 219, 218, 218);
+  static const Color iconColorLight = Color(0xff1e1e1e);
 
-  static const Color defaultDarkTableBorderColour = Color.fromARGB(255, 219, 218, 218);
-  static const Color defaultLightTableBorderColour = Color(0xff000000);
+  static const Color tableBorderColourDark = Color.fromARGB(255, 219, 218, 218);
+  static const Color tableBorderColourLight = Color(0xff000000);
+
+  static const Color toggleSwitchBackgroundDark = Color.fromARGB(255, 33, 150, 243);
+  static const Color toggleSwitchBackgroundLight = Color.fromARGB(255, 33, 150, 243);
+
+
 }

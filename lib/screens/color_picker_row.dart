@@ -8,18 +8,14 @@ class ColorPickerRow extends StatelessWidget {
   final String text;
   final Color color;
   final ValueChanged<Color> onColorChanged;
-  final bool isDarkMode;
-  final Color darkFontColor;
-  final Color lightFontColor;
+  final bool addBorder;
 
   const ColorPickerRow({
     super.key,
     required this.text,
     required this.color,
     required this.onColorChanged,
-    required this.isDarkMode,
-    required this.darkFontColor,
-    required this.lightFontColor,
+    this.addBorder = false,
   });
 
   @override
@@ -32,7 +28,7 @@ class ColorPickerRow extends StatelessWidget {
         Text(
           text,
           style: TextStyle(
-            color: isDarkMode ? darkFontColor : lightFontColor,
+            color: themeProvider.fontColour,
           ),
         ),
         const SizedBox(width: 10),
@@ -41,11 +37,13 @@ class ColorPickerRow extends StatelessWidget {
             _showColorPickerDialog(context, color, onColorChanged, themeProvider);
           },
           child: Container(
-            width: 24,
-            height: 24,
-            color: color,
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-          ),
+              width: 24,
+              height: 24,
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              decoration: BoxDecoration(
+                color: color,
+                border: addBorder ? Border.all(color: themeProvider.tableBorderColour) : null,
+              )),
         ),
       ],
     );

@@ -23,23 +23,41 @@ class TrackTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context);
 
-    final rowStyle = material.TextStyle(
+    final rowStyle = TextStyle(
       fontWeight: theme.dataTableFontWeightNormal,
       fontFamily: theme.fontStyleDataTable,
       fontSize: theme.fontSizeDataTableRow,
       color: theme.fontColour,
     );
 
-    final headerStyle = material.TextStyle(
+    final altRowStyle = TextStyle(
+      fontWeight: theme.dataTableFontWeightNormal,
+      fontFamily: theme.fontStyleDataTable,
+      fontSize: theme.fontSizeDataTableRow,
+      color: theme.fontColour,
+    );
+
+    final headerStyle = TextStyle(
       fontWeight: theme.dataTableFontWeightBold,
       fontFamily: theme.fontStyleDataTable,
       fontSize: theme.fontSizeDataTableHeader,
-      color: theme.boldFontColour,
+      color: theme.headerFontColour,
+      backgroundColor: theme.transparent,
     );
 
-    final cellDeco = material.BoxDecoration(
-      border: material.Border.all(color: theme.tableBorderColour, width: 1.0),
-      color: theme.backgroundColour,
+    final colDeco = BoxDecoration(
+      border: Border.all(color: theme.tableBorderColour, width: 1.0),
+      color: theme.headerBackgroundColour,
+    );
+
+    final rowDelco = BoxDecoration(
+      border: Border.all(color: theme.tableBorderColour, width: 1.0),
+      color: theme.rowBackgroundColour,
+    );
+
+    final altRowDeco = BoxDecoration(
+      border: Border.all(color: theme.tableBorderColour, width: 1.0),
+      color: theme.rowAltBackgroundColour,
     );
 
     return FlyoutTarget(
@@ -49,12 +67,15 @@ class TrackTable extends StatelessWidget {
         data: _getData(),
         columnActions: _getColumnBehaviors(),
         rowStyle: rowStyle,
+        altRowStyle: altRowStyle,
         headerStyle: headerStyle,
         onRightClick: (context, position, columnIndex, rowIndex, d) {
           _showContextMenu(context, position, columnIndex, rowIndex, d);
         },
         infiniteScrollController: scrollController,
-        cellDecoration: cellDeco
+        columnDecoration: colDeco,
+        rowCellDecoration: rowDelco,
+        altRowDecoration: altRowDeco,
       ),
     );
   }

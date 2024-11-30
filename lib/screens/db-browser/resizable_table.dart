@@ -5,25 +5,31 @@ import 'package:url_launcher/url_launcher.dart';
 class ResizableTable extends StatefulWidget {
   final List<ResizeColumn> headers;
   final List<List<String>> data;
-  final material.TextStyle rowStyle;
-  final material.TextStyle headerStyle;
+  final TextStyle rowStyle;
+  final TextStyle altRowStyle;
+  final TextStyle headerStyle;
   final Map<int, ColumnAction> columnActions;
   final bool showAutoNumbering;
   final void Function(BuildContext context, Offset position, int columnIndex, int rowIndex, TapDownDetails d)? onRightClick;
   final ScrollController infiniteScrollController;
-  final material.BoxDecoration cellDecoration;
+  final BoxDecoration columnDecoration;
+  final BoxDecoration rowCellDecoration;
+  final BoxDecoration altRowDecoration;
 
   const ResizableTable({
     super.key,
     required this.headers,
     required this.data,
     required this.rowStyle,
+    required this.altRowStyle,
     required this.headerStyle,
     required this.columnActions,
     this.showAutoNumbering = true,
     this.onRightClick,
     required this.infiniteScrollController,
-    required this.cellDecoration,
+    required this.columnDecoration,
+    required this.rowCellDecoration,
+    required this.altRowDecoration,
   });
   @override
   ResizableTableState createState() => ResizableTableState();
@@ -149,7 +155,7 @@ class ResizableTableState extends State<ResizableTable> {
     return Container(
       width: autoNumberColumnWidth,
       padding: const EdgeInsets.all(8.0),
-      decoration: widget.cellDecoration,
+      decoration: widget.columnDecoration,
       child: SelectableText(
         '#',
         textAlign: TextAlign.right,
@@ -162,11 +168,11 @@ class ResizableTableState extends State<ResizableTable> {
     return Container(
       width: autoNumberColumnWidth,
       padding: const EdgeInsets.all(8.0),
-      decoration: widget.cellDecoration,
+      decoration: rowIndex % 2 == 0 ? widget.rowCellDecoration : widget.altRowDecoration,
       child: SelectableText(
         (rowIndex + 1).toString(),
         textAlign: TextAlign.right,
-        style: widget.rowStyle,
+        style: rowIndex % 2 == 0 ? widget.rowStyle : widget.altRowStyle,
       ),
     );
   }
@@ -188,14 +194,14 @@ class ResizableTableState extends State<ResizableTable> {
       },
       child: Container(
         width: columnWidths[index],
-        padding: const EdgeInsets.fromLTRB(8.0, 8.0,4.0, 8.0),
-        decoration: widget.cellDecoration,
+        padding: const EdgeInsets.fromLTRB(8.0, 8.0, 4.0, 8.0),
+        decoration: widget.columnDecoration,
         child: Row(
           children: [
             Expanded(child: SelectableText(header, style: widget.headerStyle)),
             MouseRegion(
               cursor: SystemMouseCursors.resizeColumn,
-              child: Container(   
+              child: Container(
                 width: 10.0,
                 color: Colors.transparent,
                 child: Icon(
@@ -240,10 +246,10 @@ class ResizableTableState extends State<ResizableTable> {
         child: Container(
           width: columnWidths[index],
           padding: const EdgeInsets.all(8.0),
-          decoration: widget.cellDecoration,
+          decoration: rowIndex % 2 == 0 ? widget.rowCellDecoration : widget.altRowDecoration,
           child: Text(
             text,
-            style: widget.rowStyle,
+            style: rowIndex % 2 == 0 ? widget.rowStyle : widget.altRowStyle,
             overflow: TextOverflow.ellipsis,
             softWrap: false,
           ),
@@ -275,12 +281,16 @@ class ResizableTableState extends State<ResizableTable> {
             child: Container(
               width: columnWidths[index],
               padding: const EdgeInsets.all(8.0),
-              decoration: widget.cellDecoration,
+              decoration: rowIndex % 2 == 0 ? widget.rowCellDecoration : widget.altRowDecoration,
               child: Text(
                 text,
-                style: widget.rowStyle.copyWith(
-                  decoration: material.TextDecoration.underline,
-                ),
+                style: rowIndex % 2 == 0
+                    ? widget.rowStyle.copyWith(
+                        decoration: TextDecoration.underline,
+                      )
+                    : widget.rowStyle.copyWith(
+                        decoration: TextDecoration.underline,
+                      ),
                 overflow: TextOverflow.ellipsis,
                 softWrap: false,
               ),
