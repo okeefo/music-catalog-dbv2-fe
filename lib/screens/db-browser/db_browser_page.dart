@@ -178,7 +178,11 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                           Tooltip(
                             message: 'Scan for music',
                             child: IconButton(
-                              icon: Icon(FluentIcons.music_in_collection_fill, size: themeProvider.iconSizeLarge),
+                              icon: Icon(
+                                FluentIcons.music_in_collection_fill,
+                                size: themeProvider.iconSizeLarge,
+                                color: themeProvider.iconColour,
+                              ),
                               onPressed: () => _trackProvider.scanForMusic(context, _channel),
                             ),
                           ),
@@ -197,7 +201,11 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                           Tooltip(
                             message: 'Reload tracks',
                             child: IconButton(
-                              icon: Icon(FluentIcons.refresh, size: themeProvider.iconSizeLarge),
+                              icon: Icon(
+                                FluentIcons.refresh,
+                                size: themeProvider.iconSizeLarge,
+                                color: themeProvider.iconColour,
+                              ),
                               onPressed: _loadTracks,
                             ),
                           ),

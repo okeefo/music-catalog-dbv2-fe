@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart' as material;
 import 'package:front_end/screens/popups.dart';
 import 'package:provider/provider.dart';
 import 'track_model.dart';
@@ -27,14 +26,14 @@ class TrackTable extends StatelessWidget {
       fontWeight: theme.dataTableFontWeightNormal,
       fontFamily: theme.fontStyleDataTable,
       fontSize: theme.fontSizeDataTableRow,
-      color: theme.fontColour,
+      color: theme.rowFontColour,
     );
 
     final altRowStyle = TextStyle(
       fontWeight: theme.dataTableFontWeightNormal,
       fontFamily: theme.fontStyleDataTable,
       fontSize: theme.fontSizeDataTableRow,
-      color: theme.fontColour,
+      color: theme.rowAltFontColour,
     );
 
     final headerStyle = TextStyle(
