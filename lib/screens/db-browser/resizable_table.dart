@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart' as material;
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -65,11 +64,11 @@ class ResizableTableState extends State<ResizableTable> {
   }
 
   double _calculateAutoNumberColumnWidth() {
-    final textPainter = material.TextPainter(textDirection: material.TextDirection.ltr);
+    final textPainter = TextPainter(textDirection: TextDirection.ltr);
     // auto number column width  is fixed width of f 99999 records (5 digits)
     if (widget.showAutoNumbering) {
       // Measure auto-numbering column width
-      textPainter.text = material.TextSpan(text: '9999', style: widget.headerStyle);
+      textPainter.text = TextSpan(text: '9999', style: widget.headerStyle);
       textPainter.layout();
       return (textPainter.width + 25.0).ceilToDouble(); // 8.0 padding on each side
     }
@@ -77,22 +76,22 @@ class ResizableTableState extends State<ResizableTable> {
   }
 
   double _calculateMinColumnWidth(int index) {
-    final textPainter = material.TextPainter(textDirection: material.TextDirection.ltr);
+    final textPainter = TextPainter(textDirection: TextDirection.ltr);
 
     // Measure header width
-    textPainter.text = material.TextSpan(text: widget.headers[index].name, style: widget.headerStyle);
+    textPainter.text = TextSpan(text: widget.headers[index].name, style: widget.headerStyle);
     textPainter.layout();
     double width = (textPainter.width + 30.0).ceilToDouble(); // extra padding to include the icon for dragging
     return width;
   }
 
   double _calculateMaxColumnWidth(int index) {
-    final textPainter = material.TextPainter(textDirection: material.TextDirection.ltr);
+    final textPainter = TextPainter(textDirection: TextDirection.ltr);
     double width = minColumnWidths[index]; // extra padding to include the icon for dragging
 
     // Measure each cell in the column
     for (var row in widget.data) {
-      textPainter.text = material.TextSpan(text: row[index], style: widget.rowStyle);
+      textPainter.text = TextSpan(text: row[index], style: widget.rowStyle);
       textPainter.layout();
       if (textPainter.width + 25.0 > width) {
         width = (textPainter.width + 25.0).ceilToDouble();
@@ -207,7 +206,7 @@ class ResizableTableState extends State<ResizableTable> {
                 child: Icon(
                   FluentIcons.gripper_bar_vertical,
                   size: widget.headerStyle.fontSize,
-                  color: material.Colors.grey,
+                  color: widget.headerStyle.color,
                 ),
               ),
             ),
@@ -288,7 +287,7 @@ class ResizableTableState extends State<ResizableTable> {
                     ? widget.rowStyle.copyWith(
                         decoration: TextDecoration.underline,
                       )
-                    : widget.rowStyle.copyWith(
+                    : widget.altRowStyle.copyWith(
                         decoration: TextDecoration.underline,
                       ),
                 overflow: TextOverflow.ellipsis,
