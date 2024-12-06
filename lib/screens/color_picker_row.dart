@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:front_end/screens/popups.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 
@@ -9,8 +10,10 @@ class ColorPickerRow extends StatelessWidget {
   final Color color;
   final ValueChanged<Color> onColorChanged;
   final bool addBorder;
+  final FlyoutController menuController = FlyoutController();
+  final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
-  const ColorPickerRow({
+  ColorPickerRow({
     super.key,
     required this.text,
     required this.color,
@@ -32,18 +35,24 @@ class ColorPickerRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        GestureDetector(
-          onTap: () {
-            _showColorPickerDialog(context, color, onColorChanged, themeProvider);
-          },
-          child: Container(
-              width: 24,
-              height: 24,
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-              decoration: BoxDecoration(
-                color: color,
-                border: addBorder ? Border.all(color: themeProvider.tableBorderColour) : null,
-              )),
+        FlyoutTarget(
+          controller: menuController,
+          child: GestureDetector(
+            onTap: () {
+              _showColorPickerDialog(context, color, onColorChanged, themeProvider);
+            },
+            onSecondaryTapDown: (details) {
+              _showContextMenu(context, details);
+            },
+            child: Container(
+                width: 24,
+                height: 24,
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: BoxDecoration(
+                  color: color,
+                  border: addBorder ? Border.all(color: themeProvider.tableBorderColour) : null,
+                )),
+          ),
         ),
       ],
     );
@@ -60,6 +69,43 @@ class ColorPickerRow extends StatelessWidget {
         );
       },
     );
+  }
+
+  void _showContextMenu(BuildContext context, TapDownDetails details) {
+    // This calculates the position of the flyout according to the parent navigator
+
+    menuController.showFlyout(
+      barrierDismissible: true,
+      dismissOnPointerMoveAway: true,
+      dismissWithEsc: true,
+      position: details.globalPosition,
+      navigatorKey: rootNavigatorKey.currentState,
+      builder: (context) {
+        return MenuFlyout(items: [
+          MenuFlyoutItem(
+            leading: const Icon(FluentIcons.copy),
+            text: const Text('Copy'),
+            onPressed: () => _showNotImplementedDialog(context),
+          ),
+          MenuFlyoutItem(
+            leading: const Icon(FluentIcons.paste),
+            text: const Text('Paste', style: TextStyle(fontSize: 12)),
+            onPressed: () => _showNotImplementedDialog(context),
+          ),
+          const MenuFlyoutSeparator(),
+          MenuFlyoutItem(
+            leading: const Icon(FluentIcons.open_in_new_window),
+            text: const Text('Open'),
+            onPressed: () => _showNotImplementedDialog(context),
+          ),
+        ]);
+      },
+    );
+  }
+
+  void _showNotImplementedDialog(BuildContext context) {
+    Flyout.of(context).close();
+    showErrorDialog(context, "Nothing to see here", "Not Implemented");
   }
 }
 
