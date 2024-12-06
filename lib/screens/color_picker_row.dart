@@ -42,7 +42,7 @@ class ColorPickerRow extends StatelessWidget {
               _showColorPickerDialog(context, color, onColorChanged, themeProvider);
             },
             onSecondaryTapDown: (details) {
-              _showContextMenu(context, details);
+              _showContextMenu(context, details, color, onColorChanged, themeProvider);
             },
             child: Container(
                 width: 24,
@@ -71,7 +71,7 @@ class ColorPickerRow extends StatelessWidget {
     );
   }
 
-  void _showContextMenu(BuildContext context, TapDownDetails details) {
+  void _showContextMenu(BuildContext context, TapDownDetails details, Color currentColor, ValueChanged<Color> onColorChanged, ThemeProvider themeProvider) {
     // This calculates the position of the flyout according to the parent navigator
 
     menuController.showFlyout(
@@ -96,7 +96,11 @@ class ColorPickerRow extends StatelessWidget {
           MenuFlyoutItem(
             leading: const Icon(FluentIcons.open_in_new_window),
             text: const Text('Open'),
-            onPressed: () => _showNotImplementedDialog(context),
+            closeAfterClick: true,
+            onPressed: (){ 
+              Navigator.pop(context);
+              _showColorPickerDialog(context, color, onColorChanged, themeProvider);
+            }
           ),
         ]);
       },
