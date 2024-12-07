@@ -24,21 +24,21 @@ class TrackTable extends StatelessWidget {
 
     final rowStyle = TextStyle(
       fontWeight: theme.dataTableFontWeightNormal,
-      fontFamily: theme.fontStyleDataTable,
+      fontFamily: theme.dataTableFontFamily,
       fontSize: theme.fontSizeDataTableRow,
       color: theme.rowFontColour,
     );
 
     final altRowStyle = TextStyle(
       fontWeight: theme.dataTableFontWeightNormal,
-      fontFamily: theme.fontStyleDataTable,
+      fontFamily: theme.dataTableFontFamily,
       fontSize: theme.fontSizeDataTableRow,
       color: theme.rowAltFontColour,
     );
 
     final headerStyle = TextStyle(
       fontWeight: theme.dataTableFontWeightBold,
-      fontFamily: theme.fontStyleDataTable,
+      fontFamily: theme.dataTableFontFamily,
       fontSize: theme.fontSizeDataTableHeader,
       color: theme.headerFontColour,
       backgroundColor: theme.transparent,

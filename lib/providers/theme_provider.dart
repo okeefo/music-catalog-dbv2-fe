@@ -22,6 +22,7 @@ class ThemeProvider with ChangeNotifier {
   Brightness _brightness = AppTheme.brightness;
   double _windowWidth = 800.0;
   double _windowHeight = 600.0;
+  String _dataTableFont = AppTheme.dataTableFontFamily;
 
   ThemeProvider._internal() {
     colourItems = <ThemeColourItem>[];
@@ -202,7 +203,14 @@ class ThemeProvider with ChangeNotifier {
     _tableBorderColour.setColor(color);
   }
 
-  String get fontStyleDataTable => AppTheme.dataTableFontFamily;
+  String get dataTableFontFamily => _dataTableFont;
+  
+  void setDataTableFontFamily(String font) {
+    _dataTableFont = font;
+    _savePreferences();
+    notifyListeners();
+  }
+
   double get fontSizeDataTableHeader => AppTheme.dataTableFontHeaderSize;
   double get fontSizeDataTableRow => AppTheme.dataTableFontRowSize;
   FontWeight get dataTableFontWeight => AppTheme.dataTableFontWeight;
@@ -268,6 +276,7 @@ class ThemeProvider with ChangeNotifier {
     _brightness = Brightness.values[prefs.getInt('brightness') ?? Brightness.light.index];
     _windowWidth = prefs.getDouble('windowWidth') ?? 800.0;
     _windowHeight = prefs.getDouble('windowHeight') ?? 600.0;
+    _dataTableFont = prefs.getString('dataTableFont') ?? AppTheme.dataTableFontFamily;
 
     for (var item in colourItems) {
       item._loadPreferences(prefs);
@@ -286,6 +295,7 @@ class ThemeProvider with ChangeNotifier {
     prefs.setInt('brightness', _brightness.index);
     prefs.setDouble('windowWidth', _windowWidth);
     prefs.setDouble('windowHeight', _windowHeight);
+    prefs.setString('dataTableFont', _dataTableFont);
 
     for (var item in colourItems) {
       item._savePreferences(prefs);
