@@ -80,11 +80,31 @@ flutter:
     - assets/fonts/
   
   fonts:
-    - family: Roboto  # Replace with your font family name
+    - family: Roboto  
       fonts:
-        - asset: assets/fonts/Roboto-Regular.ttf  # Replace with your font file
-        - asset: assets/fonts/Roboto-Bold.ttf  # Replace with your font file
+        - asset: assets/fonts/Roboto-Regular.ttf  
+        - asset: assets/fonts/Roboto-Bold.ttf 
           weight: 700
+    
+    - family: Roboto Mono  
+      fonts:
+        - asset: assets/fonts/RobotoMono-VariableFont_wght.ttf
+    
+    - family: Source Code Pro  
+      fonts:
+        - asset: assets/fonts/SourceCodePro-VariableFont_wght.ttf
+    
+    - family: Fira Code
+      fonts:
+        - asset: assets/fonts/FiraCode-VariableFont_wght.ttf
+    
+    - family: Inconsolata  
+      fonts:
+        - asset: assets/fonts/Inconsolata-VariableFont_wdth,wght.ttf
+
+        
+
+
   
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
