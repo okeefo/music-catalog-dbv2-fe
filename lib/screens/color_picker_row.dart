@@ -4,6 +4,8 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:front_end/screens/popups.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
+import 'package:flutter/services.dart';
+import 'package:logging/logging.dart';
 
 class ColorPickerRow extends StatelessWidget {
   final String text;
@@ -73,7 +75,7 @@ class ColorPickerRow extends StatelessWidget {
 
   void _showContextMenu(BuildContext context, TapDownDetails details, Color currentColor, ValueChanged<Color> onColorChanged, ThemeProvider themeProvider) {
     // This calculates the position of the flyout according to the parent navigator
-
+    final logger = Logger('ColorPickerRow');
     menuController.showFlyout(
       barrierDismissible: true,
       dismissOnPointerMoveAway: true,
@@ -83,25 +85,43 @@ class ColorPickerRow extends StatelessWidget {
       builder: (context) {
         return MenuFlyout(items: [
           MenuFlyoutItem(
-            leading: const Icon(FluentIcons.copy),
-            text: const Text('Copy'),
-            onPressed: () => _showNotImplementedDialog(context),
-          ),
+              leading: const Icon(FluentIcons.copy),
+              text: const Text('Copy'),
+              onPressed: () {
+               String hexColour = colorToHex(currentColor);
+                Clipboard.setData(ClipboardData(text: hexColour));
+                logger.info('Color copied to clipboard: $hexColour');
+              }),
           MenuFlyoutItem(
             leading: const Icon(FluentIcons.paste),
             text: const Text('Paste', style: TextStyle(fontSize: 12)),
-            onPressed: () => _showNotImplementedDialog(context),
+            selected: false,
+            onPressed: () => {
+              Clipboard.getData('text/plain').then((value) {
+                if (value != null) {
+                  String? hexColour = value.text;
+                  if (hexColour != null) {
+                    Color? newColor = hexColour.toColor();
+                    if (newColor != null) {
+                      logger.info('Pasted colour: $hexColour');
+                      onColorChanged(newColor);
+                    } else {
+                      logger.warning ( "Invalid colour: $hexColour", "Paste Error");
+                    }
+                  }
+                }
+              })
+            },
           ),
           const MenuFlyoutSeparator(),
           MenuFlyoutItem(
-            leading: const Icon(FluentIcons.open_in_new_window),
-            text: const Text('Open'),
-            closeAfterClick: true,
-            onPressed: (){ 
-              Navigator.pop(context);
-              _showColorPickerDialog(context, color, onColorChanged, themeProvider);
-            }
-          ),
+              leading: const Icon(FluentIcons.open_in_new_window),
+              text: const Text('Open'),
+              closeAfterClick: true,
+              onPressed: () {
+                Navigator.pop(context);
+                _showColorPickerDialog(context, color, onColorChanged, themeProvider);
+              }),
         ]);
       },
     );
