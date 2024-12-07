@@ -3,7 +3,7 @@ import 'package:flutter/material.dart' as material;
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:front_end/screens/popups.dart';
 import 'package:provider/provider.dart';
-import '../providers/theme_provider.dart';
+import '../../providers/theme_provider.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 

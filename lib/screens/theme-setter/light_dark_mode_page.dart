@@ -1,7 +1,8 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:front_end/screens/theme-setter/color_picker_row.dart';
 import 'package:provider/provider.dart';
-import '../../providers/theme_provider.dart';
-import 'color_picker_row.dart';
+import '../../../providers/theme_provider.dart';
+
 
 class LightDarkModePage extends StatefulWidget {
   const LightDarkModePage({super.key});
