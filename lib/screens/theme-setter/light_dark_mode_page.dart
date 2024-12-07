@@ -64,7 +64,6 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                           colour: themeProvider.backgroundColour,
                           saveColourFunc: themeProvider.setBackgroundColour,
                           themeProvider: themeProvider,
-                          addBorder: true,
                         ),
                         _buildColourPickerRow(
                           description: 'Font',
@@ -283,7 +282,7 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
     required Color colour,
     required void Function(Color color) saveColourFunc,
     required ThemeProvider themeProvider,
-    bool addBorder = false,
+
   }) {
     return TableRow(
       children: [
@@ -299,7 +298,7 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
           child: _buildColorPicker(
             colour: colour,
             saveColourFunc: saveColourFunc,
-            addBorder: addBorder,
+            addBorder: true,
           ),
         ),
       ],
@@ -343,6 +342,9 @@ _buildColorPicker({
   );
 }
 
+
+
+
 _buildFontPicker({
   required String font,
   required void Function(String font) saveFontFunc,
@@ -352,22 +354,27 @@ _buildFontPicker({
   fonts.add('Roboto');
   fonts.addAll([...commonWindowsFonts, ...monospacedWindowsFonts]);
 
-  return ComboBox<String>(
-    value: font,
-    onChanged: (String? newFont) {
-      if (newFont != null) {
-        saveFontFunc(newFont);
-      }
-    },
-    items: fonts.map<ComboBoxItem<String>>((String value) {
-      return ComboBoxItem<String>(
-        value: value,
-        child: Text(
-          value,
-          style: TextStyle(fontFamily: 'value'),
-        ),
-      );
-    }).toList(),
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      ComboBox<String>(
+        value: font,
+        onChanged: (String? newFont) {
+          if (newFont != null) {
+            saveFontFunc(newFont);
+          }
+        },
+        items: fonts.map<ComboBoxItem<String>>((String value) {
+          return ComboBoxItem<String>(
+            value: value,
+            child: Text(
+              value,
+              style: TextStyle(fontFamily: 'value'),
+            ),
+          );
+        }).toList(),
+      ),
+    ],
   );
 }
 
