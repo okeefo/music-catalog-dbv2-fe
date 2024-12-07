@@ -2,7 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:front_end/screens/theme-setter/color_picker_row.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/theme_provider.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 
 class LightDarkModePage extends StatefulWidget {
   const LightDarkModePage({super.key});
@@ -59,38 +59,38 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                       themeProvider: themeProvider,
                       maxDescriptionWidth: maxDescriptionWidth,
                       children: [
-                        _buildTableRow(
+                        _buildColourPickerRow(
                           description: 'Background',
                           colour: themeProvider.backgroundColour,
                           saveColourFunc: themeProvider.setBackgroundColour,
                           themeProvider: themeProvider,
                           addBorder: true,
                         ),
-                        _buildTableRow(
+                        _buildColourPickerRow(
                           description: 'Font',
                           colour: themeProvider.fontColour,
                           saveColourFunc: themeProvider.setFontColour,
                           themeProvider: themeProvider,
                         ),
-                        _buildTableRow(
+                        _buildColourPickerRow(
                           description: 'Bold Font',
                           colour: themeProvider.boldFontColour,
                           saveColourFunc: themeProvider.setBoldFontColor,
                           themeProvider: themeProvider,
                         ),
-                        _buildTableRow(
+                        _buildColourPickerRow(
                           description: 'Icon',
                           colour: themeProvider.iconColour,
                           saveColourFunc: themeProvider.setIconColour,
                           themeProvider: themeProvider,
                         ),
-                        _buildTableRow(
+                        _buildColourPickerRow(
                           description: 'Toggle Background',
                           colour: themeProvider.toggleSwitchBackgroundColor,
                           saveColourFunc: themeProvider.setToggleBackgroundColour,
                           themeProvider: themeProvider,
                         ),
-                        _buildTableRow(
+                        _buildColourPickerRow(
                           description: 'Toggle Knob',
                           colour: themeProvider.toggleSwitchKnobColor,
                           saveColourFunc: themeProvider.setToggleKnobColour,
@@ -104,46 +104,52 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                       themeProvider: themeProvider,
                       maxDescriptionWidth: maxDescriptionWidth,
                       children: [
-                        _buildTableRow(
+                        _buildColourPickerRow(
                           description: 'Border',
                           colour: themeProvider.tableBorderColour,
                           saveColourFunc: themeProvider.setTableBorderColour,
                           themeProvider: themeProvider,
                         ),
-                        _buildTableRow(
+                        _buildColourPickerRow(
                           description: 'Header Font',
                           colour: themeProvider.headerFontColour,
                           saveColourFunc: themeProvider.setHeaderFontColour,
                           themeProvider: themeProvider,
                         ),
-                        _buildTableRow(
+                        _buildColourPickerRow(
                           description: 'Header Background',
                           colour: themeProvider.headerBackgroundColour,
                           saveColourFunc: themeProvider.setHeaderFontBackgroundColour,
                           themeProvider: themeProvider,
                         ),
-                        _buildTableRow(
+                        _buildColourPickerRow(
                           description: 'Row Font',
                           colour: themeProvider.rowFontColour,
                           saveColourFunc: themeProvider.setRowFontColour,
                           themeProvider: themeProvider,
                         ),
-                        _buildTableRow(
+                        _buildColourPickerRow(
                           description: 'Row Background',
                           colour: themeProvider.rowBackgroundColour,
                           saveColourFunc: themeProvider.setRowBackgroundColour,
                           themeProvider: themeProvider,
                         ),
-                        _buildTableRow(
+                        _buildColourPickerRow(
                           description: 'Alternate Row Font',
                           colour: themeProvider.rowAltFontColour,
                           saveColourFunc: themeProvider.setRowAltFontColour,
                           themeProvider: themeProvider,
                         ),
-                        _buildTableRow(
+                        _buildColourPickerRow(
                           description: 'Alternate Row Background',
                           colour: themeProvider.rowAltBackgroundColour,
                           saveColourFunc: themeProvider.setRowAltBackgroundColour,
+                          themeProvider: themeProvider,
+                        ),
+                        _buildFontPickerRow(
+                          description: 'Font',
+                          font: themeProvider.dataTableFontFamily,
+                          saveFontFunc: themeProvider.setDataTableFontFamily,
                           themeProvider: themeProvider,
                         ),
                       ],
@@ -272,7 +278,7 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
     );
   }
 
-  TableRow _buildTableRow({
+  TableRow _buildColourPickerRow({
     required String description,
     required Color colour,
     required void Function(Color color) saveColourFunc,
@@ -299,6 +305,27 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
       ],
     );
   }
+
+  TableRow _buildFontPickerRow({required String description, required String font, required void Function(String font) saveFontFunc, required themeProvider}) {
+    return TableRow(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Text(
+            description,
+            style: TextStyle(fontSize: 14, color: themeProvider.fontColour),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: _buildFontPicker(
+            font: font,
+            saveFontFunc: saveFontFunc,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 _buildColorPicker({
@@ -315,3 +342,57 @@ _buildColorPicker({
     addBorder: addBorder,
   );
 }
+
+_buildFontPicker({
+  required String font,
+  required void Function(String font) saveFontFunc,
+}) {
+  List<String> fonts = [];
+  fonts.add('JetBrainsMono Nerd Font');
+  fonts.add('Roboto');
+  fonts.addAll([...commonWindowsFonts, ...monospacedWindowsFonts]);
+
+  return ComboBox<String>(
+    value: font,
+    onChanged: (String? newFont) {
+      if (newFont != null) {
+        saveFontFunc(newFont);
+      }
+    },
+    items: fonts.map<ComboBoxItem<String>>((String value) {
+      return ComboBoxItem<String>(
+        value: value,
+        child: Text(
+          value,
+          style: TextStyle(fontFamily: 'value'),
+        ),
+      );
+    }).toList(),
+  );
+}
+
+const List<String> commonWindowsFonts = [
+  'Arial',
+  'Times New Roman',
+  'Verdana',
+  'Georgia',
+  'Trebuchet MS',
+  'Comic Sans MS',
+  'Impact',
+  'Calibri',
+  'Cambria',
+  'Tahoma',
+];
+
+const List<String> monospacedWindowsFonts = [
+  'Courier New',
+  'Consolas',
+  'Lucida Console',
+  'Monaco',
+  'Inconsolata',
+  'Source Code Pro',
+  'Roboto Mono',
+  'JetBrains Mono',
+  'Fira Code',
+  'DejaVu Sans Mono',
+];
