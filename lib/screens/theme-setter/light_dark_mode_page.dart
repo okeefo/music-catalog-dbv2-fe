@@ -1,8 +1,8 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:front_end/screens/theme-setter/color_picker_row.dart';
+import 'package:front_end/screens/theme-setter/font_picker_row.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/theme_provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class LightDarkModePage extends StatefulWidget {
   const LightDarkModePage({super.key});
@@ -52,7 +52,6 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min, // Ensure the row only takes up the space it needs
                   crossAxisAlignment: CrossAxisAlignment.stretch, // Stretch children to match the tallest child
-
                   children: [
                     _buildGridBox(
                       title: 'General',
@@ -241,13 +240,13 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
     required List<TableRow> children,
   }) {
     return Container(
-      margin: const EdgeInsets.all(8.0),
+      margin: const EdgeInsets.all(4.0),
       decoration: BoxDecoration(
         border: Border.all(color: themeProvider.tableBorderColour, width: 2.0),
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           mainAxisSize: MainAxisSize.min, // Take up minimum space
           crossAxisAlignment: CrossAxisAlignment.center, // Center the title horizontally
@@ -265,7 +264,7 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
               alignment: Alignment.centerLeft, // Align the table to the left
               child: Table(
                 columnWidths: {
-                  0: FixedColumnWidth(maxDescriptionWidth + 16), // Add some padding
+                  0: FixedColumnWidth(maxDescriptionWidth + 2), // Add some padding
                   1: IntrinsicColumnWidth(),
                 },
                 children: children,
@@ -282,7 +281,6 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
     required Color colour,
     required void Function(Color color) saveColourFunc,
     required ThemeProvider themeProvider,
-
   }) {
     return TableRow(
       children: [
@@ -305,7 +303,12 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
     );
   }
 
-  TableRow _buildFontPickerRow({required String description, required String font, required void Function(String font) saveFontFunc, required themeProvider}) {
+  TableRow _buildFontPickerRow({
+    required String description,
+    required String font,
+    required void Function(String font) saveFontFunc,
+    required ThemeProvider themeProvider,
+  }) {
     return TableRow(
       children: [
         Padding(
@@ -317,9 +320,11 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: _buildFontPicker(
+          child: FontPickerRow(
+            text: '',
             font: font,
-            saveFontFunc: saveFontFunc,
+            onFontChanged: saveFontFunc,
+            addBorder: true,
           ),
         ),
       ],
@@ -342,64 +347,3 @@ _buildColorPicker({
   );
 }
 
-
-
-
-_buildFontPicker({
-  required String font,
-  required void Function(String font) saveFontFunc,
-}) {
-  List<String> fonts = [];
-  fonts.add('JetBrainsMono Nerd Font');
-  fonts.add('Roboto');
-  fonts.addAll([...commonWindowsFonts, ...monospacedWindowsFonts]);
-
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      ComboBox<String>(
-        value: font,
-        onChanged: (String? newFont) {
-          if (newFont != null) {
-            saveFontFunc(newFont);
-          }
-        },
-        items: fonts.map<ComboBoxItem<String>>((String value) {
-          return ComboBoxItem<String>(
-            value: value,
-            child: Text(
-              value,
-              style: TextStyle(fontFamily: 'value'),
-            ),
-          );
-        }).toList(),
-      ),
-    ],
-  );
-}
-
-const List<String> commonWindowsFonts = [
-  'Arial',
-  'Times New Roman',
-  'Verdana',
-  'Georgia',
-  'Trebuchet MS',
-  'Comic Sans MS',
-  'Impact',
-  'Calibri',
-  'Cambria',
-  'Tahoma',
-];
-
-const List<String> monospacedWindowsFonts = [
-  'Courier New',
-  'Consolas',
-  'Lucida Console',
-  'Monaco',
-  'Inconsolata',
-  'Source Code Pro',
-  'Roboto Mono',
-  'JetBrains Mono',
-  'Fira Code',
-  'DejaVu Sans Mono',
-];
