@@ -124,6 +124,9 @@ flutter:
     - family: Crakos  
       fonts:
         - asset: assets/fonts/Crakos.ttf
+    - family: High Def  
+      fonts:
+        - asset: assets/fonts/High Def.ttf
     - family: Monaco  
       fonts:
         - asset: assets/fonts/Monaco.ttf

@@ -3,6 +3,7 @@ import 'package:front_end/screens/theme-settings/color_picker_row.dart';
 import 'package:front_end/screens/theme-settings/font_picker_row.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/theme_provider.dart';
+import '../popups.dart';
 
 class LightDarkModePage extends StatefulWidget {
   const LightDarkModePage({super.key});
@@ -198,11 +199,15 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                   ),
                   const SizedBox(width: 20),
                   Button(
-                    onPressed: () {
-                      if (themeProvider.isDarkMode) {
-                        themeProvider.resetDarkColours();
-                      } else {
-                        themeProvider.resetLightColours();
+                    onPressed: () async {
+                      bool? yesNo = await showConfirmDialog(context, 'Are you sure you want to reset the colours to the default values?', 'Reset to Default');
+
+                      if (yesNo == true) {
+                        if (themeProvider.isDarkMode) {
+                          themeProvider.resetDarkColours();
+                        } else {
+                          themeProvider.resetLightColours();
+                        }
                       }
                     },
                     child: Text(
