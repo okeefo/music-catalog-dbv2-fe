@@ -5,7 +5,7 @@ import 'settings_page.dart';
 import 'navigation_items.dart';
 import 'db-browser/db_browser_page.dart';
 import 'db_connections_page.dart';
-import 'theme-setter/light_dark_mode_page.dart';
+import 'theme-settings/light_dark_mode_page.dart';
 
 // lib/screens/home_screen.dart
 

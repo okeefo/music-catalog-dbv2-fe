@@ -22,10 +22,12 @@ class FontPickerRow extends StatefulWidget {
 }
 
 class _FontPickerRowState extends State<FontPickerRow> {
+  final String exampleText = 'The quick brown fox jumps over the lazy dog.\n 1 2 3 4 5 6 7 8 9 0\n = != < > + - * / @';
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    List<String> fonts = ['JetBrainsMono Nerd Font', 'Roboto', ...commonWindowsFonts, ...monospacedWindowsFonts];
+    List<String> fonts = ['JetBrainsMono Nerd Font', 'Roboto', ...fontsList];
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -188,15 +190,52 @@ class _FontPickerRowState extends State<FontPickerRow> {
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: Container(
-                margin: const EdgeInsets.all(16.0),
-                child: Center(
-                  widthFactor: 10.0,
-                  child: Text(
-                    'The quick brown fox jumps over the lazy dog\n\n 1 2 3 4 5 6 7 8 9 0\n\n = != < > + - * / @ ',
-                    style: TextStyle(fontFamily: previewFont, color: themeProvider.fontColour),
+              child: Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.all(16.0),
+                    child: Center(
+                      widthFactor: 10.0,
+                      child: Text(
+                        '$previewFont\n',
+                        style: _getStyleReg(themeProvider, previewFont, themeProvider.fontSizeLarge),
+                      ),
+                    ),
                   ),
-                ),
+                  Container(
+                    margin: const EdgeInsets.all(16.0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        textAlign: TextAlign.left,
+                        "Thin : $exampleText",
+                        style: _getStyleThin(themeProvider, previewFont, themeProvider.fontSizeReg),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.all(16.0),
+                    child: Center(
+                      widthFactor: 10.0,
+                      child: Text(
+                        textAlign: TextAlign.left,
+                        "Normal : $exampleText",
+                        style: _getStyleReg(themeProvider, previewFont, themeProvider.fontSizeReg),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.all(16.0),
+                    child: Center(
+                      widthFactor: 10.0,
+                      child: Text(
+                        textAlign: TextAlign.left,
+                        "Bold : $exampleText",
+                        style: _getStyleBold(themeProvider, previewFont, themeProvider.fontSizeReg),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -204,9 +243,21 @@ class _FontPickerRowState extends State<FontPickerRow> {
       ),
     );
   }
+
+  TextStyle _getStyleReg(ThemeProvider themeProvider, String previewFont, double size) {
+    return TextStyle(fontFamily: previewFont, color: themeProvider.fontColour, fontSize: size, fontWeight: themeProvider.fontWeightNorm);
+  }
+
+  TextStyle _getStyleBold(ThemeProvider themeProvider, String previewFont, double size) {
+    return TextStyle(fontFamily: previewFont, color: themeProvider.fontColour, fontSize: size, fontWeight: themeProvider.fontWeightBold);
+  }
+
+  TextStyle _getStyleThin(ThemeProvider themeProvider, String previewFont, double size) {
+    return TextStyle(fontFamily: previewFont, color: themeProvider.fontColour, fontSize: size, fontWeight: themeProvider.fontWeightThin);
+  }
 }
 
-const List<String> commonWindowsFonts = [
+const List<String> fontsList = [
   'Arial',
   'Times New Roman',
   'Verdana',
@@ -217,9 +268,13 @@ const List<String> commonWindowsFonts = [
   'Calibri',
   'Cambria',
   'Tahoma',
-];
+  'National Park',
+  'Bookmark',
+  'Coutline',
+  'Crakos',
+  
+  //Mono spaced
 
-const List<String> monospacedWindowsFonts = [
   'Courier New',
   'Consolas',
   'Lucida Console',
@@ -229,4 +284,6 @@ const List<String> monospacedWindowsFonts = [
   'Roboto Mono',
   'Fira Code',
   'DejaVu Sans Mono',
+  'BouCollege',
+
 ];

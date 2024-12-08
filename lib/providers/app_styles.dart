@@ -6,8 +6,13 @@ class AppTheme {
 
   //Default font
   static const String fontFamily = 'Roboto';
-  static const double defaultTextSize = 16.0;
-  static const double titleTextSize = 24.0;
+  static const double fontSizeReg = 16.0;
+  static const double fontSizeTitle = 24.0;
+  static const double fontSizeSmall = 12.0;
+  static const double fontSizeLarge = 32.0;
+  static const FontWeight fontWeightNorm = FontWeight.normal;
+  static const FontWeight fontWeightBold = FontWeight.bold;
+  static const FontWeight fontWeightThin = FontWeight.w100;
 
   //Default DataTable font
   static const String dataTableFontFamily = 'JetBrainsMono Nerd Font';

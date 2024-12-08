@@ -82,13 +82,14 @@ flutter:
   fonts:
     - family: Roboto  
       fonts:
-        - asset: assets/fonts/Roboto-Regular.ttf  
-        - asset: assets/fonts/Roboto-Bold.ttf 
+        - asset: assets/fonts/roboto/Roboto-Regular.ttf 
+          weight: 400 
+        - asset: assets/fonts/roboto/Roboto-Bold.ttf 
           weight: 700
     
     - family: Roboto Mono  
       fonts:
-        - asset: assets/fonts/RobotoMono-VariableFont_wght.ttf
+        - asset: assets/fonts/roboto/RobotoMono-VariableFont_wght.ttf
     
     - family: Source Code Pro  
       fonts:
@@ -101,10 +102,32 @@ flutter:
     - family: Inconsolata  
       fonts:
         - asset: assets/fonts/Inconsolata-VariableFont_wdth,wght.ttf
-
+    
+    - family: National Park  
+      fonts:
+        - asset: assets/fonts/national-park/NationalPark-Regular.otf
+          weight: 400
+        - asset: assets/fonts/national-park/NationalPark-Heavy.otf
+          weight: 700
+        - asset: assets/fonts/national-park/NationalPark-Thin.otf
+          weight: 100
+    
+    - family: Bookmark  
+      fonts:
+        - asset: assets/fonts/bookmark.ttf
+    - family: BouCollege  
+      fonts:
+        - asset: assets/fonts/BouCollege.ttf
+    - family: Coutline  
+      fonts:
+        - asset: assets/fonts/Coutline.ttf
+    - family: Crakos  
+      fonts:
+        - asset: assets/fonts/Crakos.ttf
+    - family: Monaco  
+      fonts:
+        - asset: assets/fonts/Monaco.ttf
         
-
-
   
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
