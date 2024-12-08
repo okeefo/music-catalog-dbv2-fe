@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:front_end/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../utils/app_styles.dart';
+import 'app_styles.dart';
 
 class ThemeProvider with ChangeNotifier {
   late final ThemeColourItem _fontColour;
@@ -221,27 +222,34 @@ class ThemeProvider with ChangeNotifier {
 
   // Text Styles
   TextStyle get styleTableRow => TextStyle(
-    fontWeight: dataTableFontWeightNormal,
-    fontFamily: dataTableFontFamily,
-    fontSize: fontSizeDataTableRow,
-    color: tableRowFontColour,
-  );
+        fontWeight: dataTableFontWeightNormal,
+        fontFamily: dataTableFontFamily,
+        fontSize: fontSizeDataTableRow,
+        color: tableRowFontColour,
+      );
 
   TextStyle get styleTableAltRow => TextStyle(
-    fontWeight: dataTableFontWeightNormal,
-    fontFamily: dataTableFontFamily,
-    fontSize: fontSizeDataTableRow,
-    color: tableRowAltFontColour,
-  );
+        fontWeight: dataTableFontWeightNormal,
+        fontFamily: dataTableFontFamily,
+        fontSize: fontSizeDataTableRow,
+        color: tableRowAltFontColour,
+      );
 
   TextStyle get styleTableHeader => TextStyle(
-    fontWeight: dataTableFontWeightBold,
-    fontFamily: dataTableFontFamily,
-    fontSize: fontSizeDataTableHeader,
-    color: headerFontColour,
-    backgroundColor: transparent,
-  );
+        fontWeight: dataTableFontWeightBold,
+        fontFamily: dataTableFontFamily,
+        fontSize: fontSizeDataTableHeader,
+        color: headerFontColour,
+        backgroundColor: transparent,
+      );
 
+  double get fontSizeReg => AppTheme.fontSizeReg;
+  double get fontSizeTitle => AppTheme.fontSizeTitle;
+  double get fontSizeSmall => AppTheme.fontSizeSmall;
+  double get fontSizeLarge => AppTheme.iconSizeLarge;
+  FontWeight get fontWeightNorm => AppTheme.fontWeightNorm;
+  FontWeight get fontWeightBold => AppTheme.fontWeightBold;
+  FontWeight get fontWeightThin => AppTheme.fontWeightThin;
 
 //General Settings.
   Color get greyBackground => AppTheme.greyBackground;

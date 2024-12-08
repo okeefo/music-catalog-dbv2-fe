@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:path/path.dart' as path;
 import '../providers/db_provider.dart';
 import '../providers/theme_provider.dart';
-import '../utils/app_styles.dart';
+import '../providers/app_styles.dart';
 
 class DbConnectionsPage extends StatelessWidget {
   const DbConnectionsPage({super.key});
@@ -26,7 +26,7 @@ class DbConnectionsPage extends StatelessWidget {
               child: Text(
                 'DB Connections Page',
                 style: TextStyle(
-                  fontSize: AppTheme.titleTextSize,
+                  fontSize: AppTheme.fontSizeTitle,
                   fontFamily: AppTheme.fontFamily,
                   color: fontColour,
                 ),
