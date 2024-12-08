@@ -22,27 +22,6 @@ class TrackTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context);
 
-    final rowStyle = TextStyle(
-      fontWeight: theme.dataTableFontWeightNormal,
-      fontFamily: theme.dataTableFontFamily,
-      fontSize: theme.fontSizeDataTableRow,
-      color: theme.rowFontColour,
-    );
-
-    final altRowStyle = TextStyle(
-      fontWeight: theme.dataTableFontWeightNormal,
-      fontFamily: theme.dataTableFontFamily,
-      fontSize: theme.fontSizeDataTableRow,
-      color: theme.rowAltFontColour,
-    );
-
-    final headerStyle = TextStyle(
-      fontWeight: theme.dataTableFontWeightBold,
-      fontFamily: theme.dataTableFontFamily,
-      fontSize: theme.fontSizeDataTableHeader,
-      color: theme.headerFontColour,
-      backgroundColor: theme.transparent,
-    );
 
     final colDeco = BoxDecoration(
       border: Border.all(color: theme.tableBorderColour, width: 1.0),
@@ -51,12 +30,12 @@ class TrackTable extends StatelessWidget {
 
     final rowDelco = BoxDecoration(
       border: Border.all(color: theme.tableBorderColour, width: 1.0),
-      color: theme.rowBackgroundColour,
+      color: theme.tableRowBackgroundColour,
     );
 
     final altRowDeco = BoxDecoration(
       border: Border.all(color: theme.tableBorderColour, width: 1.0),
-      color: theme.rowAltBackgroundColour,
+      color: theme.tableRowAltBackgroundColour,
     );
 
     return FlyoutTarget(
@@ -65,9 +44,9 @@ class TrackTable extends StatelessWidget {
         headers: _getHeaders(),
         data: _getData(),
         columnActions: _getColumnBehaviors(),
-        rowStyle: rowStyle,
-        altRowStyle: altRowStyle,
-        headerStyle: headerStyle,
+        rowStyle: theme.styleTableRow,
+        altRowStyle: theme.styleTableAltRow,
+        headerStyle: theme.styleTableHeader,
         onRightClick: (context, position, columnIndex, rowIndex, d) {
           _showContextMenu(context, position, columnIndex, rowIndex, d);
         },

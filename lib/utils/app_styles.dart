@@ -24,7 +24,7 @@ class AppTheme {
   static const double iconSizeLarge = 24.0;
 
   static const Color black = Color(0xff000000);
-  
+
   // Default colour theme
   static const Color darkBackground = Color(0xff1e1e1e);
   static const Color lightBackground = Color(0xffffffff);
@@ -45,5 +45,21 @@ class AppTheme {
   static const Color toggleSwitchBackgroundDark = Color.fromARGB(255, 33, 150, 243);
   static const Color toggleSwitchBackgroundLight = Color.fromARGB(255, 33, 150, 243);
 
+  static const Color tableHeaderFontColourDark = Color.fromARGB(255, 183, 127, 238);
+  static const Color tableHeaderFontColourLight = Color.fromARGB(255, 130, 4, 36);
 
+  static const Color tableHeaderBackgroundColourDark = Color.fromARGB(255, 52, 52, 52);
+  static const Color tableHeaderBackgroundColourLight = Color.fromARGB(255, 248, 246, 241);
+
+  static const Color tableFontColourDark = Color.fromARGB(255, 247, 210, 185);
+  static const Color tableFontColourLight = Color.fromARGB(255, 46, 44, 10);
+
+  static const Color tableBackgroundColourDark = Color.fromARGB(255, 60, 59, 59);
+  static const Color tableBackgroundColourLight = Color.fromARGB(255, 237, 238, 238);
+
+  static const Color tableFontAltColourDark = Color.fromARGB(255, 182, 237, 240);
+  static const Color tableFontAltColourLight = Color.fromARGB(255, 56, 5, 95);
+
+  static const Color tableBackgroundAltColourDark = Color.fromARGB(255, 76, 75, 75);
+  static const Color tableBackgroundAltColourLight = Color.fromARGB(255, 243, 246, 239);
 }
