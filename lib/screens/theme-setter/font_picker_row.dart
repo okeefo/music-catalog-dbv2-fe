@@ -148,7 +148,7 @@ class _FontPickerRowState extends State<FontPickerRow> {
                       onFontSelected(value);
                     },
                     child: Container(
-                      color: index % 2 == 0 ? themeProvider.rowBackgroundColour : themeProvider.rowAltBackgroundColour,
+                      color: index % 2 == 0 ? themeProvider.tableRowBackgroundColour : themeProvider.tableRowAltBackgroundColour,
                       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                       child: Text(
                         value,

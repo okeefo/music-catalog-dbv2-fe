@@ -9,11 +9,11 @@ class ThemeProvider with ChangeNotifier {
   late final ThemeColourItem _tableBorderColour;
   late final ThemeColourItem _backgroundColour;
   late final ThemeColourItem _headerFontColour;
-  late final ThemeColourItem _headerFontBackgroundColour;
-  late final ThemeColourItem _rowFontColour;
-  late final ThemeColourItem _rowFontBackgroundColour;
-  late final ThemeColourItem _rowAltFontColour;
-  late final ThemeColourItem _rowAltFontBackgroundColour;
+  late final ThemeColourItem _headerBackgroundColour;
+  late final ThemeColourItem _tableRowFontColour;
+  late final ThemeColourItem _tableRowBackgroundColour;
+  late final ThemeColourItem _tableRowAltFontColour;
+  late final ThemeColourItem _tableRowAltBackgroundColour;
   late final ThemeColourItem _toggleSwitchBackgroundColour;
   late final ThemeColourItem _toggleSwitchKnobColour;
 
@@ -68,51 +68,51 @@ class ThemeProvider with ChangeNotifier {
 
     _headerFontColour = ThemeColourItem(
         key: 'headerFont',
-        defaultDark: AppTheme.fontColourDark,
-        defaultLight: AppTheme.fontColourLight,
+        defaultDark: AppTheme.tableHeaderFontColourDark,
+        defaultLight: AppTheme.tableHeaderFontColourLight,
         isDarkMode: () => _isDarkMode(),
         onChanged: () => _onColorChanged());
     colourItems.add(_headerFontColour);
 
-    _headerFontBackgroundColour = ThemeColourItem(
+    _headerBackgroundColour = ThemeColourItem(
         key: 'headerFontBackground',
-        defaultDark: AppTheme.darkBackground,
-        defaultLight: AppTheme.lightBackground,
+        defaultDark: AppTheme.tableHeaderBackgroundColourDark,
+        defaultLight: AppTheme.tableHeaderBackgroundColourLight,
         isDarkMode: () => _isDarkMode(),
         onChanged: () => _onColorChanged());
-    colourItems.add(_headerFontBackgroundColour);
+    colourItems.add(_headerBackgroundColour);
 
-    _rowFontColour = ThemeColourItem(
+    _tableRowFontColour = ThemeColourItem(
         key: 'rowFont',
-        defaultDark: AppTheme.fontColourDark,
-        defaultLight: AppTheme.fontColourLight,
+        defaultDark: AppTheme.tableFontColourDark,
+        defaultLight: AppTheme.tableFontColourLight,
         isDarkMode: () => _isDarkMode(),
         onChanged: () => _onColorChanged());
-    colourItems.add(_rowFontColour);
+    colourItems.add(_tableRowFontColour);
 
-    _rowFontBackgroundColour = ThemeColourItem(
+    _tableRowBackgroundColour = ThemeColourItem(
         key: 'rowFontBackground',
-        defaultDark: AppTheme.darkBackground,
-        defaultLight: AppTheme.lightBackground,
+        defaultDark: AppTheme.tableBackgroundColourDark,
+        defaultLight: AppTheme.tableBackgroundColourLight,
         isDarkMode: () => _isDarkMode(),
         onChanged: () => _onColorChanged());
-    colourItems.add(_rowFontBackgroundColour);
+    colourItems.add(_tableRowBackgroundColour);
 
-    _rowAltFontColour = ThemeColourItem(
+    _tableRowAltFontColour = ThemeColourItem(
         key: 'rowAltFont',
-        defaultDark: AppTheme.fontColourDark,
-        defaultLight: AppTheme.fontColourLight,
+        defaultDark: AppTheme.tableFontAltColourDark,
+        defaultLight: AppTheme.tableFontAltColourLight,
         isDarkMode: () => _isDarkMode(),
         onChanged: () => _onColorChanged());
-    colourItems.add(_rowAltFontColour);
+    colourItems.add(_tableRowAltFontColour);
 
-    _rowAltFontBackgroundColour = ThemeColourItem(
+    _tableRowAltBackgroundColour = ThemeColourItem(
         key: 'rowAltFontBackground',
-        defaultDark: AppTheme.greyBackground,
-        defaultLight: AppTheme.greyBackground,
+        defaultDark: AppTheme.tableBackgroundAltColourDark,
+        defaultLight: AppTheme.tableBackgroundAltColourLight,
         isDarkMode: () => _isDarkMode(),
         onChanged: () => _onColorChanged());
-    colourItems.add(_fontColour);
+    colourItems.add(_tableRowAltBackgroundColour);
 
     _toggleSwitchBackgroundColour = ThemeColourItem(
         key: 'toggleSwitch',
@@ -162,29 +162,29 @@ class ThemeProvider with ChangeNotifier {
     _headerFontColour.setColor(color);
   }
 
-  Color get headerBackgroundColour => _headerFontBackgroundColour.getColour();
+  Color get headerBackgroundColour => _headerBackgroundColour.getColour();
   void setHeaderFontBackgroundColour(Color color) {
-    _headerFontBackgroundColour.setColor(color);
+    _headerBackgroundColour.setColor(color);
   }
 
-  Color get rowFontColour => _rowFontColour.getColour();
-  void setRowFontColour(Color color) {
-    _rowFontColour.setColor(color);
+  Color get tableRowFontColour => _tableRowFontColour.getColour();
+  void setTableRowFontColour(Color color) {
+    _tableRowFontColour.setColor(color);
   }
 
-  Color get rowBackgroundColour => _rowFontBackgroundColour.getColour();
-  void setRowBackgroundColour(Color color) {
-    _rowFontBackgroundColour.setColor(color);
+  Color get tableRowBackgroundColour => _tableRowBackgroundColour.getColour();
+  void setTableRowBackgroundColour(Color color) {
+    _tableRowBackgroundColour.setColor(color);
   }
 
-  Color get rowAltFontColour => _rowAltFontColour.getColour();
-  void setRowAltFontColour(Color color) {
-    _rowAltFontColour.setColor(color);
+  Color get tableRowAltFontColour => _tableRowAltFontColour.getColour();
+  void setTableRowAltFontColour(Color color) {
+    _tableRowAltFontColour.setColor(color);
   }
 
-  Color get rowAltBackgroundColour => _rowAltFontBackgroundColour.getColour();
-  void setRowAltBackgroundColour(Color color) {
-    _rowAltFontBackgroundColour.setColor(color);
+  Color get tableRowAltBackgroundColour => _tableRowAltBackgroundColour.getColour();
+  void setTableRowAltBackgroundColour(Color color) {
+    _tableRowAltBackgroundColour.setColor(color);
   }
 
   Color get toggleSwitchBackgroundColor => _toggleSwitchBackgroundColour.getColour();
@@ -204,7 +204,7 @@ class ThemeProvider with ChangeNotifier {
   }
 
   String get dataTableFontFamily => _dataTableFont;
-  
+
   void setDataTableFontFamily(String font) {
     _dataTableFont = font;
     _savePreferences();
@@ -218,6 +218,30 @@ class ThemeProvider with ChangeNotifier {
   FontWeight get dataTableFontWeightBold => AppTheme.dataTableFontWeightBold;
   FontWeight get dataTableFontWeightNormal => AppTheme.dataTableFontWeightNormal;
   Color get transparent => Colors.transparent;
+
+  // Text Styles
+  TextStyle get styleTableRow => TextStyle(
+    fontWeight: dataTableFontWeightNormal,
+    fontFamily: dataTableFontFamily,
+    fontSize: fontSizeDataTableRow,
+    color: tableRowFontColour,
+  );
+
+  TextStyle get styleTableAltRow => TextStyle(
+    fontWeight: dataTableFontWeightNormal,
+    fontFamily: dataTableFontFamily,
+    fontSize: fontSizeDataTableRow,
+    color: tableRowAltFontColour,
+  );
+
+  TextStyle get styleTableHeader => TextStyle(
+    fontWeight: dataTableFontWeightBold,
+    fontFamily: dataTableFontFamily,
+    fontSize: fontSizeDataTableHeader,
+    color: headerFontColour,
+    backgroundColor: transparent,
+  );
+
 
 //General Settings.
   Color get greyBackground => AppTheme.greyBackground;

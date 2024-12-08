@@ -122,26 +122,26 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                         ),
                         _buildColourPickerRow(
                           description: 'Row Font',
-                          colour: themeProvider.rowFontColour,
-                          saveColourFunc: themeProvider.setRowFontColour,
+                          colour: themeProvider.tableRowFontColour,
+                          saveColourFunc: themeProvider.setTableRowFontColour,
                           themeProvider: themeProvider,
                         ),
                         _buildColourPickerRow(
                           description: 'Row Background',
-                          colour: themeProvider.rowBackgroundColour,
-                          saveColourFunc: themeProvider.setRowBackgroundColour,
+                          colour: themeProvider.tableRowBackgroundColour,
+                          saveColourFunc: themeProvider.setTableRowBackgroundColour,
                           themeProvider: themeProvider,
                         ),
                         _buildColourPickerRow(
                           description: 'Alternate Row Font',
-                          colour: themeProvider.rowAltFontColour,
-                          saveColourFunc: themeProvider.setRowAltFontColour,
+                          colour: themeProvider.tableRowAltFontColour,
+                          saveColourFunc: themeProvider.setTableRowAltFontColour,
                           themeProvider: themeProvider,
                         ),
                         _buildColourPickerRow(
                           description: 'Alternate Row Background',
-                          colour: themeProvider.rowAltBackgroundColour,
-                          saveColourFunc: themeProvider.setRowAltBackgroundColour,
+                          colour: themeProvider.tableRowAltBackgroundColour,
+                          saveColourFunc: themeProvider.setTableRowAltBackgroundColour,
                           themeProvider: themeProvider,
                         ),
                         _buildFontPickerRow(
@@ -151,6 +151,10 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                           themeProvider: themeProvider,
                         ),
                       ],
+                    ),
+                    SizedBox(width: 20),
+                    _buildExampleTableGridBox(
+                      themeProvider: themeProvider,
                     ),
                   ],
                 ),
@@ -347,3 +351,100 @@ _buildColorPicker({
   );
 }
 
+Widget _buildExampleTableGridBox({
+  required ThemeProvider themeProvider,
+}) {
+  // Define dummy data
+  final columns = ['Header 1', 'Header 2'];
+  final rows = [
+    ['Row 1 Data 1', 'Row 1 Data 2'],
+    ['Row 2 Data 1', 'Row 2 Data 2'],
+    ['Row 3 Data 1', 'Row 3 Data 2'],
+    ['Row 4 Data 1', 'Row 4 Data 2'],
+  ];
+
+  return Container(
+    margin: const EdgeInsets.all(4.0),
+    decoration: BoxDecoration(
+      border: Border.all(color: themeProvider.tableBorderColour, width: 2.0),
+      borderRadius: BorderRadius.circular(8.0),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            'Example Table',
+            style: TextStyle(
+              fontSize: 18,
+              color: themeProvider.boldFontColour,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 10),
+          // Add the example table
+          _buildExampleTable(
+            columns: columns,
+            rows: rows,
+            themeProvider: themeProvider,
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _buildExampleTable({
+  required List<String> columns,
+  required List<List<String>> rows,
+  required ThemeProvider themeProvider,
+}) {
+  return SingleChildScrollView(
+    scrollDirection: Axis.horizontal,
+    child: Table(
+      border: TableBorder.all(
+        color: themeProvider.tableBorderColour,
+      ),
+      columnWidths: const {
+        0: IntrinsicColumnWidth(),
+        1: IntrinsicColumnWidth(),
+      },
+      children: [
+        // Table header
+        TableRow(
+          decoration: BoxDecoration(
+            color: themeProvider.headerBackgroundColour,
+          ),
+          children: columns.map((column) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(column, style: themeProvider.styleTableHeader),
+            );
+          }).toList(),
+        ),
+        // Table rows
+        ...rows.asMap().entries.map((entry) {
+          final index = entry.key;
+          final row = entry.value;
+          final isAlternateRow = index % 2 == 1;
+          return TableRow(
+            decoration: BoxDecoration(
+              color: isAlternateRow ? themeProvider.tableRowAltBackgroundColour : themeProvider.tableRowBackgroundColour,
+            ),
+            children: row.map((cell) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  cell,
+                  style: isAlternateRow ? themeProvider.styleTableAltRow : themeProvider.styleTableRow,
+                ),
+              );
+            }).toList(),
+          );
+        }).toList(),
+      ],
+    ),
+  );
+}
