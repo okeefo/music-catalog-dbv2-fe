@@ -272,6 +272,7 @@ const List<String> fontsList = [
   'Bookmark',
   'Coutline',
   'Crakos',
+  'High Def',
   
   //Mono spaced
 

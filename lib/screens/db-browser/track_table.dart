@@ -22,7 +22,6 @@ class TrackTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context);
 
-
     final colDeco = BoxDecoration(
       border: Border.all(color: theme.tableBorderColour, width: 1.0),
       color: theme.headerBackgroundColour,
@@ -52,8 +51,9 @@ class TrackTable extends StatelessWidget {
         },
         infiniteScrollController: scrollController,
         columnDecoration: colDeco,
-        rowCellDecoration: rowDelco,
+        rowDecoration: rowDelco,
         altRowDecoration: altRowDeco,
+        altRowColumnIndex: 1,
       ),
     );
   }

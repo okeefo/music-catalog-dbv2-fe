@@ -298,6 +298,7 @@ class ThemeProvider with ChangeNotifier {
     _fontColour._resetLightColor();
     _boldFontColour._resetLightColor();
     _iconColour._resetLightColor();
+    _tableBorderColour._resetDarkColor();
     _savePreferences();
     notifyListeners();
   }

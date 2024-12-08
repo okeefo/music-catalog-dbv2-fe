@@ -12,24 +12,26 @@ class ResizableTable extends StatefulWidget {
   final void Function(BuildContext context, Offset position, int columnIndex, int rowIndex, TapDownDetails d)? onRightClick;
   final ScrollController infiniteScrollController;
   final BoxDecoration columnDecoration;
-  final BoxDecoration rowCellDecoration;
+  final BoxDecoration rowDecoration;
   final BoxDecoration altRowDecoration;
+  final int altRowColumnIndex;
 
-  const ResizableTable({
-    super.key,
-    required this.headers,
-    required this.data,
-    required this.rowStyle,
-    required this.altRowStyle,
-    required this.headerStyle,
-    required this.columnActions,
-    this.showAutoNumbering = true,
-    this.onRightClick,
-    required this.infiniteScrollController,
-    required this.columnDecoration,
-    required this.rowCellDecoration,
-    required this.altRowDecoration,
-  });
+  const ResizableTable(
+      {super.key,
+      required this.headers,
+      required this.data,
+      required this.rowStyle,
+      required this.altRowStyle,
+      required this.headerStyle,
+      required this.columnActions,
+      this.showAutoNumbering = true,
+      this.onRightClick,
+      required this.infiniteScrollController,
+      required this.columnDecoration,
+      required this.rowDecoration,
+      required this.altRowDecoration,
+      required this.altRowColumnIndex});
+
   @override
   ResizableTableState createState() => ResizableTableState();
 }
@@ -100,9 +102,25 @@ class ResizableTableState extends State<ResizableTable> {
     return width;
   }
 
+  TextStyle _determineRowStyle(int rowIndex, TextStyle currentStyle) {
+    if (rowIndex == 0) {
+      return currentStyle;
+    }
+
+    final currentGroupValue = widget.data[rowIndex][widget.altRowColumnIndex];
+    final previousGroupValue = widget.data[rowIndex - 1][widget.altRowColumnIndex];
+
+    if (currentGroupValue != previousGroupValue) {
+      return currentStyle == widget.rowStyle ? widget.altRowStyle : widget.rowStyle;
+    }
+
+    return currentStyle;
+  }
+
   @override
   Widget build(BuildContext context) {
     bool showAutoNumbering = widget.showAutoNumbering;
+    TextStyle rowStyle = widget.rowStyle;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -129,15 +147,16 @@ class ResizableTableState extends State<ResizableTable> {
                 child: Column(
                   children: widget.data.asMap().entries.map((entry) {
                     int rowIndex = entry.key;
+                    rowStyle = _determineRowStyle(rowIndex, rowStyle);
                     List<String> row = entry.value;
                     return Row(
                       children: List.generate(row.length + 1, (colIndex) {
                         if (colIndex == 0) {
-                          return showAutoNumbering ? _buildAutoNumberingCell(rowIndex) : Container();
+                          return showAutoNumbering ? _buildAutoNumberingCell(rowIndex, rowStyle) : Container();
                         } else if (!widget.headers[colIndex - 1].isVisible) {
                           return Container();
                         }
-                        return _buildCell(colIndex - 1, row[colIndex - 1], row, rowIndex);
+                        return _buildCell(colIndex - 1, row[colIndex - 1], row, rowIndex, rowStyle);
                       }),
                     );
                   }).toList(),
@@ -163,15 +182,15 @@ class ResizableTableState extends State<ResizableTable> {
     );
   }
 
-  Widget _buildAutoNumberingCell(int rowIndex) {
+  Widget _buildAutoNumberingCell(int rowIndex, TextStyle rowStyle) {
     return Container(
       width: autoNumberColumnWidth,
       padding: const EdgeInsets.all(8.0),
-      decoration: rowIndex % 2 == 0 ? widget.rowCellDecoration : widget.altRowDecoration,
+      decoration: rowStyle == widget.rowStyle ? widget.rowDecoration : widget.altRowDecoration,
       child: SelectableText(
         (rowIndex + 1).toString(),
         textAlign: TextAlign.right,
-        style: rowIndex % 2 == 0 ? widget.rowStyle : widget.altRowStyle,
+        style: rowStyle,
       ),
     );
   }
@@ -216,24 +235,24 @@ class ResizableTableState extends State<ResizableTable> {
     );
   }
 
-  Widget _buildCell(int colIndex, String text, List<String> row, int rowIndex) {
+  Widget _buildCell(int colIndex, String text, List<String> row, int rowIndex, TextStyle rowStyle) {
     final action = widget.columnActions[colIndex];
 
     if (action == null) {
-      return _buildTextCell(colIndex, text, rowIndex);
+      return _buildTextCell(colIndex, text, rowIndex, rowStyle);
     }
 
     switch (action.type) {
       case ColumnActionType.displayAsUrl:
       case ColumnActionType.displayAsFileUrl:
         final url = row[action.urlColumnIndex!];
-        return _buildUrlCell(colIndex, text, url, action.type == ColumnActionType.displayAsUrl, rowIndex);
+        return _buildUrlCell(colIndex, text, url, action.type == ColumnActionType.displayAsUrl, rowIndex, rowStyle);
       default:
-        return _buildTextCell(colIndex, text, rowIndex);
+        return _buildTextCell(colIndex, text, rowIndex, rowStyle);
     }
   }
 
-  Widget _buildTextCell(int index, String text, int rowIndex) {
+  Widget _buildTextCell(int index, String text, int rowIndex, TextStyle rowStyle) {
     return GestureDetector(
       onSecondaryTapDown: (details) {
         if (widget.onRightClick != null) {
@@ -245,10 +264,10 @@ class ResizableTableState extends State<ResizableTable> {
         child: Container(
           width: columnWidths[index],
           padding: const EdgeInsets.all(8.0),
-          decoration: rowIndex % 2 == 0 ? widget.rowCellDecoration : widget.altRowDecoration,
+          decoration: rowStyle == widget.rowStyle ? widget.rowDecoration : widget.altRowDecoration,
           child: Text(
             text,
-            style: rowIndex % 2 == 0 ? widget.rowStyle : widget.altRowStyle,
+            style: rowStyle,
             overflow: TextOverflow.ellipsis,
             softWrap: false,
           ),
@@ -257,7 +276,7 @@ class ResizableTableState extends State<ResizableTable> {
     );
   }
 
-  Widget _buildUrlCell(int index, String text, String url, bool isWebUrl, int rowIndex) {
+  Widget _buildUrlCell(int index, String text, String url, bool isWebUrl, int rowIndex, TextStyle rowStyle) {
     return GestureDetector(
       onSecondaryTapDown: (details) {
         if (widget.onRightClick != null) {
@@ -280,16 +299,12 @@ class ResizableTableState extends State<ResizableTable> {
             child: Container(
               width: columnWidths[index],
               padding: const EdgeInsets.all(8.0),
-              decoration: rowIndex % 2 == 0 ? widget.rowCellDecoration : widget.altRowDecoration,
+              decoration: rowStyle == widget.rowStyle ? widget.rowDecoration : widget.altRowDecoration,
               child: Text(
                 text,
-                style: rowIndex % 2 == 0
-                    ? widget.rowStyle.copyWith(
-                        decoration: TextDecoration.underline,
-                      )
-                    : widget.altRowStyle.copyWith(
-                        decoration: TextDecoration.underline,
-                      ),
+                style: rowStyle.copyWith(
+                  decoration: TextDecoration.underline,
+                ),
                 overflow: TextOverflow.ellipsis,
                 softWrap: false,
               ),
