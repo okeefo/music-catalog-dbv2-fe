@@ -1,5 +1,4 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:front_end/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app_styles.dart';
 
@@ -11,10 +10,10 @@ class ThemeProvider with ChangeNotifier {
   late final ThemeColourItem _backgroundColour;
   late final ThemeColourItem _headerFontColour;
   late final ThemeColourItem _headerBackgroundColour;
-  late final ThemeColourItem _tableRowFontColour;
-  late final ThemeColourItem _tableRowBackgroundColour;
-  late final ThemeColourItem _tableRowAltFontColour;
-  late final ThemeColourItem _tableRowAltBackgroundColour;
+  late final ThemeColourItem _tableFontColour;
+  late final ThemeColourItem _tableBackgroundColour;
+  late final ThemeColourItem _tableAltFontColour;
+  late final ThemeColourItem _tableAltBackgroundColour;
   late final ThemeColourItem _toggleSwitchBackgroundColour;
   late final ThemeColourItem _toggleSwitchKnobColour;
 
@@ -83,37 +82,37 @@ class ThemeProvider with ChangeNotifier {
         onChanged: () => _onColorChanged());
     colourItems.add(_headerBackgroundColour);
 
-    _tableRowFontColour = ThemeColourItem(
+    _tableFontColour = ThemeColourItem(
         key: 'rowFont',
         defaultDark: AppTheme.tableFontColourDark,
         defaultLight: AppTheme.tableFontColourLight,
         isDarkMode: () => _isDarkMode(),
         onChanged: () => _onColorChanged());
-    colourItems.add(_tableRowFontColour);
+    colourItems.add(_tableFontColour);
 
-    _tableRowBackgroundColour = ThemeColourItem(
+    _tableBackgroundColour = ThemeColourItem(
         key: 'rowFontBackground',
         defaultDark: AppTheme.tableBackgroundColourDark,
         defaultLight: AppTheme.tableBackgroundColourLight,
         isDarkMode: () => _isDarkMode(),
         onChanged: () => _onColorChanged());
-    colourItems.add(_tableRowBackgroundColour);
+    colourItems.add(_tableBackgroundColour);
 
-    _tableRowAltFontColour = ThemeColourItem(
+    _tableAltFontColour = ThemeColourItem(
         key: 'rowAltFont',
         defaultDark: AppTheme.tableFontAltColourDark,
         defaultLight: AppTheme.tableFontAltColourLight,
         isDarkMode: () => _isDarkMode(),
         onChanged: () => _onColorChanged());
-    colourItems.add(_tableRowAltFontColour);
+    colourItems.add(_tableAltFontColour);
 
-    _tableRowAltBackgroundColour = ThemeColourItem(
+    _tableAltBackgroundColour = ThemeColourItem(
         key: 'rowAltFontBackground',
         defaultDark: AppTheme.tableBackgroundAltColourDark,
         defaultLight: AppTheme.tableBackgroundAltColourLight,
         isDarkMode: () => _isDarkMode(),
         onChanged: () => _onColorChanged());
-    colourItems.add(_tableRowAltBackgroundColour);
+    colourItems.add(_tableAltBackgroundColour);
 
     _toggleSwitchBackgroundColour = ThemeColourItem(
         key: 'toggleSwitch',
@@ -168,24 +167,24 @@ class ThemeProvider with ChangeNotifier {
     _headerBackgroundColour.setColor(color);
   }
 
-  Color get tableRowFontColour => _tableRowFontColour.getColour();
-  void setTableRowFontColour(Color color) {
-    _tableRowFontColour.setColor(color);
+  Color get tableFontColour => _tableFontColour.getColour();
+  void setTableFontColour(Color color) {
+    _tableFontColour.setColor(color);
   }
 
-  Color get tableRowBackgroundColour => _tableRowBackgroundColour.getColour();
-  void setTableRowBackgroundColour(Color color) {
-    _tableRowBackgroundColour.setColor(color);
+  Color get tableBackgroundColour => _tableBackgroundColour.getColour();
+  void setTableBackgroundColour(Color color) {
+    _tableBackgroundColour.setColor(color);
   }
 
-  Color get tableRowAltFontColour => _tableRowAltFontColour.getColour();
-  void setTableRowAltFontColour(Color color) {
-    _tableRowAltFontColour.setColor(color);
+  Color get tableAltFontColour => _tableAltFontColour.getColour();
+  void setTableAltFontColour(Color color) {
+    _tableAltFontColour.setColor(color);
   }
 
-  Color get tableRowAltBackgroundColour => _tableRowAltBackgroundColour.getColour();
-  void setTableRowAltBackgroundColour(Color color) {
-    _tableRowAltBackgroundColour.setColor(color);
+  Color get tableAltBackgroundColour => _tableAltBackgroundColour.getColour();
+  void setTableAltBackgroundColour(Color color) {
+    _tableAltBackgroundColour.setColor(color);
   }
 
   Color get toggleSwitchBackgroundColor => _toggleSwitchBackgroundColour.getColour();
@@ -225,14 +224,14 @@ class ThemeProvider with ChangeNotifier {
         fontWeight: dataTableFontWeightNormal,
         fontFamily: dataTableFontFamily,
         fontSize: fontSizeDataTableRow,
-        color: tableRowFontColour,
+        color: tableFontColour,
       );
 
   TextStyle get styleTableAltRow => TextStyle(
         fontWeight: dataTableFontWeightNormal,
         fontFamily: dataTableFontFamily,
         fontSize: fontSizeDataTableRow,
-        color: tableRowAltFontColour,
+        color: tableAltFontColour,
       );
 
   TextStyle get styleTableHeader => TextStyle(
@@ -286,19 +285,17 @@ class ThemeProvider with ChangeNotifier {
   }
 
   void resetDarkColours() {
-    _fontColour._resetDarkColor();
-    _boldFontColour._resetDarkColor();
-    _iconColour._resetDarkColor();
-    _tableBorderColour._resetDarkColor();
+    for (var item in colourItems) {
+      item._resetDarkColor();
+    }
     _savePreferences();
     notifyListeners();
   }
 
   void resetLightColours() {
-    _fontColour._resetLightColor();
-    _boldFontColour._resetLightColor();
-    _iconColour._resetLightColor();
-    _tableBorderColour._resetDarkColor();
+    for (var item in colourItems) {
+      item._resetLightColor();
+    }
     _savePreferences();
     notifyListeners();
   }

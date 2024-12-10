@@ -120,7 +120,7 @@ class TrackProvider {
 class TrackProviderState {
   bool isLoading = false;
   int offset = 0;
-  final int limit = 24;
+  final int limit = 50;
   int totalTracks = 0;
   final List<Track> tracks = [];
 

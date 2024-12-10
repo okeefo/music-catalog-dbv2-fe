@@ -123,26 +123,26 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                         ),
                         _buildColourPickerRow(
                           description: 'Row Font',
-                          colour: themeProvider.tableRowFontColour,
-                          saveColourFunc: themeProvider.setTableRowFontColour,
+                          colour: themeProvider.tableFontColour,
+                          saveColourFunc: themeProvider.setTableFontColour,
                           themeProvider: themeProvider,
                         ),
                         _buildColourPickerRow(
                           description: 'Row Background',
-                          colour: themeProvider.tableRowBackgroundColour,
-                          saveColourFunc: themeProvider.setTableRowBackgroundColour,
+                          colour: themeProvider.tableBackgroundColour,
+                          saveColourFunc: themeProvider.setTableBackgroundColour,
                           themeProvider: themeProvider,
                         ),
                         _buildColourPickerRow(
                           description: 'Alternate Row Font',
-                          colour: themeProvider.tableRowAltFontColour,
-                          saveColourFunc: themeProvider.setTableRowAltFontColour,
+                          colour: themeProvider.tableAltFontColour,
+                          saveColourFunc: themeProvider.setTableAltFontColour,
                           themeProvider: themeProvider,
                         ),
                         _buildColourPickerRow(
                           description: 'Alternate Row Background',
-                          colour: themeProvider.tableRowAltBackgroundColour,
-                          saveColourFunc: themeProvider.setTableRowAltBackgroundColour,
+                          colour: themeProvider.tableAltBackgroundColour,
+                          saveColourFunc: themeProvider.setTableAltBackgroundColour,
                           themeProvider: themeProvider,
                         ),
                         _buildFontPickerRow(
@@ -436,7 +436,7 @@ Widget _buildExampleTable({
           final isAlternateRow = index % 2 == 1;
           return TableRow(
             decoration: BoxDecoration(
-              color: isAlternateRow ? themeProvider.tableRowAltBackgroundColour : themeProvider.tableRowBackgroundColour,
+              color: isAlternateRow ? themeProvider.tableAltBackgroundColour : themeProvider.tableBackgroundColour,
             ),
             children: row.map((cell) {
               return Padding(
@@ -448,7 +448,7 @@ Widget _buildExampleTable({
               );
             }).toList(),
           );
-        }).toList(),
+        }),
       ],
     ),
   );

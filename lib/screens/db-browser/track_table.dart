@@ -22,19 +22,19 @@ class TrackTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context);
 
-    final colDeco = BoxDecoration(
+    final hdrDeco = BoxDecoration(
       border: Border.all(color: theme.tableBorderColour, width: 1.0),
       color: theme.headerBackgroundColour,
     );
 
     final rowDelco = BoxDecoration(
       border: Border.all(color: theme.tableBorderColour, width: 1.0),
-      color: theme.tableRowBackgroundColour,
+      color: theme.tableBackgroundColour,
     );
 
     final altRowDeco = BoxDecoration(
       border: Border.all(color: theme.tableBorderColour, width: 1.0),
-      color: theme.tableRowAltBackgroundColour,
+      color: theme.tableAltBackgroundColour,
     );
 
     return FlyoutTarget(
@@ -50,7 +50,7 @@ class TrackTable extends StatelessWidget {
           _showContextMenu(context, position, columnIndex, rowIndex, d);
         },
         infiniteScrollController: scrollController,
-        columnDecoration: colDeco,
+        columnDecoration: hdrDeco,
         rowDecoration: rowDelco,
         altRowDecoration: altRowDeco,
         altRowColumnIndex: 1,

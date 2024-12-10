@@ -9,7 +9,7 @@ class FontPickerRow extends StatefulWidget {
   final ValueChanged<String> onFontChanged;
   final bool addBorder;
 
-  FontPickerRow({
+  const FontPickerRow({
     super.key,
     required this.text,
     required this.font,
@@ -150,7 +150,7 @@ class _FontPickerRowState extends State<FontPickerRow> {
                       onFontSelected(value);
                     },
                     child: Container(
-                      color: index % 2 == 0 ? themeProvider.tableRowBackgroundColour : themeProvider.tableRowAltBackgroundColour,
+                      color: index % 2 == 0 ? themeProvider.tableBackgroundColour : themeProvider.tableAltBackgroundColour,
                       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                       child: Text(
                         value,
@@ -273,7 +273,7 @@ const List<String> fontsList = [
   'Coutline',
   'Crakos',
   'High Def',
-  
+
   //Mono spaced
 
   'Courier New',
@@ -286,5 +286,4 @@ const List<String> fontsList = [
   'Fira Code',
   'DejaVu Sans Mono',
   'BouCollege',
-
 ];
