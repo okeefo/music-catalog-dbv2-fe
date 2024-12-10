@@ -77,6 +77,8 @@ flutter:
   assets:
     - assets/headphones.svg
     - assets/headphones.ico
+    - assets/mp3.ico
+    - assets/wav.ico
     - assets/fonts/
   
   fonts:

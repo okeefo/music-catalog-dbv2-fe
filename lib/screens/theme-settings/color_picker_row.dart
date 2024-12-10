@@ -64,7 +64,7 @@ class ColorPickerRow extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) {
-        return _ColorPickerDialog(
+        return ColorPickerDialog(
           currentColor: currentColor,
           onColorChanged: onColorChanged,
           themeProvider: themeProvider,
@@ -88,7 +88,7 @@ class ColorPickerRow extends StatelessWidget {
               leading: const Icon(FluentIcons.copy),
               text: const Text('Copy'),
               onPressed: () {
-               String hexColour = colorToHex(currentColor);
+                String hexColour = colorToHex(currentColor);
                 Clipboard.setData(ClipboardData(text: hexColour));
                 logger.info('Color copied to clipboard: $hexColour');
               }),
@@ -106,7 +106,7 @@ class ColorPickerRow extends StatelessWidget {
                       logger.info('Pasted colour: $hexColour');
                       onColorChanged(newColor);
                     } else {
-                      logger.warning ( "Invalid colour: $hexColour", "Paste Error");
+                      logger.warning("Invalid colour: $hexColour", "Paste Error");
                     }
                   }
                 }
@@ -126,29 +126,24 @@ class ColorPickerRow extends StatelessWidget {
       },
     );
   }
-
-  void _showNotImplementedDialog(BuildContext context) {
-    Flyout.of(context).close();
-    showErrorDialog(context, "Nothing to see here", "Not Implemented");
-  }
 }
 
-class _ColorPickerDialog extends StatefulWidget {
+class ColorPickerDialog extends StatefulWidget {
   final Color currentColor;
   final ValueChanged<Color> onColorChanged;
   final ThemeProvider themeProvider;
 
-  const _ColorPickerDialog({
+  const ColorPickerDialog({
     required this.currentColor,
     required this.onColorChanged,
     required this.themeProvider,
   });
 
   @override
-  __ColorPickerDialogState createState() => __ColorPickerDialogState();
+  _ColorPickerDialogState createState() => _ColorPickerDialogState();
 }
 
-class __ColorPickerDialogState extends State<_ColorPickerDialog> {
+class _ColorPickerDialogState extends State<ColorPickerDialog> {
   late Color _pickerColor;
 
   @override
@@ -159,31 +154,47 @@ class __ColorPickerDialogState extends State<_ColorPickerDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return material.Dialog(
-      backgroundColor: widget.themeProvider.backgroundColour,
-      child: material.AlertDialog(
-        title: const Text('Pick a color'),
-        content: SingleChildScrollView(
+    return ContentDialog(
+      constraints: const BoxConstraints(maxWidth: 680),
+      title: Row(
+        children: [
+          Icon(FluentIcons.color, color: widget.themeProvider.iconColour, size: widget.themeProvider.iconSizeLarge),
+          const SizedBox(width: 8),
+          Text("Pick a color"),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: material.Material(
+          color: Colors.transparent,
           child: ColorPicker(
             pickerColor: _pickerColor,
+            paletteType: PaletteType.hslWithLightness,
             onColorChanged: (color) {
               setState(() {
                 _pickerColor = color;
               });
             },
             enableAlpha: false,
+            hexInputBar: false,
+            labelTypes: [ColorLabelType.rgb, ColorLabelType.hsl, ColorLabelType.hex, ColorLabelType.hsv],
           ),
         ),
-        actions: <Widget>[
-          material.TextButton(
-            child: const Text('Done'),
-            onPressed: () {
-              widget.onColorChanged(_pickerColor);
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
       ),
+      actions: [
+        Button(
+          child: const Text('Cancel'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        Button(
+          child: const Text('Done'),
+          onPressed: () {
+            widget.onColorChanged(_pickerColor);
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
     );
   }
 }
