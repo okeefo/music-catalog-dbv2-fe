@@ -31,7 +31,7 @@ void main() async {
   windowManager.setTitleBarStyle(TitleBarStyle.normal);
 
   // Initialize the endpoints
-  Endpoints.initialize('http://localhost:8080');
+  Endpoints.initialize('http://localhost:8080/mc/api/');
 
   runApp(
     MultiProvider(
