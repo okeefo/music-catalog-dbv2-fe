@@ -127,16 +127,6 @@ class DbBrowserPageState extends State<DbBrowserPage> {
     );
   }
 
-  void _onFilterDoubleTap(String filter) {
-    setState(() {
-      _selectedFilters.add(filter);
-      _availableFilters.remove(filter);
-    });
-  }
-
-  void _onFilterTap(String filter) {
-    // Implement sorting/grouping logic here
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -255,7 +245,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
         child: Column(
           children: [
             Expanded(
-              flex: 2,
+              flex: 1,
               child: Row(
                 children: [
                   // First Column: File Browser
@@ -272,7 +262,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                   ),
                   // Third Column: Tracks Table
                   Expanded(
-                    flex: 10,
+                    flex: 5,
                     child: Align(
                       alignment: Alignment.topCenter,
                       child: TrackTable(
