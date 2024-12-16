@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:logging/logging.dart';
 
 class ResizableTable extends StatefulWidget {
   final List<ResizeColumn> headers;
@@ -40,6 +41,7 @@ class ResizableTableState extends State<ResizableTable> {
   late List<double> minColumnWidths;
   late List<double> columnWidths;
   late double autoNumberColumnWidth;
+  final Logger _logger = Logger('DbBrowserPageState');
 
   @override
   void initState() {
@@ -78,6 +80,9 @@ class ResizableTableState extends State<ResizableTable> {
   }
 
   double _calculateMinColumnWidth(int index) {
+    if (!widget.headers[index].isVisible) {
+      return 2.0;
+    }
     final textPainter = TextPainter(textDirection: TextDirection.ltr);
 
     // Measure header width
@@ -88,6 +93,10 @@ class ResizableTableState extends State<ResizableTable> {
   }
 
   double _calculateMaxColumnWidth(int index) {
+    if (!widget.headers[index].isVisible) {
+      return 2.0;
+    }
+
     final textPainter = TextPainter(textDirection: TextDirection.ltr);
     double width = minColumnWidths[index]; // extra padding to include the icon for dragging
 
@@ -122,50 +131,65 @@ class ResizableTableState extends State<ResizableTable> {
     bool showAutoNumbering = widget.showAutoNumbering;
     TextStyle rowStyle = widget.rowStyle;
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Column(
-        children: [
-          // Header Row
-          Row(
-            children: List.generate(widget.headers.length + 1, (colIndex) {
-              // Existing code for building header cells
-              if (colIndex == 0) {
-                return showAutoNumbering ? _buildAutoNumberingHeader() : Container();
-              } else if (!widget.headers[colIndex - 1].isVisible) {
-                return Container();
-              }
-              return _buildResizableColumnHeader(colIndex - 1, widget.headers[colIndex - 1].name);
-            }),
-          ),
-          // Scrollable Data Rows
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              controller: widget.infiniteScrollController,
-              child: SelectionArea(
-                child: Column(
-                  children: widget.data.asMap().entries.map((entry) {
-                    int rowIndex = entry.key;
-                    rowStyle = _determineRowStyle(rowIndex, rowStyle);
-                    List<String> row = entry.value;
-                    return Row(
-                      children: List.generate(row.length + 1, (colIndex) {
-                        if (colIndex == 0) {
-                          return showAutoNumbering ? _buildAutoNumberingCell(rowIndex, rowStyle) : Container();
-                        } else if (!widget.headers[colIndex - 1].isVisible) {
-                          return Container();
-                        }
-                        return _buildCell(colIndex - 1, row[colIndex - 1], row, rowIndex, rowStyle);
-                      }),
-                    );
-                  }).toList(),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Calculate the total width of the columns
+        double totalColumnsWidth = columnWidths.fold(0.0, (sum, width) => sum + width);
+        if (showAutoNumbering) {
+          totalColumnsWidth += autoNumberColumnWidth; // Add width for auto-numbering column if applicable
+        }
+        double calculatedWidth = totalColumnsWidth > constraints.maxWidth ? totalColumnsWidth : constraints.maxWidth;
+
+        _logger.info('Constraints Max Width: ${constraints.maxWidth}');
+        _logger.info('Total Columns Width: $totalColumnsWidth');
+        _logger.info('Calculated Width: $calculatedWidth');
+
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height - 200,
+            width: calculatedWidth,
+            child: Column(
+              children: [
+                // Header Row
+                Row(
+                  children: List.generate(widget.headers.length + 1, (colIndex) {
+                    // Existing code for building header cells
+                    if (colIndex == 0) {
+                      return showAutoNumbering ? _buildAutoNumberingHeader() : Container();
+                    } else if (!widget.headers[colIndex - 1].isVisible) {
+                      return Container();
+                    }
+                    return _buildResizableColumnHeader(colIndex - 1, widget.headers[colIndex - 1].name);
+                  }),
                 ),
-              ),
+                // Scrollable Data Rows
+                Expanded(
+                  child: ListView.builder(
+                    controller: widget.infiniteScrollController,
+                    itemCount: widget.data.length,
+                    itemBuilder: (context, index) {
+                      int rowIndex = index;
+                      rowStyle = _determineRowStyle(rowIndex, rowStyle);
+                      List<String> row = widget.data[rowIndex];
+                      return Row(
+                        children: List.generate(row.length + 1, (colIndex) {
+                          if (colIndex == 0) {
+                            return showAutoNumbering ? _buildAutoNumberingCell(rowIndex, rowStyle) : Container();
+                          } else if (!widget.headers[colIndex - 1].isVisible) {
+                            return Container();
+                          }
+                          return _buildCell(colIndex - 1, row[colIndex - 1], row, rowIndex, rowStyle);
+                        }),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
