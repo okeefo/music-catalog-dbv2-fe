@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:front_end/providers/theme_provider.dart';
 import 'package:front_end/screens/popups.dart';
@@ -10,9 +9,8 @@ import 'track_provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import 'package:logging/logging.dart';
-import 'package:front_end/screens/db-browser/file_browser.dart'; // Import the new file browser widget
+import 'file_browser.dart'; // Import the new file browser widget
 import 'track_model.dart';
-
 
 class DbBrowserPage extends StatefulWidget {
   const DbBrowserPage({super.key});
@@ -30,7 +28,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   final ValueNotifier<String> _statusNotifier = ValueNotifier<String>('No updates yet');
   final TrackProviderState _trackProviderState = TrackProviderState();
   final TrackProvider _trackProvider = TrackProvider();
-  final Map<String, List<String>> _publisherAlbums = {}; // Store publishers and their albums
+  final Map<String, Set<String>> _publisherAlbums = {}; // Store publishers and their albums
 
   final Logger _logger = Logger('DbBrowserPageState');
 
@@ -106,7 +104,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
     _publisherAlbums.clear();
     for (var track in tracks) {
       if (!_publisherAlbums.containsKey(track.label)) {
-        _publisherAlbums[track.label] = [];
+        _publisherAlbums[track.label] = <String>{};
       }
       _publisherAlbums[track.label]!.add(track.albumTitle);
     }
@@ -126,7 +124,6 @@ class DbBrowserPageState extends State<DbBrowserPage> {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -245,19 +242,13 @@ class DbBrowserPageState extends State<DbBrowserPage> {
         child: Column(
           children: [
             Expanded(
-              flex: 1,
               child: Row(
                 children: [
                   // First Column: File Browser
                   Expanded(
                     flex: 1,
-                    child: GestureDetector(
-                      onTap: () {
-                        // Handle tap event
-                      },
-                      child: FileBrowser(
-                        publisherAlbums: _publisherAlbums,
-                      ),
+                    child: FileBrowser(
+                      publisherAlbums: _publisherAlbums,
                     ),
                   ),
                   // Third Column: Tracks Table
