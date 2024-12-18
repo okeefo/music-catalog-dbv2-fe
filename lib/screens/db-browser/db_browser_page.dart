@@ -254,11 +254,14 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                   // Third Column: Tracks Table
                   Expanded(
                     flex: 5,
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: TrackTable(
-                        tracks: _trackProviderState.tracks,
-                        scrollController: _scrollController,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16.0,0,0,0),
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: TrackTable(
+                          tracks: _trackProviderState.tracks,
+                          scrollController: _scrollController,
+                        ),
                       ),
                     ),
                   ),
