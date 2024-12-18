@@ -262,6 +262,8 @@ class ThemeProvider with ChangeNotifier {
   double get windowWidth => _windowWidth;
   double get windowHeight => _windowHeight;
 
+  Color get selectedRowColor => Colors.grey;
+
   bool _isDarkMode() {
     return _brightness == Brightness.dark;
   }
