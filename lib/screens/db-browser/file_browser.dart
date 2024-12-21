@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/services.dart';
 import 'package:front_end/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:logging/logging.dart';
@@ -78,92 +79,83 @@ class _FileBrowserState extends State<FileBrowser> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
-    return Focus(
-      autofocus: true,
-      onKey: (FocusNode node, RawKeyEvent event) {
-        setState(() {
-          _isShiftPressed = event.isShiftPressed;
-        });
-        return KeyEventResult.ignored;
-      },
-      child: ListView.builder(
-        itemCount: widget.publisherAlbums.keys.length,
-        itemBuilder: (context, index) {
-          String publisher = widget.publisherAlbums.keys.elementAt(index);
-          Set<String> albums = widget.publisherAlbums[publisher]!;
-          bool isExpanded = _expandedPublishers[publisher] ?? false;
-          bool isPublisherSelected = _selectedPublishers.contains(publisher);
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Listener(
-                onPointerDown: (event) {
-                  if (_isShiftPressed) {
-                    handleShiftClick(publisher, albums);
-                  } else {
-                    handlePublisherClick(publisher, albums);
-                  }
-                },
-                child: Container(
-                  color: isPublisherSelected ? themeProvider.selectedRowColor : Colors.transparent,
-                  child: ListTile(
-                    leading: Icon(
-                      isExpanded ? FluentIcons.folder_open : FluentIcons.folder_list,
-                      color: themeProvider.iconColour,
-                    ),
-                    title: Text(
-                      publisher,
-                      style: TextStyle(
-                        color: themeProvider.fontColour,
-                        fontSize: themeProvider.fontSizeDataTableRow,
-                        fontFamily: themeProvider.dataTableFontFamily,
-                      ),
+    return ListView.builder(
+      itemCount: widget.publisherAlbums.keys.length,
+      itemBuilder: (context, index) {
+        String publisher = widget.publisherAlbums.keys.elementAt(index);
+        Set<String> albums = widget.publisherAlbums[publisher]!;
+        bool isExpanded = _expandedPublishers[publisher] ?? false;
+        bool isPublisherSelected = _selectedPublishers.contains(publisher);
+    
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Listener(
+              onPointerDown: (event) {
+                if (HardwareKeyboard.instance.isShiftPressed) {
+                  handleShiftClick(publisher, albums);
+                } else {
+                  handlePublisherClick(publisher, albums);
+                }
+              },
+              child: Container(
+                color: isPublisherSelected ? themeProvider.selectedRowColor : Colors.transparent,
+                child: ListTile(
+                  leading: Icon(
+                    isExpanded ? FluentIcons.folder_open : FluentIcons.folder_list,
+                    color: themeProvider.iconColour,
+                  ),
+                  title: Text(
+                    publisher,
+                    style: TextStyle(
+                      color: themeProvider.fontColour,
+                      fontSize: themeProvider.fontSizeDataTableRow,
+                      fontFamily: themeProvider.dataTableFontFamily,
                     ),
                   ),
                 ),
               ),
-              if (isExpanded)
-                Padding(
-                  padding: const EdgeInsets.only(left: 16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: albums.map((album) {
-                      bool isAlbumSelected = _selectedAlbums.contains(album);
-                      return Listener(
-                        onPointerDown: (event) => {
-                          setState(() {
-                            _logger.info('Toggling expansion album $album for $publisher');
-                            if (isAlbumSelected) {
-                              _selectedAlbums.remove(album);
-                            } else {
-                              _selectedAlbums.add(album);
-                            }
-                            _selectedPublishers.clear();
-                          }),
-                        },
-                        child: Container(
-                          color: isAlbumSelected ? themeProvider.selectedRowColor : Colors.transparent,
-                          child: ListTile(
-                            leading: Icon(FluentIcons.music_note, color: themeProvider.iconColour),
-                            title: Text(
-                              album,
-                              style: TextStyle(
-                                color: themeProvider.fontColour,
-                                fontSize: themeProvider.fontSizeDataTableRow,
-                                fontFamily: themeProvider.dataTableFontFamily,
-                              ),
+            ),
+            if (isExpanded)
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: albums.map((album) {
+                    bool isAlbumSelected = _selectedAlbums.contains(album);
+                    return Listener(
+                      onPointerDown: (event) => {
+                        setState(() {
+                          _logger.info('Toggling expansion album $album for $publisher');
+                          if (isAlbumSelected) {
+                            _selectedAlbums.remove(album);
+                          } else {
+                            _selectedAlbums.add(album);
+                          }
+                          _selectedPublishers.clear();
+                        }),
+                      },
+                      child: Container(
+                        color: isAlbumSelected ? themeProvider.selectedRowColor : Colors.transparent,
+                        child: ListTile(
+                          leading: Icon(FluentIcons.music_note, color: themeProvider.iconColour),
+                          title: Text(
+                            album,
+                            style: TextStyle(
+                              color: themeProvider.fontColour,
+                              fontSize: themeProvider.fontSizeDataTableRow,
+                              fontFamily: themeProvider.dataTableFontFamily,
                             ),
                           ),
                         ),
-                      );
-                    }).toList(),
-                  ),
+                      ),
+                    );
+                  }).toList(),
                 ),
-            ],
-          );
-        },
-      ),
+              ),
+          ],
+        );
+      },
     );
   }
 }

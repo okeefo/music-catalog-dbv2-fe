@@ -167,7 +167,7 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
           color: Colors.transparent,
           child: ColorPicker(
             pickerColor: _pickerColor,
-            paletteType: PaletteType.hslWithLightness,
+            paletteType: PaletteType.hsvWithHue,
             onColorChanged: (color) {
               setState(() {
                 _pickerColor = color;
