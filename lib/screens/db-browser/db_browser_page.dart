@@ -12,6 +12,7 @@ import 'package:web_socket_channel/status.dart' as status;
 import 'package:logging/logging.dart';
 import 'publisher_browser.dart'; // Import the new file browser widget
 import 'track_model.dart';
+import '../../utils/endpoints.dart';
 
 class DbBrowserPage extends StatefulWidget {
   const DbBrowserPage({super.key});
@@ -23,8 +24,6 @@ class DbBrowserPage extends StatefulWidget {
 class DbBrowserPageState extends State<DbBrowserPage> {
   WebSocketChannel? _channel;
   final List<String> _statusUpdates = [];
-  final List<String> _selectedFilters = [];
-  final List<String> _availableFilters = ['Label', 'Album', 'Artist', 'Year', 'Country', 'Style', 'Genre'];
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<String> _statusNotifier = ValueNotifier<String>('No updates yet');
   final TrackProviderState _trackProviderState = TrackProviderState();
@@ -67,30 +66,44 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   }
 
   void _initializeWebSocket() {
-    _channel = WebSocketChannel.connect(Uri.parse('ws://localhost:8080/ws'));
+    try {
+      _channel = WebSocketChannel.connect(Uri.parse(Endpoints.wsScanUpdatesUri()));
 
-    _channel!.stream.listen((message) {
-      final decodedMessage = jsonDecode(message);
-      final code = decodedMessage['code'];
-      final msg = decodedMessage['message'];
-      final upd = msg.replaceAll('\n', '-');
-      _logger.info('Received message: $code : $upd');
+      _channel!.stream.listen(
+        (message) {
+          final decodedMessage = jsonDecode(message);
+          final code = decodedMessage['code'];
+          final msg = decodedMessage['message'];
+          final upd = msg.replaceAll('\n', '-');
+          _logger.info('Received message: $code : $upd');
 
-      _statusNotifier.value = upd;
+          _statusNotifier.value = upd;
 
-      if (code == 'UPDATE') {
-        _statusUpdates.add(msg);
-      } else if (code == 'COMPLETED') {
-        showInfoDialog(context, msg, 'Scan Completed!');
-        _loadMoreTracks();
-      } else if (code == 'INFO') {
-        showInfoDialog(context, msg, 'Scan Info!');
-      } else if (code == 'ERROR') {
-        showErrorDialog(context, msg, 'Scan failed!');
-      } else {
-        _logger.warning('Unknown message code: $code');
-      }
-    });
+          if (code == 'UPDATE') {
+            _statusUpdates.add(msg);
+          } else if (code == 'COMPLETED') {
+            showInfoDialog(context, msg, 'Scan Completed!');
+            _loadMoreTracks();
+          } else if (code == 'INFO') {
+            showInfoDialog(context, msg, 'Scan Info!');
+          } else if (code == 'ERROR') {
+            showErrorDialog(context, msg, 'Scan failed!');
+          } else {
+            _logger.warning('Unknown message code: $code');
+          }
+        },
+        onError: (error) {
+          _logger.severe('WebSocket error: $error');
+          showErrorDialog(context, 'WebSocket error: $error', 'Connection Error');
+        },
+        onDone: () {
+          _logger.info('WebSocket connection closed');
+        },
+      );
+    } catch (e) {
+      _logger.severe('Failed to connect to WebSocket: $e');
+      showErrorDialog(context, 'Failed to connect to WebSocket: $e', 'Connection Error');
+    }
   }
 
   void _loadTracks() {
@@ -299,7 +312,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                   // First Column: File Browser
                   Expanded(
                     flex: 1,
-                    child: PubLisherBrowser(
+                    child: PublisherBrowser(
                       publisherAlbums: _filterPublisherAlbums(),
                     ),
                   ),
