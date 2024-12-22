@@ -23,7 +23,6 @@ class _FileBrowserState extends State<FileBrowser> {
   final Set<String> _selectedPublishers = {};
   final Set<String> _selectedAlbums = {};
   final Logger _logger = Logger('FileBrowser');
-  bool _isShiftPressed = false;
 
   @override
   void initState() {
@@ -64,7 +63,7 @@ class _FileBrowserState extends State<FileBrowser> {
     removeSelectedAlbums(albums);
   }
 
-  void handleShiftClick(String publisher, Set<String> albums) {
+  void handlePublisherClickWithShift(String publisher, Set<String> albums) {
     setState(() {
       if (_selectedPublishers.contains(publisher)) {
         _selectedPublishers.remove(publisher);
@@ -86,59 +85,66 @@ class _FileBrowserState extends State<FileBrowser> {
         Set<String> albums = widget.publisherAlbums[publisher]!;
         bool isExpanded = _expandedPublishers[publisher] ?? false;
         bool isPublisherSelected = _selectedPublishers.contains(publisher);
-    
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Listener(
               onPointerDown: (event) {
                 if (HardwareKeyboard.instance.isShiftPressed) {
-                  handleShiftClick(publisher, albums);
+                  handlePublisherClickWithShift(publisher, albums);
                 } else {
                   handlePublisherClick(publisher, albums);
                 }
               },
               child: Container(
+                padding: EdgeInsets.symmetric(vertical: 0.0),
                 color: isPublisherSelected ? themeProvider.selectedRowColor : Colors.transparent,
-                child: ListTile(
-                  leading: Icon(
-                    isExpanded ? FluentIcons.folder_open : FluentIcons.folder_list,
-                    color: themeProvider.iconColour,
-                  ),
-                  title: Text(
-                    publisher,
-                    style: TextStyle(
-                      color: themeProvider.fontColour,
-                      fontSize: themeProvider.fontSizeDataTableRow,
-                      fontFamily: themeProvider.dataTableFontFamily,
+                child: SizedBox(
+                  height: 22.00,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+                    leading: Icon(
+                      isExpanded ? FluentIcons.folder_open : FluentIcons.folder_list,
+                      color: themeProvider.iconColour, size: 14,
+                    ),
+                    title: Text(
+                      publisher,
+                      style: TextStyle(
+                        color: themeProvider.fontColour,
+                        fontSize: themeProvider.fontSizeDataTableRow,
+                        fontFamily: themeProvider.dataTableFontFamily,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
             if (isExpanded)
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: albums.map((album) {
-                    bool isAlbumSelected = _selectedAlbums.contains(album);
-                    return Listener(
-                      onPointerDown: (event) => {
-                        setState(() {
-                          _logger.info('Toggling expansion album $album for $publisher');
-                          if (isAlbumSelected) {
-                            _selectedAlbums.remove(album);
-                          } else {
-                            _selectedAlbums.add(album);
-                          }
-                          _selectedPublishers.clear();
-                        }),
-                      },
-                      child: Container(
-                        color: isAlbumSelected ? themeProvider.selectedRowColor : Colors.transparent,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: albums.map((album) {
+                  bool isAlbumSelected = _selectedAlbums.contains(album);
+                  return Listener(
+                    onPointerDown: (event) => {
+                      setState(() {
+                        _logger.info('Toggling expansion album $album for $publisher');
+                        if (isAlbumSelected) {
+                          _selectedAlbums.remove(album);
+                        } else {
+                          _selectedAlbums.add(album);
+                        }
+                        _selectedPublishers.clear();
+                      }),
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 0.0),
+                      color: isAlbumSelected ? themeProvider.selectedRowColor : Colors.transparent,
+                      child: SizedBox(
+                        height: 22.00,
                         child: ListTile(
-                          leading: Icon(FluentIcons.music_note, color: themeProvider.iconColour),
+                          contentPadding: EdgeInsets.fromLTRB( 30.0, 0.0, 0.0, 0.0),
+                          leading: Icon(FluentIcons.music_note, color: themeProvider.iconColour, size: 14),
                           title: Text(
                             album,
                             style: TextStyle(
@@ -149,9 +155,9 @@ class _FileBrowserState extends State<FileBrowser> {
                           ),
                         ),
                       ),
-                    );
-                  }).toList(),
-                ),
+                    ),
+                  );
+                }).toList(),
               ),
           ],
         );

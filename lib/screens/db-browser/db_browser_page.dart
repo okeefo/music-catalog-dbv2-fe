@@ -238,7 +238,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
         ),
       ),
       content: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(2.0),
         child: Column(
           children: [
             Expanded(
