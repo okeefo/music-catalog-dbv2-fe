@@ -6,19 +6,20 @@ import 'package:front_end/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:logging/logging.dart';
 
-class FileBrowser extends StatefulWidget {
+class PubLisherBrowser extends StatefulWidget {
   final Map<String, Set<String>> publisherAlbums;
 
-  const FileBrowser({
+  const 
+  PubLisherBrowser({
     Key? key,
     required this.publisherAlbums,
   }) : super(key: key);
 
   @override
-  _FileBrowserState createState() => _FileBrowserState();
+  _PubLisherBrowserState createState() => _PubLisherBrowserState();
 }
 
-class _FileBrowserState extends State<FileBrowser> {
+class _PubLisherBrowserState extends State<PubLisherBrowser> {
   final Map<String, bool> _expandedPublishers = {};
   final Set<String> _selectedPublishers = {};
   final Set<String> _selectedAlbums = {};
