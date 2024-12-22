@@ -10,7 +10,7 @@ import 'track_provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import 'package:logging/logging.dart';
-import 'file_browser.dart'; // Import the new file browser widget
+import 'publisher_browser.dart'; // Import the new file browser widget
 import 'track_model.dart';
 
 class DbBrowserPage extends StatefulWidget {
@@ -299,7 +299,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                   // First Column: File Browser
                   Expanded(
                     flex: 1,
-                    child: FileBrowser(
+                    child: PubLisherBrowser(
                       publisherAlbums: _filterPublisherAlbums(),
                     ),
                   ),
