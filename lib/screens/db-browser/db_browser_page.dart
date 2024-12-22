@@ -32,6 +32,12 @@ class DbBrowserPageState extends State<DbBrowserPage> {
 
   final Logger _logger = Logger('DbBrowserPageState');
 
+  // Search controllers and state variables
+  final TextEditingController _fileBrowserSearchController = TextEditingController();
+  final TextEditingController _trackTableSearchController = TextEditingController();
+  String _fileBrowserSearchQuery = '';
+  String _trackTableSearchQuery = '';
+
   @override
   void initState() {
     _logger.info("initState");
@@ -54,6 +60,8 @@ class DbBrowserPageState extends State<DbBrowserPage> {
     _channel?.sink.close(status.normalClosure);
     _scrollController.dispose();
     _statusNotifier.dispose();
+    _fileBrowserSearchController.dispose();
+    _trackTableSearchController.dispose();
     super.dispose();
   }
 
@@ -241,6 +249,41 @@ class DbBrowserPageState extends State<DbBrowserPage> {
         padding: const EdgeInsets.all(2.0),
         child: Column(
           children: [
+            // Search bars
+            Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextBox(
+                      controller: _fileBrowserSearchController,
+                      placeholder: 'Search File Browser',
+                      onChanged: (value) {
+                        setState(() {
+                          _fileBrowserSearchQuery = value;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 5,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TextBox(
+                      controller: _trackTableSearchController,
+                      placeholder: 'Search Track Table',
+                      onChanged: (value) {
+                        setState(() {
+                          _trackTableSearchQuery = value;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
             Expanded(
               child: Row(
                 children: [
@@ -248,18 +291,18 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                   Expanded(
                     flex: 1,
                     child: FileBrowser(
-                      publisherAlbums: _publisherAlbums,
+                      publisherAlbums: _filterPublisherAlbums(),
                     ),
                   ),
                   // Third Column: Tracks Table
                   Expanded(
                     flex: 5,
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16.0,0,0,0),
+                      padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
                       child: Align(
                         alignment: Alignment.topCenter,
                         child: TrackTable(
-                          tracks: _trackProviderState.tracks,
+                          tracks: _filterTracks(),
                           scrollController: _scrollController,
                         ),
                       ),
@@ -287,5 +330,29 @@ class DbBrowserPageState extends State<DbBrowserPage> {
         ),
       ),
     );
+  }
+
+  Map<String, Set<String>> _filterPublisherAlbums() {
+    if (_fileBrowserSearchQuery.isEmpty) {
+      return _publisherAlbums;
+    }
+    final filtered = <String, Set<String>>{};
+    _publisherAlbums.forEach((publisher, albums) {
+      if (publisher.toLowerCase().contains(_fileBrowserSearchQuery.toLowerCase())) {
+        filtered[publisher] = albums;
+      }
+    });
+    return filtered;
+  }
+
+  List<Track> _filterTracks() {
+    if (_trackTableSearchQuery.isEmpty) {
+      return _trackProviderState.tracks;
+    }
+    return _trackProviderState.tracks.where((track) {
+      return track.title.toLowerCase().contains(_trackTableSearchQuery.toLowerCase()) ||
+             track.artist.toLowerCase().contains(_trackTableSearchQuery.toLowerCase()) ||
+             track.albumTitle.toLowerCase().contains(_trackTableSearchQuery.toLowerCase());
+    }).toList();
   }
 }
