@@ -6,24 +6,23 @@ import 'package:front_end/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:logging/logging.dart';
 
-class PubLisherBrowser extends StatefulWidget {
+class PublisherBrowser extends StatefulWidget {
   final Map<String, Set<String>> publisherAlbums;
 
-  const 
-  PubLisherBrowser({
+  const PublisherBrowser({
     Key? key,
     required this.publisherAlbums,
   }) : super(key: key);
 
   @override
-  _PubLisherBrowserState createState() => _PubLisherBrowserState();
+  _PublisherBrowserState createState() => _PublisherBrowserState();
 }
 
-class _PubLisherBrowserState extends State<PubLisherBrowser> {
+class _PublisherBrowserState extends State<PublisherBrowser> {
   final Map<String, bool> _expandedPublishers = {};
   final Set<String> _selectedPublishers = {};
   final Set<String> _selectedAlbums = {};
-  final Logger _logger = Logger('FileBrowser');
+  final Logger _logger = Logger('PublisherBrowser');
 
   @override
   void initState() {
@@ -57,22 +56,48 @@ class _PubLisherBrowserState extends State<PubLisherBrowser> {
     return _expandedPublishers[publisher] ?? false;
   }
 
-  void handlePublisherClick(String publisher, Set<String> albums) {
-    if (shouldToggleExpansion(publisher, albums)) {
-      togglePublisherExpansion(publisher);
-    }
-    removeSelectedAlbums(albums);
+  void handlePublisherClick(String publisher) {
+    setState(() {
+      if (HardwareKeyboard.instance.isShiftPressed) {
+        if (_selectedPublishers.contains(publisher)) {
+          _selectedPublishers.remove(publisher);
+        } else {
+          _selectedPublishers.add(publisher);
+        }
+      } else {
+        if (_selectedPublishers.contains(publisher)) {
+          _selectedPublishers.clear();
+        } else {
+          _selectedPublishers.clear();
+          _selectedPublishers.add(publisher);
+        }
+      }
+      _selectedAlbums.clear();
+    });
   }
 
-  void handlePublisherClickWithShift(String publisher, Set<String> albums) {
+  void handleAlbumClick(String album) {
     setState(() {
-      if (_selectedPublishers.contains(publisher)) {
-        _selectedPublishers.remove(publisher);
+      if (HardwareKeyboard.instance.isShiftPressed) {
+        if (_selectedAlbums.contains(album)) {
+          _selectedAlbums.remove(album);
+        } else {
+          _selectedAlbums.add(album);
+        }
       } else {
-        _selectedPublishers.add(publisher);
-        _selectedAlbums.removeAll(albums);
+        if (_selectedAlbums.contains(album)) {
+          _selectedAlbums.clear();
+        } else {
+          _selectedAlbums.clear();
+          _selectedAlbums.add(album);
+        }
       }
+      _selectedPublishers.clear();
     });
+  }
+
+  void handlePublisherIconClick(String publisher) {
+    togglePublisherExpansion(publisher);
   }
 
   @override
@@ -92,11 +117,7 @@ class _PubLisherBrowserState extends State<PubLisherBrowser> {
           children: [
             Listener(
               onPointerDown: (event) {
-                if (HardwareKeyboard.instance.isShiftPressed) {
-                  handlePublisherClickWithShift(publisher, albums);
-                } else {
-                  handlePublisherClick(publisher, albums);
-                }
+                handlePublisherClick(publisher);
               },
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 0.0),
@@ -105,9 +126,15 @@ class _PubLisherBrowserState extends State<PubLisherBrowser> {
                   height: 22.00,
                   child: ListTile(
                     contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
-                    leading: Icon(
-                      isExpanded ? FluentIcons.folder_open : FluentIcons.folder_list,
-                      color: themeProvider.iconColour, size: 14,
+                    leading: GestureDetector(
+                      onTap: () {
+                        handlePublisherIconClick(publisher);
+                      },
+                      child: Icon(
+                        isExpanded ? FluentIcons.folder_open : FluentIcons.folder_list,
+                        color: themeProvider.iconColour,
+                        size: 14,
+                      ),
                     ),
                     title: Text(
                       publisher,
@@ -127,16 +154,8 @@ class _PubLisherBrowserState extends State<PubLisherBrowser> {
                 children: albums.map((album) {
                   bool isAlbumSelected = _selectedAlbums.contains(album);
                   return Listener(
-                    onPointerDown: (event) => {
-                      setState(() {
-                        _logger.info('Toggling expansion album $album for $publisher');
-                        if (isAlbumSelected) {
-                          _selectedAlbums.remove(album);
-                        } else {
-                          _selectedAlbums.add(album);
-                        }
-                        _selectedPublishers.clear();
-                      }),
+                    onPointerDown: (event) {
+                      handleAlbumClick(album);
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 0.0),
@@ -144,7 +163,7 @@ class _PubLisherBrowserState extends State<PubLisherBrowser> {
                       child: SizedBox(
                         height: 22.00,
                         child: ListTile(
-                          contentPadding: EdgeInsets.fromLTRB( 30.0, 0.0, 0.0, 0.0),
+                          contentPadding: EdgeInsets.fromLTRB(30.0, 0.0, 0.0, 0.0),
                           leading: Icon(FluentIcons.music_note, color: themeProvider.iconColour, size: 14),
                           title: Text(
                             album,
@@ -153,6 +172,7 @@ class _PubLisherBrowserState extends State<PubLisherBrowser> {
                               fontSize: themeProvider.fontSizeDataTableRow,
                               fontFamily: themeProvider.dataTableFontFamily,
                             ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ),
