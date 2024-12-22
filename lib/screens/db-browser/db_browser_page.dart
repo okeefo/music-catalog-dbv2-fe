@@ -10,9 +10,14 @@ import 'track_provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import 'package:logging/logging.dart';
-import 'publisher_browser.dart'; // Import the new file browser widget
+import 'publisher_browser.dart';
 import 'track_model.dart';
 import '../../utils/endpoints.dart';
+
+// Constants for repeated values
+const double paddingValue = 16.0;
+const double searchBoxWidth = 400.0;
+const double threshold = 800.0;
 
 class DbBrowserPage extends StatefulWidget {
   const DbBrowserPage({super.key});
@@ -28,7 +33,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   final ValueNotifier<String> _statusNotifier = ValueNotifier<String>('No updates yet');
   final TrackProviderState _trackProviderState = TrackProviderState();
   final TrackProvider _trackProvider = TrackProvider();
-  final Map<String, Set<String>> _publisherAlbums = {}; // Store publishers and their albums
+  final Map<String, Set<String>> _publisherAlbums = {};
 
   final Logger _logger = Logger('DbBrowserPageState');
 
@@ -45,14 +50,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
     _loadTracks();
     _initializeWebSocket();
 
-    _scrollController.addListener(() {
-      // Define a threshold value (e.g., 200 pixels) before reaching the end of the list
-      const double threshold = 800.0;
-
-      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - threshold && !_trackProviderState.isLoading) {
-        _loadMoreTracks();
-      }
-    });
+    _scrollController.addListener(_scrollListener);
   }
 
   @override
@@ -70,40 +68,51 @@ class DbBrowserPageState extends State<DbBrowserPage> {
       _channel = WebSocketChannel.connect(Uri.parse(Endpoints.wsScanUpdatesUri()));
 
       _channel!.stream.listen(
-        (message) {
-          final decodedMessage = jsonDecode(message);
-          final code = decodedMessage['code'];
-          final msg = decodedMessage['message'];
-          final upd = msg.replaceAll('\n', '-');
-          _logger.info('Received message: $code : $upd');
-
-          _statusNotifier.value = upd;
-
-          if (code == 'UPDATE') {
-            _statusUpdates.add(msg);
-          } else if (code == 'COMPLETED') {
-            showInfoDialog(context, msg, 'Scan Completed!');
-            _loadMoreTracks();
-          } else if (code == 'INFO') {
-            showInfoDialog(context, msg, 'Scan Info!');
-          } else if (code == 'ERROR') {
-            showErrorDialog(context, msg, 'Scan failed!');
-          } else {
-            _logger.warning('Unknown message code: $code');
-          }
-        },
-        onError: (error) {
-          _logger.severe('WebSocket error: $error');
-          showErrorDialog(context, 'WebSocket error: $error', 'Connection Error');
-        },
-        onDone: () {
-          _logger.info('WebSocket connection closed');
-        },
+        _onWebSocketMessage,
+        onError: _onWebSocketError,
+        onDone: _onWebSocketDone,
       );
     } catch (e) {
       _logger.severe('Failed to connect to WebSocket: $e');
       showErrorDialog(context, 'Failed to connect to WebSocket: $e', 'Connection Error');
     }
+  }
+
+  void _onWebSocketMessage(dynamic message) {
+    final decodedMessage = jsonDecode(message);
+    final code = decodedMessage['code'];
+    final msg = decodedMessage['message'];
+    final upd = msg.replaceAll('\n', '-');
+    _logger.info('Received message: $code : $upd');
+
+    _statusNotifier.value = upd;
+
+    switch (code) {
+      case 'UPDATE':
+        _statusUpdates.add(msg);
+        break;
+      case 'COMPLETED':
+        showInfoDialog(context, msg, 'Scan Completed!');
+        _loadMoreTracks();
+        break;
+      case 'INFO':
+        showInfoDialog(context, msg, 'Scan Info!');
+        break;
+      case 'ERROR':
+        showErrorDialog(context, msg, 'Scan failed!');
+        break;
+      default:
+        _logger.warning('Unknown message code: $code');
+    }
+  }
+
+  void _onWebSocketError(dynamic error) {
+    _logger.severe('WebSocket error: $error');
+    showErrorDialog(context, 'WebSocket error: $error', 'Connection Error');
+  }
+
+  void _onWebSocketDone() {
+    _logger.info('WebSocket connection closed');
   }
 
   void _loadTracks() {
@@ -113,7 +122,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
         setState(() {
           _trackProviderState.addTracks(newTracks);
           _trackProviderState.setTotalTracks(totalTracks);
-          _populatePublisherAlbums(newTracks); // Populate publishers and albums
+          _populatePublisherAlbums(newTracks);
         });
       },
       onError: (error) {
@@ -125,10 +134,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   void _populatePublisherAlbums(List<Track> tracks) {
     _publisherAlbums.clear();
     for (var track in tracks) {
-      if (!_publisherAlbums.containsKey(track.label)) {
-        _publisherAlbums[track.label] = <String>{};
-      }
-      _publisherAlbums[track.label]!.add(track.albumTitle);
+      _publisherAlbums.putIfAbsent(track.label, () => <String>{}).add(track.albumTitle);
     }
   }
 
@@ -139,6 +145,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
         setState(() {
           _trackProviderState.addTracks(newTracks);
           _trackProviderState.setTotalTracks(totalTracks);
+          _populatePublisherAlbums(newTracks);
         });
       },
       onError: (error) {
@@ -147,176 +154,33 @@ class DbBrowserPageState extends State<DbBrowserPage> {
     );
   }
 
+  void _scrollListener() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - threshold && !_trackProviderState.isLoading) {
+      _loadMoreTracks();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return ScaffoldPage(
-      header: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Stack(
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Total Tracks: ${_trackProviderState.totalTracks}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: themeProvider.fontColour,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Consumer<DbProvider>(
-                        builder: (context, dbProvider, child) {
-                          if (dbProvider.databases.isEmpty) {
-                            return const ProgressRing();
-                          } else {
-                            return ComboBox<String>(
-                              items: dbProvider.databases.map((db) {
-                                return ComboBoxItem<String>(
-                                  value: db['Name'],
-                                  child: Text(db['Name']!),
-                                );
-                              }).toList(),
-                              value: dbProvider.activeDatabase,
-                              onChanged: (String? newValue) async {
-                                if (newValue != null) {
-                                  final selectedDb = dbProvider.databases.firstWhere((db) => db['Name'] == newValue);
-                                  await dbProvider.setActiveDatabase(context, selectedDb['Name']!, selectedDb['Path']!);
-                                  _loadTracks();
-                                }
-                              },
-                            );
-                          }
-                        },
-                      ),
-                      const SizedBox(width: 16),
-                      Column(
-                        children: [
-                          Tooltip(
-                            message: 'Scan for music',
-                            child: IconButton(
-                              icon: Icon(
-                                FluentIcons.music_in_collection_fill,
-                                size: themeProvider.iconSizeLarge,
-                                color: themeProvider.iconColour,
-                              ),
-                              onPressed: () => _trackProvider.scanForMusic(context, _channel),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Scan',
-                            style: TextStyle(
-                              color: themeProvider.fontColour,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 16),
-                      Column(
-                        children: [
-                          Tooltip(
-                            message: 'Reload tracks',
-                            child: IconButton(
-                              icon: Icon(
-                                FluentIcons.refresh,
-                                size: themeProvider.iconSizeLarge,
-                                color: themeProvider.iconColour,
-                              ),
-                              onPressed: _loadTracks,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Reload',
-                            style: TextStyle(
-                              color: themeProvider.fontColour,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Align(
-              alignment: Alignment.center,
-              child: Text(
-                'DB Browser',
-                style: TextStyle(
-                  fontSize: 24,
-                  color: themeProvider.fontColour,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      header: _buildHeader(themeProvider),
       content: Padding(
         padding: const EdgeInsets.all(2.0),
         child: Column(
           children: [
-            // Search bars
-            Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextBox(
-                      controller: _fileBrowserSearchController,
-                      placeholder: 'Search Lavel or Album',
-                      onChanged: (value) {
-                        setState(() {
-                          _fileBrowserSearchQuery = value;
-                        });
-                      },
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 5,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 400, // Set the fixed width to 400
-                          child: TextBox(
-                            controller: _trackTableSearchController,
-                            placeholder: 'Search Table search all or use column:search',
-                            onChanged: (value) {
-                              setState(() {
-                                _trackTableSearchQuery = value;
-                              });
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            _buildSearchBars(),
             Expanded(
               flex: 1,
               child: Row(
                 children: [
-                  // First Column: File Browser
                   Expanded(
                     flex: 1,
                     child: PublisherBrowser(
                       publisherAlbums: _filterPublisherAlbums(),
                     ),
                   ),
-                  // Third Column: Tracks Table
                   Expanded(
                     flex: 5,
                     child: Padding(
@@ -336,20 +200,174 @@ class DbBrowserPageState extends State<DbBrowserPage> {
           ],
         ),
       ),
-      bottomBar: Container(
-        padding: const EdgeInsets.all(8.0),
-        color: themeProvider.backgroundColour,
-        child: ValueListenableBuilder<String>(
-          valueListenable: _statusNotifier,
-          builder: (context, value, child) {
-            return Text(
-              value,
+      bottomBar: _buildBottomBar(themeProvider),
+    );
+  }
+
+  Widget _buildHeader(ThemeProvider themeProvider) {
+    return Padding(
+      padding: const EdgeInsets.all(paddingValue),
+      child: Stack(
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Total Tracks: ${_trackProviderState.totalTracks}',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: themeProvider.fontColour,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Consumer<DbProvider>(
+                      builder: (context, dbProvider, child) {
+                        if (dbProvider.databases.isEmpty) {
+                          return const ProgressRing();
+                        } else {
+                          return ComboBox<String>(
+                            items: dbProvider.databases.map((db) {
+                              return ComboBoxItem<String>(
+                                value: db['Name'],
+                                child: Text(db['Name']!),
+                              );
+                            }).toList(),
+                            value: dbProvider.activeDatabase,
+                            onChanged: (String? newValue) async {
+                              if (newValue != null) {
+                                final selectedDb = dbProvider.databases.firstWhere((db) => db['Name'] == newValue);
+                                await dbProvider.setActiveDatabase(context, selectedDb['Name']!, selectedDb['Path']!);
+                                _loadTracks();
+                              }
+                            },
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(width: 16),
+                    _buildIconButton(
+                      themeProvider,
+                      icon: FluentIcons.music_in_collection_fill,
+                      tooltip: 'Scan for music',
+                      onPressed: () => _trackProvider.scanForMusic(context, _channel),
+                      label: 'Scan',
+                    ),
+                    const SizedBox(width: 16),
+                    _buildIconButton(
+                      themeProvider,
+                      icon: FluentIcons.refresh,
+                      tooltip: 'Reload tracks',
+                      onPressed: _loadTracks,
+                      label: 'Reload',
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Align(
+            alignment: Alignment.center,
+            child: Text(
+              'DB Browser',
               style: TextStyle(
+                fontSize: 24,
                 color: themeProvider.fontColour,
               ),
-            );
-          },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIconButton(ThemeProvider themeProvider,
+      {required IconData icon, required String tooltip, required VoidCallback onPressed, required String label}) {
+    return Column(
+      children: [
+        Tooltip(
+          message: tooltip,
+          child: IconButton(
+            icon: Icon(
+              icon,
+              size: themeProvider.iconSizeLarge,
+              color: themeProvider.iconColour,
+            ),
+            onPressed: onPressed,
+          ),
         ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            color: themeProvider.fontColour,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSearchBars() {
+    return Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextBox(
+              controller: _fileBrowserSearchController,
+              placeholder: 'Search Label or Album',
+              onChanged: (value) {
+                setState(() {
+                  _fileBrowserSearchQuery = value;
+                });
+              },
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 5,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: searchBoxWidth,
+                  child: TextBox(
+                    controller: _trackTableSearchController,
+                    placeholder: 'Search Table search all or use column:search',
+                    onChanged: (value) {
+                      setState(() {
+                        _trackTableSearchQuery = value;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBottomBar(ThemeProvider themeProvider) {
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      color: themeProvider.backgroundColour,
+      child: ValueListenableBuilder<String>(
+        valueListenable: _statusNotifier,
+        builder: (context, value, child) {
+          return Text(
+            value,
+            style: TextStyle(
+              color: themeProvider.fontColour,
+            ),
+          );
+        },
       ),
     );
   }
