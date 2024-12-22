@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:front_end/providers/theme_provider.dart';
+import 'package:front_end/screens/db-browser/filters.dart';
 import 'package:front_end/screens/popups.dart';
 import 'package:provider/provider.dart';
 import '../../providers/db_provider.dart';
@@ -258,7 +259,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                     padding: const EdgeInsets.all(8.0),
                     child: TextBox(
                       controller: _fileBrowserSearchController,
-                      placeholder: 'Search File Browser',
+                      placeholder: 'Search Lavel or Album',
                       onChanged: (value) {
                         setState(() {
                           _fileBrowserSearchQuery = value;
@@ -271,20 +272,28 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                   flex: 5,
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: TextBox(
-                      controller: _trackTableSearchController,
-                      placeholder: 'Search Track Table',
-                      onChanged: (value) {
-                        setState(() {
-                          _trackTableSearchQuery = value;
-                        });
-                      },
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 400, // Set the fixed width to 400
+                          child: TextBox(
+                            controller: _trackTableSearchController,
+                            placeholder: 'Search Table search all or use column:search',
+                            onChanged: (value) {
+                              setState(() {
+                                _trackTableSearchQuery = value;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ],
             ),
             Expanded(
+              flex: 1,
               child: Row(
                 children: [
                   // First Column: File Browser
@@ -333,26 +342,10 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   }
 
   Map<String, Set<String>> _filterPublisherAlbums() {
-    if (_fileBrowserSearchQuery.isEmpty) {
-      return _publisherAlbums;
-    }
-    final filtered = <String, Set<String>>{};
-    _publisherAlbums.forEach((publisher, albums) {
-      if (publisher.toLowerCase().contains(_fileBrowserSearchQuery.toLowerCase())) {
-        filtered[publisher] = albums;
-      }
-    });
-    return filtered;
+    return PublisherFilter.filterPublisherAlbums(_publisherAlbums, _fileBrowserSearchQuery);
   }
 
   List<Track> _filterTracks() {
-    if (_trackTableSearchQuery.isEmpty) {
-      return _trackProviderState.tracks;
-    }
-    return _trackProviderState.tracks.where((track) {
-      return track.title.toLowerCase().contains(_trackTableSearchQuery.toLowerCase()) ||
-             track.artist.toLowerCase().contains(_trackTableSearchQuery.toLowerCase()) ||
-             track.albumTitle.toLowerCase().contains(_trackTableSearchQuery.toLowerCase());
-    }).toList();
+    return TrackFilter.filterTracks(_trackProviderState.tracks, _trackTableSearchQuery);
   }
 }
