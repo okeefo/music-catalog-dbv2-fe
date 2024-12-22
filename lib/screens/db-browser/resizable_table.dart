@@ -16,8 +16,9 @@ class ResizableTable extends StatefulWidget {
   final BoxDecoration rowDecoration;
   final BoxDecoration altRowDecoration;
   final int altRowColumnIndex;
+  final EdgeInsets cellPadding =  EdgeInsets.fromLTRB(8, 4.0, 0.0, 4.0);
 
-  const ResizableTable(
+  ResizableTable(
       {super.key,
       required this.headers,
       required this.data,
@@ -31,7 +32,8 @@ class ResizableTable extends StatefulWidget {
       required this.columnDecoration,
       required this.rowDecoration,
       required this.altRowDecoration,
-      required this.altRowColumnIndex});
+      required this.altRowColumnIndex,
+      });
 
   @override
   ResizableTableState createState() => ResizableTableState();
@@ -209,7 +211,7 @@ class ResizableTableState extends State<ResizableTable> {
   Widget _buildAutoNumberingCell(int rowIndex, TextStyle rowStyle) {
     return Container(
       width: autoNumberColumnWidth,
-      padding: const EdgeInsets.all(8.0),
+      padding: widget.cellPadding,
       decoration: rowStyle == widget.rowStyle ? widget.rowDecoration : widget.altRowDecoration,
       child: SelectableText(
         (rowIndex + 1).toString(),
@@ -287,7 +289,7 @@ class ResizableTableState extends State<ResizableTable> {
         message: text,
         child: Container(
           width: columnWidths[index],
-          padding: const EdgeInsets.all(8.0),
+          padding: widget.cellPadding, 
           decoration: rowStyle == widget.rowStyle ? widget.rowDecoration : widget.altRowDecoration,
           child: Text(
             text,
@@ -322,7 +324,7 @@ class ResizableTableState extends State<ResizableTable> {
             cursor: SystemMouseCursors.click,
             child: Container(
               width: columnWidths[index],
-              padding: const EdgeInsets.all(8.0),
+              padding:  widget.cellPadding, 
               decoration: rowStyle == widget.rowStyle ? widget.rowDecoration : widget.altRowDecoration,
               child: Text(
                 text,
