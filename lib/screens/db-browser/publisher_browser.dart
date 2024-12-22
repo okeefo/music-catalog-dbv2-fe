@@ -56,43 +56,23 @@ class _PublisherBrowserState extends State<PublisherBrowser> {
     return _expandedPublishers[publisher] ?? false;
   }
 
-  void handlePublisherClick(String publisher) {
+  void handleSelectionClick(String selectedItem, Set<String> selectedItems, Set<String> listToClear) {
     setState(() {
       if (HardwareKeyboard.instance.isShiftPressed) {
-        if (_selectedPublishers.contains(publisher)) {
-          _selectedPublishers.remove(publisher);
+        if (selectedItems.contains(selectedItem)) {
+          selectedItems.remove(selectedItem);
         } else {
-          _selectedPublishers.add(publisher);
+          selectedItems.add(selectedItem);
         }
       } else {
-        if (_selectedPublishers.contains(publisher)) {
-          _selectedPublishers.clear();
+        if (selectedItems.contains(selectedItem)) {
+          selectedItems.clear();
         } else {
-          _selectedPublishers.clear();
-          _selectedPublishers.add(publisher);
+          selectedItems.clear();
+          selectedItems.add(selectedItem);
         }
       }
-      _selectedAlbums.clear();
-    });
-  }
-
-  void handleAlbumClick(String album) {
-    setState(() {
-      if (HardwareKeyboard.instance.isShiftPressed) {
-        if (_selectedAlbums.contains(album)) {
-          _selectedAlbums.remove(album);
-        } else {
-          _selectedAlbums.add(album);
-        }
-      } else {
-        if (_selectedAlbums.contains(album)) {
-          _selectedAlbums.clear();
-        } else {
-          _selectedAlbums.clear();
-          _selectedAlbums.add(album);
-        }
-      }
-      _selectedPublishers.clear();
+      listToClear.clear();
     });
   }
 
@@ -117,7 +97,7 @@ class _PublisherBrowserState extends State<PublisherBrowser> {
           children: [
             Listener(
               onPointerDown: (event) {
-                handlePublisherClick(publisher);
+                handleSelectionClick(publisher, _selectedPublishers, _selectedAlbums);
               },
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 0.0),
@@ -155,7 +135,7 @@ class _PublisherBrowserState extends State<PublisherBrowser> {
                   bool isAlbumSelected = _selectedAlbums.contains(album);
                   return Listener(
                     onPointerDown: (event) {
-                      handleAlbumClick(album);
+                      handleSelectionClick(album, _selectedAlbums, _selectedPublishers);
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 0.0),
