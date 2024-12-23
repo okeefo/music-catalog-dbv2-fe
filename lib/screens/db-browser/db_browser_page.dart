@@ -34,6 +34,8 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   final TrackProviderState _trackProviderState = TrackProviderState();
   final TrackProvider _trackProvider = TrackProvider();
   final Map<String, Set<String>> _publisherAlbums = {};
+  final Set<String> _selectedPublishers = {};
+  final Set<String> _selectedAlbums = {};
 
   final Logger _logger = Logger('DbBrowserPageState');
 
@@ -179,6 +181,18 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                     flex: 1,
                     child: PublisherBrowser(
                       publisherAlbums: _filterPublisherAlbums(),
+                      onPublishersSelected: (publishers) {
+                        setState(() {
+                          _selectedPublishers.clear();
+                          _selectedPublishers.addAll(publishers);
+                        });
+                      },
+                      onAlbumsSelected: (albums) {
+                        setState(() {
+                          _selectedAlbums.clear();
+                          _selectedAlbums.addAll(albums);
+                        });
+                      },
                     ),
                   ),
                   Expanded(
@@ -377,6 +391,6 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   }
 
   List<Track> _filterTracks() {
-    return TrackFilter.filterTracks(_trackProviderState.tracks, _trackTableSearchQuery);
+    return TrackFilter.filterTracks(_trackProviderState.tracks, _trackTableSearchQuery, _selectedPublishers, _selectedAlbums);
   }
 }

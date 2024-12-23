@@ -13,14 +13,23 @@ const EdgeInsets albumListTilePadding = EdgeInsets.fromLTRB(30.0, 0.0, 0.0, 0.0)
 
 class PublisherBrowser extends StatefulWidget {
   final Map<String, Set<String>> publisherAlbums;
+  final ValueChanged<Set<String>> onPublishersSelected;
+  final ValueChanged<Set<String>> onAlbumsSelected;
 
   const PublisherBrowser({
     super.key,
     required this.publisherAlbums,
+    required this.onPublishersSelected,
+    required this.onAlbumsSelected,
   });
 
   @override
   _PublisherBrowserState createState() => _PublisherBrowserState();
+
+  notifyFilterChange(Set<String> selectedPublishers, Set<String> selectedAlbums) {
+    onPublishersSelected(selectedPublishers);
+    onAlbumsSelected(selectedAlbums);
+  }
 }
 
 class _PublisherBrowserState extends State<PublisherBrowser> {
@@ -73,7 +82,6 @@ class _PublisherBrowserState extends State<PublisherBrowser> {
 
   @override
   Widget build(BuildContext context) {
-
     return ListView.builder(
       itemCount: widget.publisherAlbums.keys.length,
       itemBuilder: (context, index) {
@@ -89,7 +97,10 @@ class _PublisherBrowserState extends State<PublisherBrowser> {
               publisher: publisher,
               isExpanded: isExpanded,
               isSelected: isPublisherSelected,
-              onClick: () => handleSelectionClick(publisher, _selectedPublishers, _selectedAlbums),
+              onClick: () => {
+                handleSelectionClick(publisher, _selectedPublishers, _selectedAlbums),
+                widget.notifyFilterChange(_selectedPublishers, _selectedAlbums),
+              },
               onIconClick: () => handlePublisherIconClick(publisher),
             ),
             if (isExpanded)
@@ -98,7 +109,10 @@ class _PublisherBrowserState extends State<PublisherBrowser> {
                 return AlbumRow(
                   album: album,
                   isSelected: isAlbumSelected,
-                  onClick: () => handleSelectionClick(album, _selectedAlbums, _selectedPublishers),
+                  onClick: () => {
+                    handleSelectionClick(album, _selectedAlbums, _selectedPublishers),
+                    widget.notifyFilterChange(_selectedPublishers, _selectedAlbums),
+                  },
                 );
               }),
           ],
