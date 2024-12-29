@@ -11,8 +11,8 @@ class Endpoints {
   
 
   static void initialize(String baseUri) {
-    _baseUriHttp = "http://"+baseUri;
-    _baseUriWs = "ws://"+baseUri;
+    _baseUriHttp = "http://$baseUri";
+    _baseUriWs = "ws://$baseUri";
   }
 
   static String getActiveDatabaseUri() {
