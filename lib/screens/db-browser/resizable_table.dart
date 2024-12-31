@@ -16,24 +16,28 @@ class ResizableTable extends StatefulWidget {
   final BoxDecoration rowDecoration;
   final BoxDecoration altRowDecoration;
   final int altRowColumnIndex;
-  final EdgeInsets cellPadding =  EdgeInsets.fromLTRB(8, 4.0, 0.0, 4.0);
+  final List<double> preCalcColumnWidths;
+  final EdgeInsets cellPadding = EdgeInsets.fromLTRB(8, 4.0, 0.0, 4.0);
+  final void Function(int index, double width) onColumnWidthChanged;
 
-  ResizableTable(
-      {super.key,
-      required this.headers,
-      required this.data,
-      required this.rowStyle,
-      required this.altRowStyle,
-      required this.headerStyle,
-      required this.columnActions,
-      this.showAutoNumbering = true,
-      this.onRightClick,
-      required this.infiniteScrollController,
-      required this.columnDecoration,
-      required this.rowDecoration,
-      required this.altRowDecoration,
-      required this.altRowColumnIndex,
-      });
+  ResizableTable({
+    super.key,
+    required this.headers,
+    required this.data,
+    required this.rowStyle,
+    required this.altRowStyle,
+    required this.headerStyle,
+    required this.columnActions,
+    this.showAutoNumbering = true,
+    this.onRightClick,
+    required this.infiniteScrollController,
+    required this.columnDecoration,
+    required this.rowDecoration,
+    required this.altRowDecoration,
+    required this.altRowColumnIndex,
+    this.preCalcColumnWidths = const [],
+    required this.onColumnWidthChanged,
+  });
 
   @override
   ResizableTableState createState() => ResizableTableState();
@@ -49,7 +53,15 @@ class ResizableTableState extends State<ResizableTable> {
   void initState() {
     super.initState();
     minColumnWidths = List<double>.generate(widget.headers.length, (i) => _calculateMinColumnWidth(i));
-    columnWidths = List<double>.generate(widget.headers.length, (i) => _calculateMaxColumnWidth(i));
+    if (widget.preCalcColumnWidths.isEmpty || widget.preCalcColumnWidths.every((width) => width == 0.0)) {
+      columnWidths = List<double>.generate(widget.headers.length, (i) => _calculateMaxColumnWidth(i));
+      for (int i = 0; i < columnWidths.length; i++) {
+        widget.onColumnWidthChanged(i, columnWidths[i]);
+      }
+    } else {
+      columnWidths = List<double>.from(widget.preCalcColumnWidths);
+    }
+
     autoNumberColumnWidth = _calculateAutoNumberColumnWidth();
   }
 
@@ -59,13 +71,18 @@ class ResizableTableState extends State<ResizableTable> {
     if (oldWidget.data.isEmpty && widget.data.isNotEmpty) {
       setState(() {
         columnWidths = List<double>.generate(widget.headers.length, (i) => _calculateMaxColumnWidth(i));
+        for (int i = 0; i < columnWidths.length; i++) {
+          widget.onColumnWidthChanged(i, columnWidths[i]);
+        }
       });
     }
   }
 
   void _resizeColumn(int index) {
+    double width = _calculateMaxColumnWidth(index);
     setState(() {
-      columnWidths[index] = _calculateMaxColumnWidth(index);
+      columnWidths[index] = width;
+      widget.onColumnWidthChanged(index, width);
     });
   }
 
@@ -140,9 +157,9 @@ class ResizableTableState extends State<ResizableTable> {
         if (showAutoNumbering) {
           totalColumnsWidth += autoNumberColumnWidth; // Add width for auto-numbering column if applicable
         }
-        double calculatedWidth = totalColumnsWidth > constraints.maxWidth ? totalColumnsWidth : constraints.maxWidth;
+        double calculatedWidth = roundToTwoDecimalPlaces(totalColumnsWidth > constraints.maxWidth ? totalColumnsWidth : constraints.maxWidth);
 
-        _logger.info('Constraints Max Width: ${constraints.maxWidth}');
+        _logger.info('Constraints Max Width: ${roundToTwoDecimalPlaces(constraints.maxWidth)}');
         _logger.info('Total Columns Width: $totalColumnsWidth');
         _logger.info('Calculated Width: $calculatedWidth');
 
@@ -221,14 +238,23 @@ class ResizableTableState extends State<ResizableTable> {
     );
   }
 
+  double roundToTwoDecimalPlaces(double value) {
+    return (value * 100).roundToDouble() / 100;
+  }
+
   Widget _buildResizableColumnHeader(int index, String header) {
     return GestureDetector(
       onHorizontalDragUpdate: (details) {
+        double delta = roundToTwoDecimalPlaces(details.delta.dx);
+        _logger.info('Delta: $delta');
+        if (columnWidths[index] + delta < minColumnWidths[index]) {
+          return;
+        }
         setState(() {
-          if (columnWidths[index] + details.delta.dx < minColumnWidths[index]) {
-            return;
-          }
-          columnWidths[index] += details.delta.dx;
+          columnWidths[index] = roundToTwoDecimalPlaces(columnWidths[index] + delta);
+
+          _logger.info('Column Widths updated:  $columnWidths');
+          widget.onColumnWidthChanged(index, columnWidths[index]);
         });
       },
       onDoubleTap: () {
@@ -289,7 +315,7 @@ class ResizableTableState extends State<ResizableTable> {
         message: text,
         child: Container(
           width: columnWidths[index],
-          padding: widget.cellPadding, 
+          padding: widget.cellPadding,
           decoration: rowStyle == widget.rowStyle ? widget.rowDecoration : widget.altRowDecoration,
           child: Text(
             text,
@@ -324,7 +350,7 @@ class ResizableTableState extends State<ResizableTable> {
             cursor: SystemMouseCursors.click,
             child: Container(
               width: columnWidths[index],
-              padding:  widget.cellPadding, 
+              padding: widget.cellPadding,
               decoration: rowStyle == widget.rowStyle ? widget.rowDecoration : widget.altRowDecoration,
               child: Text(
                 text,

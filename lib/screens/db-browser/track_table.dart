@@ -1,9 +1,11 @@
+import 'package:front_end/providers/table_settings_provider.dart';
 import 'package:front_end/screens/popups.dart';
 import 'package:provider/provider.dart';
 import 'track_model.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'resizable_table.dart';
 import 'package:front_end/providers/theme_provider.dart';
+import 'package:logging/logging.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -11,6 +13,7 @@ class TrackTable extends StatelessWidget {
   final List<Track> tracks;
   final ScrollController scrollController;
   final FlyoutController menuController = FlyoutController();
+  final Logger _logger = Logger('TrackTable');
 
   TrackTable({
     super.key,
@@ -21,40 +24,56 @@ class TrackTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context);
+    final TableSettingsProvider tableSettingsProvider = Provider.of<TableSettingsProvider>(context, listen: false);
 
-    final hdrDeco = BoxDecoration(
-      border: Border.all(color: theme.tableBorderColour, width: 1.0),
-      color: theme.headerBackgroundColour,
-    );
+    return FutureBuilder<void>(
+      future: tableSettingsProvider.loadColumnWidths(_getHeaders().length),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: ProgressRing());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error loading column widths'));
+        } else {
+          final hdrDeco = BoxDecoration(
+            border: Border.all(color: theme.tableBorderColour, width: 1.0),
+            color: theme.headerBackgroundColour,
+          );
 
-    final rowDelco = BoxDecoration(
-      border: Border.all(color: theme.tableBorderColour, width: 1.0),
-      color: theme.tableBackgroundColour,
-    );
+          final rowDelco = BoxDecoration(
+            border: Border.all(color: theme.tableBorderColour, width: 1.0),
+            color: theme.tableBackgroundColour,
+          );
 
-    final altRowDeco = BoxDecoration(
-      border: Border.all(color: theme.tableBorderColour, width: 1.0),
-      color: theme.tableAltBackgroundColour,
-    );
+          final altRowDeco = BoxDecoration(
+            border: Border.all(color: theme.tableBorderColour, width: 1.0),
+            color: theme.tableAltBackgroundColour,
+          );
 
-    return FlyoutTarget(
-      controller: menuController,
-      child: ResizableTable(
-        headers: _getHeaders(),
-        data: _getData(),
-        columnActions: _getColumnBehaviors(),
-        rowStyle: theme.styleTableRow,
-        altRowStyle: theme.styleTableAltRow,
-        headerStyle: theme.styleTableHeader,
-        onRightClick: (context, position, columnIndex, rowIndex, d) {
-          _showContextMenu(context, position, columnIndex, rowIndex, d);
-        },
-        infiniteScrollController: scrollController,
-        columnDecoration: hdrDeco,
-        rowDecoration: rowDelco,
-        altRowDecoration: altRowDeco,
-        altRowColumnIndex: 1,
-      ),
+          return FlyoutTarget(
+            controller: menuController,
+            child: ResizableTable(
+              headers: _getHeaders(),
+              data: _getData(),
+              columnActions: _getColumnBehaviors(),
+              rowStyle: theme.styleTableRow,
+              altRowStyle: theme.styleTableAltRow,
+              headerStyle: theme.styleTableHeader,
+              onRightClick: (context, position, columnIndex, rowIndex, d) {
+                _showContextMenu(context, position, columnIndex, rowIndex, d);
+              },
+              infiniteScrollController: scrollController,
+              columnDecoration: hdrDeco,
+              rowDecoration: rowDelco,
+              altRowDecoration: altRowDeco,
+              altRowColumnIndex: 1,
+              preCalcColumnWidths: tableSettingsProvider.columnWidths,
+              onColumnWidthChanged: (index, width) {
+                tableSettingsProvider.updateColumnWidth(index, width);
+              },
+            ),
+          );
+        }
+      },
     );
   }
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:front_end/providers/table_settings_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:logging/logging.dart';
 import 'package:window_manager/window_manager.dart';
@@ -20,7 +21,6 @@ void main() async {
   // Create ThemeProvider and load preferences
   final themeProvider = await ThemeProvider.create();
 
-
   // Set the window size
   await windowManager.setSize(Size(themeProvider.windowWidth, themeProvider.windowHeight));
   await windowManager.center(animate: true);
@@ -38,6 +38,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => themeProvider),
         ChangeNotifierProvider(create: (_) => DbProvider()),
+        ChangeNotifierProvider(create: (_) => TableSettingsProvider()),
       ],
       child: const MyApp(),
     ),
