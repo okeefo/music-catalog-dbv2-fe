@@ -175,7 +175,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
             _buildSearchBars(),
             Expanded(
               flex: 1,
-              child: Row(
+              child: Row(   // ------------- Publisher Browser 
                 children: [
                   Expanded(
                     flex: 1,
@@ -195,7 +195,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                       },
                     ),
                   ),
-                  Expanded(
+                  Expanded(       // ------------- Track Table
                     flex: 5,
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
