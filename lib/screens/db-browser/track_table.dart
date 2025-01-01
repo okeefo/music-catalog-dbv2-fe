@@ -26,51 +26,40 @@ class TrackTable extends StatelessWidget {
     final theme = Provider.of<ThemeProvider>(context);
     final TableSettingsProvider tableSettingsProvider = Provider.of<TableSettingsProvider>(context, listen: false);
 
-    return FutureBuilder<void>(
-      future: tableSettingsProvider.loadColumnWidths(_getHeaders().length),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: ProgressRing());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error loading column widths'));
-        } else {
-          final hdrDeco = BoxDecoration(
-            border: Border.all(color: theme.tableBorderColour, width: 1.0),
-            color: theme.headerBackgroundColour,
-          );
+    final hdrDeco = BoxDecoration(
+      border: Border.all(color: theme.tableBorderColour, width: 1.0),
+      color: theme.headerBackgroundColour,
+    );
 
-          final rowDelco = BoxDecoration(
-            border: Border.all(color: theme.tableBorderColour, width: 1.0),
-            color: theme.tableBackgroundColour,
-          );
+    final rowDelco = BoxDecoration(
+      border: Border.all(color: theme.tableBorderColour, width: 1.0),
+      color: theme.tableBackgroundColour,
+    );
 
-          final altRowDeco = BoxDecoration(
-            border: Border.all(color: theme.tableBorderColour, width: 1.0),
-            color: theme.tableAltBackgroundColour,
-          );
+    final altRowDeco = BoxDecoration(
+      border: Border.all(color: theme.tableBorderColour, width: 1.0),
+      color: theme.tableAltBackgroundColour,
+    );
 
-          return FlyoutTarget(
-            controller: menuController,
-            child: ResizableTable(
-              headers: _getHeaders(),
-              data: _getData(),
-              columnActions: _getColumnBehaviors(),
-              rowStyle: theme.styleTableRow,
-              altRowStyle: theme.styleTableAltRow,
-              headerStyle: theme.styleTableHeader,
-              onRightClick: (context, position, columnIndex, rowIndex, d) {
-                _showContextMenu(context, position, columnIndex, rowIndex, d);
-              },
-              infiniteScrollController: scrollController,
-              columnDecoration: hdrDeco,
-              rowDecoration: rowDelco,
-              altRowDecoration: altRowDeco,
-              altRowColumnIndex: 1,
-              tableSettingsProvider: tableSettingsProvider,  
-            ),
-          );
-        }
-      },
+    return FlyoutTarget(
+      controller: menuController,
+      child: ResizableTable(
+        headers: _getHeaders(),
+        data: _getData(),
+        columnActions: _getColumnBehaviors(),
+        rowStyle: theme.styleTableRow,
+        altRowStyle: theme.styleTableAltRow,
+        headerStyle: theme.styleTableHeader,
+        onRightClick: (context, position, columnIndex, rowIndex, d) {
+          _showContextMenu(context, position, columnIndex, rowIndex, d);
+        },
+        infiniteScrollController: scrollController,
+        columnDecoration: hdrDeco,
+        rowDecoration: rowDelco,
+        altRowDecoration: altRowDeco,
+        altRowColumnIndex: 1,
+        tableSettingsProvider: tableSettingsProvider,
+      ),
     );
   }
 
