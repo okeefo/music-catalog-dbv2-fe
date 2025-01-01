@@ -286,7 +286,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
           Align(
             alignment: Alignment.center,
             child: Text(
-              'DB Browser',
+              'Table Viewer',
               style: TextStyle(
                 fontSize: 24,
                 color: themeProvider.fontColour,
