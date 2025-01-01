@@ -26,7 +26,7 @@ class TrackProvider {
     final response = await _dbService.getTracks(offset, limit);
     if (response.statusCode == 200) {
       _logger.info('Got 200 response from Backend decoding response');
-      final Map<String, dynamic> data = jsonDecode(response.body);
+      final Map<String, dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
       return TrackQueryResponse.fromJson(data);
     } else {
       throw Exception('Failed to load tracks');
