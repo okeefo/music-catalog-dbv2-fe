@@ -26,18 +26,18 @@ class TableSettingsProvider with ChangeNotifier {
     final columnWidthsString = columnWidths.map((width) => width.toString()).toList();
     await prefs.setStringList('columnWidths', columnWidthsString);
     _columnWidths = columnWidths;
-    _logger.info('Saved column widths: $_columnWidths');
+//    _logger.info('Saved column widths: $_columnWidths');
     notifyListeners();
   }
 
   void updateColumnWidth(int index, double width) {
-    _logger.info('Updating column width: index: $index, width: $width');
+   // _logger.info('Updating column width: index: $index, width: $width');
     if (index >= 0) {
       if (index >= _columnWidths.length) {
         _columnWidths.length = index + 1; // Ensure the list is long enough
       }
       _columnWidths[index] = width;
-      _logger.info('Updated column width: index: $index, width: $width');
+//_logger.info('Updated column width: index: $index, width: $width');
       saveColumnWidths(_columnWidths);
     }
   }

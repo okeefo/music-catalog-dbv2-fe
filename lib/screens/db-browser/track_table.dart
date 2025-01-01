@@ -66,10 +66,7 @@ class TrackTable extends StatelessWidget {
               rowDecoration: rowDelco,
               altRowDecoration: altRowDeco,
               altRowColumnIndex: 1,
-              preCalcColumnWidths: tableSettingsProvider.columnWidths,
-              onColumnWidthChanged: (index, width) {
-                tableSettingsProvider.updateColumnWidth(index, width);
-              },
+              tableSettingsProvider: tableSettingsProvider,  
             ),
           );
         }
