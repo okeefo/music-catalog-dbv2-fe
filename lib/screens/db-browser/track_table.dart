@@ -1,6 +1,6 @@
-import 'dart:convert';
 
 import 'package:front_end/providers/table_settings_provider.dart';
+import 'package:front_end/screens/db-browser/track_provider.dart';
 import 'package:front_end/screens/popups.dart';
 import 'package:provider/provider.dart';
 import 'track_model.dart';
@@ -16,6 +16,7 @@ class TrackTable extends StatelessWidget {
   final ScrollController scrollController;
   final FlyoutController menuController = FlyoutController();
   final Logger _logger = Logger('TrackTable');
+  final TrackProvider _trackProvider = TrackProvider();
 
   TrackTable({
     super.key,
@@ -96,28 +97,28 @@ class TrackTable extends StatelessWidget {
       builder: (context) {
         return MenuFlyout(items: [
           MenuFlyoutItem(
-            leading: const Icon(FluentIcons.share),
-            text: const Text('Share'),
-            onPressed: Flyout.of(context).close,
+            leading: const Icon(FluentIcons.play),
+            text: const Text('Play'),
+            onPressed: () => _playTrack(context, rowIndex),
           ),
           MenuFlyoutItem(
-            leading: const Icon(FluentIcons.copy),
-            text: const Text('Select Text', style: TextStyle(fontSize: 12)),
+            leading: const Icon(FluentIcons.stop),
+            text: const Text('Stop', style: TextStyle(fontSize: 12)),
+            onPressed: () => _trackProvider.stopTrack(),
+          ),
+          MenuFlyoutItem(
+            leading: const Icon(FluentIcons.pause),
+            text: const Text('Pause'),
             onPressed: () => _showNotImplementedDialog(context),
-          ),
-          MenuFlyoutItem(
-            leading: const Icon(FluentIcons.delete),
-            text: const Text('Delete'),
-            onPressed: Flyout.of(context).close,
           ),
           const MenuFlyoutSeparator(),
           MenuFlyoutItem(
             text: const Text('Rename'),
-            onPressed: Flyout.of(context).close,
+            onPressed: () => _showNotImplementedDialog(context),
           ),
           MenuFlyoutItem(
             text: const Text('Select'),
-            onPressed: Flyout.of(context).close,
+            onPressed: () => _showNotImplementedDialog(context),
           ),
           const MenuFlyoutSeparator(),
           MenuFlyoutSubItem(
@@ -125,26 +126,26 @@ class TrackTable extends StatelessWidget {
             items: (_) => [
               MenuFlyoutItem(
                 text: const Text('Bluetooth'),
-                onPressed: Flyout.of(context).close,
+                onPressed: () => _showNotImplementedDialog(context),
               ),
               MenuFlyoutItem(
                 text: const Text('Desktop (shortcut)'),
-                onPressed: Flyout.of(context).close,
+                onPressed: () => _showNotImplementedDialog(context),
               ),
               MenuFlyoutSubItem(
                 text: const Text('Compressed file'),
                 items: (context) => [
                   MenuFlyoutItem(
                     text: const Text('Compress and email'),
-                    onPressed: Flyout.of(context).close,
+                    onPressed: () => _showNotImplementedDialog(context),
                   ),
                   MenuFlyoutItem(
                     text: const Text('Compress to .7z'),
-                    onPressed: Flyout.of(context).close,
+                    onPressed: () => _showNotImplementedDialog(context),
                   ),
                   MenuFlyoutItem(
                     text: const Text('Compress to .zip'),
-                    onPressed: Flyout.of(context).close,
+                    onPressed: () => _showNotImplementedDialog(context),
                   ),
                 ],
               ),
@@ -157,6 +158,15 @@ class TrackTable extends StatelessWidget {
 
   void _showNotImplementedDialog(BuildContext context) {
     Flyout.of(context).close();
+    _logger.warning('Not implemented');
     showErrorDialog(context, "Nothing to see here", "Not Implemented");
+  }
+
+  _playTrack(BuildContext context, int rowIndex) {
+    _trackProvider.playTrack(tracks[rowIndex], (errorMessage) {
+      if (context.mounted) {
+        showErrorDialog(context, errorMessage, ' Playback Failure');
+      }
+    });
   }
 }
