@@ -13,6 +13,7 @@ import 'package:logging/logging.dart';
 import 'publisher_browser.dart';
 import 'track_model.dart';
 import '../../utils/endpoints.dart';
+import 'media_player.dart';
 
 // Constants for repeated values
 const double paddingValue = 16.0;
@@ -167,50 +168,14 @@ class DbBrowserPageState extends State<DbBrowserPage> {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return ScaffoldPage(
-      header: _buildHeader(themeProvider),
+      // header: _buildHeader(themeProvider),
       content: Padding(
-        padding: const EdgeInsets.all(2.0),
+        padding: const EdgeInsets.fromLTRB(4.0, 0, 16.0, 0),
         child: Column(
           children: [
+            _buildHeader(themeProvider),
             _buildSearchBars(),
-            Expanded(
-              flex: 1,
-              child: Row(   // ------------- Publisher Browser 
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: PublisherBrowser(
-                      publisherAlbums: _filterPublisherAlbums(),
-                      onPublishersSelected: (publishers) {
-                        setState(() {
-                          _selectedPublishers.clear();
-                          _selectedPublishers.addAll(publishers);
-                        });
-                      },
-                      onAlbumsSelected: (albums) {
-                        setState(() {
-                          _selectedAlbums.clear();
-                          _selectedAlbums.addAll(albums);
-                        });
-                      },
-                    ),
-                  ),
-                  Expanded(       // ------------- Track Table
-                    flex: 5,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: TrackTable(
-                          tracks: _filterTracks(),
-                          scrollController: _scrollController,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            _buildBrowserAndTable(themeProvider),
           ],
         ),
       ),
@@ -219,12 +184,13 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   }
 
   Widget _buildHeader(ThemeProvider themeProvider) {
-    return Padding(
-      padding: const EdgeInsets.all(paddingValue),
-      child: Stack(
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
+    return Row(
+      //  crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 1,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -235,34 +201,33 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                     color: themeProvider.fontColour,
                   ),
                 ),
-                const SizedBox(height: 8),
+                //const SizedBox(height: 8),
                 Row(
                   children: [
                     Consumer<DbProvider>(
                       builder: (context, dbProvider, child) {
-                        if (dbProvider.databases.isEmpty) {
-                          return const ProgressRing();
-                        } else {
-                          return ComboBox<String>(
-                            items: dbProvider.databases.map((db) {
-                              return ComboBoxItem<String>(
-                                value: db['Name'],
-                                child: Text(db['Name']!),
-                              );
-                            }).toList(),
-                            value: dbProvider.activeDatabase,
-                            onChanged: (String? newValue) async {
-                              if (newValue != null) {
-                                final selectedDb = dbProvider.databases.firstWhere((db) => db['Name'] == newValue);
-                                await dbProvider.setActiveDatabase(context, selectedDb['Name']!, selectedDb['Path']!);
-                                _loadTracks();
-                              }
-                            },
-                          );
-                        }
+                        return ComboBox<String>(
+                          items: dbProvider.databases.map((db) {
+                            return ComboBoxItem<String>(
+                              value: db['Name'],
+                              child: Text(
+                                db['Name']!,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            );
+                          }).toList(),
+                          value: dbProvider.activeDatabase,
+                          onChanged: (String? newValue) async {
+                            if (newValue != null) {
+                              final selectedDb = dbProvider.databases.firstWhere((db) => db['Name'] == newValue);
+                              await dbProvider.setActiveDatabase(context, selectedDb['Name']!, selectedDb['Path']!);
+                              _loadTracks();
+                            }
+                          },
+                        );
                       },
                     ),
-                    const SizedBox(width: 16),
+                      const SizedBox(width: 12),
                     _buildIconButton(
                       themeProvider,
                       icon: FluentIcons.music_in_collection_fill,
@@ -270,7 +235,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                       onPressed: () => _trackProvider.scanForMusic(context, _channel),
                       label: 'Scan',
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 6),
                     _buildIconButton(
                       themeProvider,
                       icon: FluentIcons.refresh,
@@ -283,18 +248,16 @@ class DbBrowserPageState extends State<DbBrowserPage> {
               ],
             ),
           ),
-          Align(
-            alignment: Alignment.center,
-            child: Text(
-              'Table Viewer',
-              style: TextStyle(
-                fontSize: 24,
-                color: themeProvider.fontColour,
-              ),
-            ),
+        ),
+        // const SizedBox(width: 16),
+        Expanded(
+          flex: 5,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16.0), // Add padding to align with search bar
+            child: MediaPlayer(),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -307,7 +270,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
           child: IconButton(
             icon: Icon(
               icon,
-              size: themeProvider.iconSizeLarge,
+              size: themeProvider.iconSizeMedium,
               color: themeProvider.iconColour,
             ),
             onPressed: onPressed,
@@ -317,7 +280,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
         Text(
           label,
           style: TextStyle(
-            color: themeProvider.fontColour,
+            color: themeProvider.fontColour, fontSize: themeProvider.fontSizeSmall
           ),
         ),
       ],
@@ -392,5 +355,46 @@ class DbBrowserPageState extends State<DbBrowserPage> {
 
   List<Track> _filterTracks() {
     return TrackFilter.filterTracks(_trackProviderState.tracks, _trackTableSearchQuery, _selectedPublishers, _selectedAlbums);
+  }
+
+  _buildBrowserAndTable(ThemeProvider themeProvider) {
+    return Expanded(
+      flex: 1,
+      child: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: PublisherBrowser(
+              publisherAlbums: _filterPublisherAlbums(),
+              onPublishersSelected: (publishers) {
+                setState(() {
+                  _selectedPublishers.clear();
+                  _selectedPublishers.addAll(publishers);
+                });
+              },
+              onAlbumsSelected: (albums) {
+                setState(() {
+                  _selectedAlbums.clear();
+                  _selectedAlbums.addAll(albums);
+                });
+              },
+            ),
+          ),
+          Expanded(
+            flex: 5,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: TrackTable(
+                  tracks: _filterTracks(),
+                  scrollController: _scrollController,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
