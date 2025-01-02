@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:front_end/screens/popups.dart';
+import 'package:front_end/services/media_services.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'track_model.dart';
 import '../../services/db_service.dart';
@@ -19,6 +20,7 @@ class TrackProvider {
     return _instance;
   }
   final DbService _dbService = DbService();
+  final MediaService _mediaService = MediaService();
 
   static final Logger _logger = Logger('TrackProvider');
 
@@ -114,6 +116,23 @@ class TrackProvider {
     } else {
       throw Exception('Failed to load total number of tracks');
     }
+  }
+
+  Future<void> playTrack(Track track, Function(String) onError) async {
+    try {
+      await _mediaService.playTrack(track);
+    } catch (e) {
+      onError('Failed to play track: ${track.title}\n\n${e.toString()}');
+    }
+    await _mediaService.playTrack(track);
+  }
+
+  Future<void> pauseTrack() async {
+    await _mediaService.pauseTrack();
+  }
+
+  Future<void> stopTrack() async {
+    await _mediaService.stopTrack();
   }
 }
 

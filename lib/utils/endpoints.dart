@@ -8,7 +8,9 @@ class Endpoints {
   static const String _tracks = 'v1/tracks';
   static const String _tracksCount = 'v1/tracks/count';
   static const String _wsScanUpdates = 'v1/ws';
-  
+  static const String _playMedia = 'v1/media/play';
+  static const String _pauseMedia = 'v1/media/pause';
+  static const String _stopMedia = 'v1/media/stop';
 
   static void initialize(String baseUri) {
     _baseUriHttp = "http://$baseUri";
@@ -34,12 +36,24 @@ class Endpoints {
   static String getTracksUri() {
     return '$_baseUriHttp$_tracks';
   }
-  
+
   static String getTotalTracksUri() {
     return '$_baseUriHttp$_tracksCount';
   }
 
   static String wsScanUpdatesUri() {
     return '$_baseUriWs$_wsScanUpdates';
+  }
+
+  static String playMediaUri() {
+    return '$_baseUriHttp$_playMedia';
+  }
+
+  static String pauseMediaUri() {
+    return '$_baseUriHttp$_pauseMedia';
+  }
+
+  static String stopMediaUri() {
+    return '$_baseUriHttp$_stopMedia';
   }
 }

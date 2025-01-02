@@ -165,6 +165,7 @@ class PublisherRow extends StatelessWidget {
                 color: themeProvider.fontColour,
                 fontSize: themeProvider.fontSizeDataTableRow,
                 fontFamily: themeProvider.dataTableFontFamily,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
