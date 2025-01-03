@@ -1,6 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart' as color_picker;
 import 'package:provider/provider.dart';
 import '../../providers/theme_provider.dart';
 import 'package:flutter/services.dart';
@@ -87,7 +87,7 @@ class ColorPickerRow extends StatelessWidget {
               leading: const Icon(FluentIcons.copy),
               text: const Text('Copy'),
               onPressed: () {
-                String hexColour = colorToHex(currentColor);
+                String hexColour = color_picker.colorToHex(currentColor);
                 Clipboard.setData(ClipboardData(text: hexColour));
                 logger.info('Color copied to clipboard: $hexColour');
               }),
@@ -165,9 +165,9 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
       content: SingleChildScrollView(
         child: material.Material(
           color: Colors.transparent,
-          child: ColorPicker(
+          child: color_picker.ColorPicker(
             pickerColor: _pickerColor,
-            paletteType: PaletteType.hsvWithHue,
+            paletteType: color_picker.PaletteType.hsvWithHue,
             onColorChanged: (color) {
               setState(() {
                 _pickerColor = color;
@@ -175,7 +175,7 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
             },
             enableAlpha: false,
             hexInputBar: false,
-            labelTypes: [ColorLabelType.rgb, ColorLabelType.hsl, ColorLabelType.hex, ColorLabelType.hsv],
+            labelTypes: [color_picker.ColorLabelType.rgb, color_picker.ColorLabelType.hsl,color_picker. ColorLabelType.hex, color_picker.ColorLabelType.hsv],
           ),
         ),
       ),
