@@ -61,7 +61,7 @@ class DbProvider with ChangeNotifier {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: themeProvider.backgroundColour.withOpacity(1),
+          backgroundColor: themeProvider.backgroundColour.withAlpha((1 * 255).toInt()),
           title: Text(title),
           content: Text(message),
           actions: <Widget>[
@@ -124,7 +124,7 @@ class DbProvider with ChangeNotifier {
   Future<String?> pickDatabase() async {
     return _dbService.pickDatabase();
   }
-  
+
   Future<String?> createDatabasePrompt() async {
     return _dbService.createDatabasePrompt();
   }
