@@ -19,6 +19,7 @@ import 'media_player.dart';
 const double paddingValue = 16.0;
 const double searchBoxWidth = 400.0;
 const double threshold = 800.0;
+const double fixedFirstColumnWidth = 320.0;
 
 class DbBrowserPage extends StatefulWidget {
   const DbBrowserPage({super.key});
@@ -187,75 +188,84 @@ class DbBrowserPageState extends State<DbBrowserPage> {
     return Row(
       //  crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          flex: 1,
+        SizedBox(
+          width: fixedFirstColumnWidth,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Total Tracks: ${_trackProviderState.totalTracks}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: themeProvider.fontColour,
-                  ),
-                ),
-                //const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Consumer<DbProvider>(
-                      builder: (context, dbProvider, child) {
-                        return ComboBox<String>(
-                          items: dbProvider.databases.map((db) {
-                            return ComboBoxItem<String>(
-                              value: db['Name'],
-                              child: Text(
-                                db['Name']!,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            );
-                          }).toList(),
-                          value: dbProvider.activeDatabase,
-                          onChanged: (String? newValue) async {
-                            if (newValue != null) {
-                              final selectedDb = dbProvider.databases.firstWhere((db) => db['Name'] == newValue);
-                              await dbProvider.setActiveDatabase(context, selectedDb['Name']!, selectedDb['Path']!);
-                              _loadTracks();
-                            }
-                          },
-                        );
-                      },
-                    ),
-                      const SizedBox(width: 12),
-                    _buildIconButton(
-                      themeProvider,
-                      icon: FluentIcons.music_in_collection_fill,
-                      tooltip: 'Scan for music',
-                      onPressed: () => _trackProvider.scanForMusic(context, _channel),
-                      label: 'Scan',
-                    ),
-                    const SizedBox(width: 6),
-                    _buildIconButton(
-                      themeProvider,
-                      icon: FluentIcons.refresh,
-                      tooltip: 'Reload tracks',
-                      onPressed: _loadTracks,
-                      label: 'Reload',
-                    ),
-                  ],
-                ),
-              ],
-            ),
+            child: _buildDBControls(themeProvider),
           ),
         ),
         // const SizedBox(width: 16),
         Expanded(
-          flex: 5,
           child: Padding(
-            padding: const EdgeInsets.only(left: 16.0), // Add padding to align with search bar
+            padding: const EdgeInsets.only(left: 4), // Add padding to align with search bar
             child: MediaPlayer(),
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDBControls(ThemeProvider themeProvider) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Total Tracks: ${_trackProviderState.totalTracks}',
+          style: TextStyle(
+            fontSize: 16,
+            color: themeProvider.fontColour,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Consumer<DbProvider>(
+          builder: (context, dbProvider, child) {
+            return ComboBox<String>(
+              items: dbProvider.databases.map((db) {
+                return ComboBoxItem<String>(
+                  value: db['Name'],
+                  child: Text(
+                    db['Name']!,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                );
+              }).toList(),
+              value: dbProvider.activeDatabase,
+              onChanged: (String? newValue) async {
+                if (newValue != null) {
+                  final selectedDb = dbProvider.databases.firstWhere((db) => db['Name'] == newValue);
+                  await dbProvider.setActiveDatabase(context, selectedDb['Name']!, selectedDb['Path']!);
+                  _loadTracks();
+                }
+              },
+            );
+          },
+        ),
+        Row(
+          children: [
+            //const SizedBox(width: 12),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.00, 6.0, 0.0, 0),
+              child: _buildIconButton(
+                themeProvider,
+                icon: FluentIcons.music_in_collection_fill,
+                tooltip: 'Scan for music',
+                onPressed: () => _trackProvider.scanForMusic(context, _channel),
+                label: 'Scan',
+              ),
+            ),
+//                    const SizedBox(width: 6),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.00, 6.0, 0.0, 0),
+              child: _buildIconButton(
+                themeProvider,
+                icon: FluentIcons.refresh,
+                tooltip: 'Reload tracks',
+                onPressed: _loadTracks,
+                label: 'Reload',
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -279,9 +289,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
         const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(
-            color: themeProvider.fontColour, fontSize: themeProvider.fontSizeSmall
-          ),
+          style: TextStyle(color: themeProvider.fontColour, fontSize: themeProvider.fontSizeSmall),
         ),
       ],
     );
@@ -290,10 +298,10 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   Widget _buildSearchBars() {
     return Row(
       children: [
-        Expanded(
-          flex: 1,
+        SizedBox(
+          width: fixedFirstColumnWidth,
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.fromLTRB(8.00, 0.0, 0.0, 8.0),
             child: TextBox(
               controller: _fileBrowserSearchController,
               placeholder: 'Search Label or Album',
@@ -306,9 +314,8 @@ class DbBrowserPageState extends State<DbBrowserPage> {
           ),
         ),
         Expanded(
-          flex: 5,
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.fromLTRB(8.00, 0.0, 0.0, 8.0),
             child: Row(
               children: [
                 SizedBox(
@@ -359,11 +366,10 @@ class DbBrowserPageState extends State<DbBrowserPage> {
 
   _buildBrowserAndTable(ThemeProvider themeProvider) {
     return Expanded(
-      flex: 1,
       child: Row(
         children: [
-          Expanded(
-            flex: 1,
+          SizedBox(
+            width: fixedFirstColumnWidth,
             child: PublisherBrowser(
               publisherAlbums: _filterPublisherAlbums(),
               onPublishersSelected: (publishers) {
@@ -381,9 +387,8 @@ class DbBrowserPageState extends State<DbBrowserPage> {
             ),
           ),
           Expanded(
-            flex: 5,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
+              padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
               child: Align(
                 alignment: Alignment.topCenter,
                 child: TrackTable(
