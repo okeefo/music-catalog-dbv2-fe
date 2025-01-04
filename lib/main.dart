@@ -54,8 +54,7 @@ void _setupLogging() {
 }
 
 void customLogHandler(LogRecord record) {
-  final logMessage = '${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}';
-  Logger(record.loggerName).log(record.level, logMessage);
+  print('${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}');
 }
 
 class MyApp extends StatefulWidget {

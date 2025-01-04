@@ -8,7 +8,7 @@ import 'package:logging/logging.dart';
 const double rowHeight = 22.0;
 const double iconSize = 14.0;
 const EdgeInsets rowPadding = EdgeInsets.symmetric(vertical: 0.0);
-const EdgeInsets listTilePadding = EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0);
+const EdgeInsets listTilePadding = EdgeInsets.symmetric(vertical: 0.0, horizontal: 2.0);
 const EdgeInsets albumListTilePadding = EdgeInsets.fromLTRB(30.0, 0.0, 0.0, 0.0);
 
 class PublisherBrowser extends StatefulWidget {
