@@ -14,6 +14,8 @@ class ThemeProvider with ChangeNotifier {
   late final ThemeColourItem _tableBackgroundColour;
   late final ThemeColourItem _tableAltFontColour;
   late final ThemeColourItem _tableAltBackgroundColour;
+  late final ThemeColourItem _tableSelectFontColour;
+  late final ThemeColourItem _tableSelectBackgroundColour;
   late final ThemeColourItem _toggleSwitchBackgroundColour;
   late final ThemeColourItem _toggleSwitchKnobColour;
 
@@ -114,6 +116,22 @@ class ThemeProvider with ChangeNotifier {
         onChanged: () => _onColorChanged());
     colourItems.add(_tableAltBackgroundColour);
 
+    _tableSelectFontColour = ThemeColourItem(
+        key: 'rowSelectFont',
+        defaultDark: AppTheme.tableFontSelectColourDark,
+        defaultLight: AppTheme.tableFontSelectColourLight,
+        isDarkMode: () => _isDarkMode(),
+        onChanged: () => _onColorChanged());
+    colourItems.add(_tableSelectFontColour);
+
+    _tableSelectBackgroundColour = ThemeColourItem(
+        key: 'rowSelectFontBackground',
+        defaultDark: AppTheme.tableBackgroundSelectColourDark,
+        defaultLight: AppTheme.tableBackgroundSelectColourLight,
+        isDarkMode: () => _isDarkMode(),
+        onChanged: () => _onColorChanged());
+    colourItems.add(_tableSelectBackgroundColour);
+
     _toggleSwitchBackgroundColour = ThemeColourItem(
         key: 'toggleSwitch',
         defaultDark: AppTheme.toggleSwitchBackgroundDark,
@@ -187,6 +205,16 @@ class ThemeProvider with ChangeNotifier {
     _tableAltBackgroundColour.setColor(color);
   }
 
+  Color get tableSelectFontColour => _tableSelectFontColour.getColour();
+  void setTableSelectFontColour(Color color) {
+    _tableSelectFontColour.setColor(color);
+  }
+
+  Color get tableSelectBackgroundColour => _tableSelectBackgroundColour.getColour();
+  void setTableSelectBackgroundColour(Color color) {
+    _tableSelectBackgroundColour.setColor(color);
+  }
+
   Color get toggleSwitchBackgroundColor => _toggleSwitchBackgroundColour.getColour();
   void setToggleBackgroundColour(Color color) {
     _toggleSwitchBackgroundColour.setColor(color);
@@ -232,6 +260,13 @@ class ThemeProvider with ChangeNotifier {
         fontFamily: dataTableFontFamily,
         fontSize: fontSizeDataTableRow,
         color: tableAltFontColour,
+      );
+
+  TextStyle get styleTableSelectRow => TextStyle(
+        fontWeight: dataTableFontWeightNormal,
+        fontFamily: dataTableFontFamily,
+        fontSize: fontSizeDataTableRow,
+        color: tableSelectFontColour,
       );
 
   TextStyle get styleTableHeader => TextStyle(
@@ -358,13 +393,13 @@ class ThemeColourItem {
         light = defaultLight;
 
   void _loadPreferences(SharedPreferences prefs) {
-    dark = Color(prefs.getInt(darkKey) ?? defaultDark.value);
-    light = Color(prefs.getInt(lightKey) ?? defaultLight.value);
+    dark = Color(prefs.getInt(darkKey) ?? defaultDark.colorValue);
+    light = Color(prefs.getInt(lightKey) ?? defaultLight.colorValue);
   }
 
   void _savePreferences(SharedPreferences prefs) {
-    prefs.setInt(darkKey, dark.value);
-    prefs.setInt(lightKey, light.value);
+    prefs.setInt(darkKey, dark.colorValue);
+    prefs.setInt(lightKey, light.colorValue);
   }
 
   void _resetDarkColor() {

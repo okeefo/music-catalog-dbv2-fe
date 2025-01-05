@@ -21,8 +21,8 @@ class MediaService {
 
   Future<http.Response> playTrack(Track track) async {
     Uri uri = Uri.parse(Endpoints.playMediaUri());
-    _logger.info('Calling backend to play track: ${track.title}, ${track.fileLocation}, uri: $uri');
-    String body = jsonEncode({'path': track.fileLocation});
+    _logger.info('Calling backend to play track: ${track.id}, ${track.title}, uri: $uri');
+    String body = jsonEncode({'trackId': track.id});
 
     final stopwatch = Stopwatch()..start();
     final response = await http.post(

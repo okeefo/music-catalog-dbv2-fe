@@ -1,4 +1,3 @@
-
 import 'package:front_end/providers/table_settings_provider.dart';
 import 'package:front_end/screens/db-browser/track_provider.dart';
 import 'package:front_end/screens/popups.dart';
@@ -17,32 +16,25 @@ class TrackTable extends StatelessWidget {
   final FlyoutController menuController = FlyoutController();
   final Logger _logger = Logger('TrackTable');
   final TrackProvider _trackProvider = TrackProvider();
+  final Function(Track) onTrackSelected;
+  final double borderWidth = 0.5;
 
   TrackTable({
     super.key,
     required this.tracks,
     required this.scrollController,
+    required this.onTrackSelected,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context);
-    final TableSettingsProvider tableSettingsProvider = Provider.of<TableSettingsProvider>(context, listen: false);
+    final tableSettingsProvider = Provider.of<TableSettingsProvider>(context, listen: false);
 
-    final hdrDeco = BoxDecoration(
-      border: Border.all(color: theme.tableBorderColour, width: 1.0),
-      color: theme.headerBackgroundColour,
-    );
-
-    final rowDelco = BoxDecoration(
-      border: Border.all(color: theme.tableBorderColour, width: 1.0),
-      color: theme.tableBackgroundColour,
-    );
-
-    final altRowDeco = BoxDecoration(
-      border: Border.all(color: theme.tableBorderColour, width: 1.0),
-      color: theme.tableAltBackgroundColour,
-    );
+    final rowDecoration = getCellDecoration(theme.tableBackgroundColour, theme.tableBorderColour);
+    final altDecoration = getCellDecoration(theme.tableAltBackgroundColour, theme.tableBorderColour);
+    final headerDecoration = getCellDecoration(theme.headerBackgroundColour, theme.tableBorderColour);
+    final selectDecoration = getCellDecoration(theme.tableSelectBackgroundColour, theme.tableBorderColour);
 
     return FlyoutTarget(
       controller: menuController,
@@ -52,17 +44,33 @@ class TrackTable extends StatelessWidget {
         columnActions: _getColumnBehaviors(),
         rowStyle: theme.styleTableRow,
         altRowStyle: theme.styleTableAltRow,
+        selectRowStyle: theme.styleTableSelectRow,
         headerStyle: theme.styleTableHeader,
         onRightClick: (context, position, columnIndex, rowIndex, d) {
           _showContextMenu(context, position, columnIndex, rowIndex, d);
         },
         infiniteScrollController: scrollController,
-        columnDecoration: hdrDeco,
-        rowDecoration: rowDelco,
-        altRowDecoration: altRowDeco,
+        rowDecoration: rowDecoration,
+        altDecoration: altDecoration,
+        headerDecoration: headerDecoration,
+        selectDecoration: selectDecoration,
         altRowColumnIndex: 1,
         tableSettingsProvider: tableSettingsProvider,
+        onRowTap: (rowIndex) {
+          if (rowIndex == -1) {
+            _logger.info("de-selected track");
+            return;
+          }
+          onTrackSelected(tracks[rowIndex]);
+        },
       ),
+    );
+  }
+
+  BoxDecoration getCellDecoration(Color backgroundColor, Color borderColour) {
+    return BoxDecoration(
+      border: Border.all(color: borderColour, width: borderWidth),
+      color: backgroundColor,
     );
   }
 
