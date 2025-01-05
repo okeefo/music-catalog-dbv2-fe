@@ -60,31 +60,38 @@ class TrackFilter {
       final search = parts[1].toLowerCase();
 
       if (column == 'title') {
-        return track.title.toLowerCase().contains(search);
+        return doSearch(search, track.title);
       } else if (column == 'artist') {
-        return track.artist.toLowerCase().contains(search);
+        return doSearch(search, track.artist);
       } else if (column == 'album') {
-        return track.albumTitle.toLowerCase().contains(search);
+        return doSearch(search, track.albumTitle);
       } else if (column == 'label') {
-        return track.label.toLowerCase().contains(search);
+        return doSearch(search, track.label);
       } else if (column == 'genre') {
-        return track.genre.toLowerCase().contains(search);
+        return doSearch(search, track.genre);
       } else if (column == 'style') {
-        return track.style.toLowerCase().contains(search);
+        return doSearch(search, track.style);
       } else if (column == 'country') {
-        return track.country.toLowerCase().contains(search);
+        return doSearch(search, track.country);
       } else if (column == 'year') {
-        return track.year.toLowerCase().contains(search);
+        return doSearch(search, track.year);
       } else if (column == 'format') {
-        return track.format.toLowerCase().contains(search);
+        return doSearch(search, track.format);
       } else if (column == 'catalog' || column == 'catalogno') {
-        return track.catalogNumber.toLowerCase().contains(search);
-      } else if (column == 'discogs') {
-        return track.discogsId.toLowerCase().contains(search);
+        return doSearch(search, track.catalogNumber);
+      } else if (column == 'discogs' || column == 'release') {
+        return doSearch(search, track.discogsId);
       } else {
         return false;
       }
     }).toList();
+  }
+
+  static bool doSearch(String search, String track) {
+    if (search.length == 1 && search == ' ') {
+      return track.isEmpty;
+    }
+    return track.toLowerCase().contains(search);
   }
 }
 

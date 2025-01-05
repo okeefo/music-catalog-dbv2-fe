@@ -1,5 +1,4 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' as material;
 import 'package:flutter_colorpicker/flutter_colorpicker.dart' as color_picker;
 import 'package:provider/provider.dart';
 import '../../providers/theme_provider.dart';
@@ -132,7 +131,8 @@ class ColorPickerDialog extends StatefulWidget {
   final ValueChanged<Color> onColorChanged;
   final ThemeProvider themeProvider;
 
-  const ColorPickerDialog({super.key, 
+  const ColorPickerDialog({
+    super.key,
     required this.currentColor,
     required this.onColorChanged,
     required this.themeProvider,
@@ -154,7 +154,7 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
   @override
   Widget build(BuildContext context) {
     return ContentDialog(
-      constraints: const BoxConstraints(maxWidth: 680),
+      constraints: const BoxConstraints(maxWidth: 656),
       title: Row(
         children: [
           Icon(FluentIcons.color, color: widget.themeProvider.iconColour, size: widget.themeProvider.iconSizeLarge),
@@ -162,21 +162,17 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
           Text("Pick a color"),
         ],
       ),
-      content: SingleChildScrollView(
-        child: material.Material(
-          color: Colors.transparent,
-          child: color_picker.ColorPicker(
-            pickerColor: _pickerColor,
-            paletteType: color_picker.PaletteType.hsvWithHue,
-            onColorChanged: (color) {
-              setState(() {
-                _pickerColor = color;
-              });
-            },
-            enableAlpha: false,
-            hexInputBar: false,
-            labelTypes: [color_picker.ColorLabelType.rgb, color_picker.ColorLabelType.hsl,color_picker. ColorLabelType.hex, color_picker.ColorLabelType.hsv],
-          ),
+      content: Padding(
+        padding: const EdgeInsets.all(4.00),
+        child: ColorPicker(
+          color: _pickerColor,
+          orientation: Axis.horizontal,
+          colorSpectrumShape: ColorSpectrumShape.ring,
+          onChanged: (color) {
+            setState(() {
+              _pickerColor = color;
+            });
+          },
         ),
       ),
       actions: [

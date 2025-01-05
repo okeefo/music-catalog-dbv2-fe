@@ -1,11 +1,15 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:front_end/providers/theme_provider.dart';
+import 'package:front_end/screens/db-browser/track_model.dart';
+import 'package:front_end/screens/db-browser/track_provider.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
 class MediaPlayer extends StatelessWidget {
   static final Logger _logger = Logger('MediaPlayer');
-  static final spacer = const SizedBox(width: 2);
+  static final spacer = const SizedBox(width: 16);
+  static final TrackProvider _trackProvider = TrackProvider();
+
   const MediaPlayer({super.key});
 
   @override
@@ -81,5 +85,16 @@ class MediaPlayer extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  void loadTrack(Track track) {
+    _logger.info("Loading track: ${track.id}: ${track.title}");
+    _trackProvider.playTrack(track, (error) {
+      _logger.severe("Failed to play track: $error");
+    });
+
+    //Load Track Artwork
+    //_trackProvider().loadTrackArtwork(track);
+
   }
 }

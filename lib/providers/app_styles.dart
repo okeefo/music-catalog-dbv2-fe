@@ -67,4 +67,10 @@ class AppTheme {
 
   static const Color tableBackgroundAltColourDark = Color.fromARGB(255, 76, 75, 75);
   static const Color tableBackgroundAltColourLight = Color.fromARGB(255, 243, 246, 239);
+
+  static const Color tableFontSelectColourDark = Color.fromARGB(255, 56, 5, 95);
+  static const Color tableFontSelectColourLight = Color.fromARGB(255, 182, 237, 240);
+
+  static const Color tableBackgroundSelectColourDark = Color.fromARGB(255, 243, 246, 239);
+  static const Color tableBackgroundSelectColourLight = Color.fromARGB(255, 76, 75, 75);
 }

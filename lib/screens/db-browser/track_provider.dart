@@ -124,7 +124,6 @@ class TrackProvider {
     } catch (e) {
       onError('Failed to play track: ${track.title}\n\n${e.toString()}');
     }
-    await _mediaService.playTrack(track);
   }
 
   Future<void> pauseTrack() async {

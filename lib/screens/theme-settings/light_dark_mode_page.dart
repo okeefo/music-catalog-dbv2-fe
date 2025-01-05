@@ -54,105 +54,11 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
                   mainAxisSize: MainAxisSize.min, // Ensure the row only takes up the space it needs
                   crossAxisAlignment: CrossAxisAlignment.stretch, // Stretch children to match the tallest child
                   children: [
-                    _buildGridBox(
-                      title: 'General',
-                      themeProvider: themeProvider,
-                      maxDescriptionWidth: maxDescriptionWidth,
-                      children: [
-                        _buildColourPickerRow(
-                          description: 'Background',
-                          colour: themeProvider.backgroundColour,
-                          saveColourFunc: themeProvider.setBackgroundColour,
-                          themeProvider: themeProvider,
-                        ),
-                        _buildColourPickerRow(
-                          description: 'Font',
-                          colour: themeProvider.fontColour,
-                          saveColourFunc: themeProvider.setFontColour,
-                          themeProvider: themeProvider,
-                        ),
-                        _buildColourPickerRow(
-                          description: 'Bold Font',
-                          colour: themeProvider.boldFontColour,
-                          saveColourFunc: themeProvider.setBoldFontColor,
-                          themeProvider: themeProvider,
-                        ),
-                        _buildColourPickerRow(
-                          description: 'Icon',
-                          colour: themeProvider.iconColour,
-                          saveColourFunc: themeProvider.setIconColour,
-                          themeProvider: themeProvider,
-                        ),
-                        _buildColourPickerRow(
-                          description: 'Toggle Background',
-                          colour: themeProvider.toggleSwitchBackgroundColor,
-                          saveColourFunc: themeProvider.setToggleBackgroundColour,
-                          themeProvider: themeProvider,
-                        ),
-                        _buildColourPickerRow(
-                          description: 'Toggle Knob',
-                          colour: themeProvider.toggleSwitchKnobColor,
-                          saveColourFunc: themeProvider.setToggleKnobColour,
-                          themeProvider: themeProvider,
-                        ),
-                      ],
-                    ),
+                    _buildGeneralSettings(themeProvider, maxDescriptionWidth),
                     SizedBox(width: 20), // Space between grid boxes
-                    _buildGridBox(
-                      title: 'Table',
-                      themeProvider: themeProvider,
-                      maxDescriptionWidth: maxDescriptionWidth,
-                      children: [
-                        _buildColourPickerRow(
-                          description: 'Border',
-                          colour: themeProvider.tableBorderColour,
-                          saveColourFunc: themeProvider.setTableBorderColour,
-                          themeProvider: themeProvider,
-                        ),
-                        _buildColourPickerRow(
-                          description: 'Header Font',
-                          colour: themeProvider.headerFontColour,
-                          saveColourFunc: themeProvider.setHeaderFontColour,
-                          themeProvider: themeProvider,
-                        ),
-                        _buildColourPickerRow(
-                          description: 'Header Background',
-                          colour: themeProvider.headerBackgroundColour,
-                          saveColourFunc: themeProvider.setHeaderFontBackgroundColour,
-                          themeProvider: themeProvider,
-                        ),
-                        _buildColourPickerRow(
-                          description: 'Row Font',
-                          colour: themeProvider.tableFontColour,
-                          saveColourFunc: themeProvider.setTableFontColour,
-                          themeProvider: themeProvider,
-                        ),
-                        _buildColourPickerRow(
-                          description: 'Row Background',
-                          colour: themeProvider.tableBackgroundColour,
-                          saveColourFunc: themeProvider.setTableBackgroundColour,
-                          themeProvider: themeProvider,
-                        ),
-                        _buildColourPickerRow(
-                          description: 'Alternate Row Font',
-                          colour: themeProvider.tableAltFontColour,
-                          saveColourFunc: themeProvider.setTableAltFontColour,
-                          themeProvider: themeProvider,
-                        ),
-                        _buildColourPickerRow(
-                          description: 'Alternate Row Background',
-                          colour: themeProvider.tableAltBackgroundColour,
-                          saveColourFunc: themeProvider.setTableAltBackgroundColour,
-                          themeProvider: themeProvider,
-                        ),
-                        _buildFontPickerRow(
-                          description: 'Font',
-                          font: themeProvider.dataTableFontFamily,
-                          saveFontFunc: themeProvider.setDataTableFontFamily,
-                          themeProvider: themeProvider,
-                        ),
-                      ],
-                    ),
+                    _buildTableSettings(themeProvider, maxDescriptionWidth),
+                    SizedBox(width: 20),
+                    _buildTableSettings2(themeProvider, maxDescriptionWidth),
                     SizedBox(width: 20),
                     _buildExampleTableGridBox(
                       themeProvider: themeProvider,
@@ -339,6 +245,132 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
       ],
     );
   }
+
+  _buildGeneralSettings(ThemeProvider themeProvider, double maxDescriptionWidth) {
+    return _buildGridBox(
+      title: 'General',
+      themeProvider: themeProvider,
+      maxDescriptionWidth: maxDescriptionWidth,
+      children: [
+        _buildColourPickerRow(
+          description: 'Background',
+          colour: themeProvider.backgroundColour,
+          saveColourFunc: themeProvider.setBackgroundColour,
+          themeProvider: themeProvider,
+        ),
+        _buildColourPickerRow(
+          description: 'Font',
+          colour: themeProvider.fontColour,
+          saveColourFunc: themeProvider.setFontColour,
+          themeProvider: themeProvider,
+        ),
+        _buildColourPickerRow(
+          description: 'Bold Font',
+          colour: themeProvider.boldFontColour,
+          saveColourFunc: themeProvider.setBoldFontColor,
+          themeProvider: themeProvider,
+        ),
+        _buildColourPickerRow(
+          description: 'Icon',
+          colour: themeProvider.iconColour,
+          saveColourFunc: themeProvider.setIconColour,
+          themeProvider: themeProvider,
+        ),
+        _buildColourPickerRow(
+          description: 'Toggle Background',
+          colour: themeProvider.toggleSwitchBackgroundColor,
+          saveColourFunc: themeProvider.setToggleBackgroundColour,
+          themeProvider: themeProvider,
+        ),
+        _buildColourPickerRow(
+          description: 'Toggle Knob',
+          colour: themeProvider.toggleSwitchKnobColor,
+          saveColourFunc: themeProvider.setToggleKnobColour,
+          themeProvider: themeProvider,
+        ),
+      ],
+    );
+  }
+
+  _buildTableSettings(ThemeProvider themeProvider, double maxDescriptionWidth) {
+    return _buildGridBox(
+      title: 'Table',
+      themeProvider: themeProvider,
+      maxDescriptionWidth: maxDescriptionWidth,
+      children: [
+        _buildColourPickerRow(
+          description: 'Header Font',
+          colour: themeProvider.headerFontColour,
+          saveColourFunc: themeProvider.setHeaderFontColour,
+          themeProvider: themeProvider,
+        ),
+        _buildColourPickerRow(
+          description: 'Header Background',
+          colour: themeProvider.headerBackgroundColour,
+          saveColourFunc: themeProvider.setHeaderFontBackgroundColour,
+          themeProvider: themeProvider,
+        ),
+        _buildColourPickerRow(
+          description: 'Row Font',
+          colour: themeProvider.tableFontColour,
+          saveColourFunc: themeProvider.setTableFontColour,
+          themeProvider: themeProvider,
+        ),
+        _buildColourPickerRow(
+          description: 'Row Background',
+          colour: themeProvider.tableBackgroundColour,
+          saveColourFunc: themeProvider.setTableBackgroundColour,
+          themeProvider: themeProvider,
+        ),
+        _buildColourPickerRow(
+          description: 'Alternate Row Font',
+          colour: themeProvider.tableAltFontColour,
+          saveColourFunc: themeProvider.setTableAltFontColour,
+          themeProvider: themeProvider,
+        ),
+        _buildColourPickerRow(
+          description: 'Alternate Row Background',
+          colour: themeProvider.tableAltBackgroundColour,
+          saveColourFunc: themeProvider.setTableAltBackgroundColour,
+          themeProvider: themeProvider,
+        ),
+        _buildColourPickerRow(
+          description: 'Selected Row Font',
+          colour: themeProvider.tableSelectFontColour,
+          saveColourFunc: themeProvider.setTableSelectFontColour,
+          themeProvider: themeProvider,
+        ),
+        _buildColourPickerRow(
+          description: 'Selected Row Background',
+          colour: themeProvider.tableSelectBackgroundColour,
+          saveColourFunc: themeProvider.setTableSelectBackgroundColour,
+          themeProvider: themeProvider,
+        ),
+      ],
+    );
+  }
+
+  _buildTableSettings2(ThemeProvider themeProvider, double maxDescriptionWidth) {
+    return _buildGridBox(
+      title: 'Table',
+      themeProvider: themeProvider,
+      maxDescriptionWidth: maxDescriptionWidth,
+      children: [
+        _buildColourPickerRow(
+          description: 'Border',
+          colour: themeProvider.tableBorderColour,
+          saveColourFunc: themeProvider.setTableBorderColour,
+          themeProvider: themeProvider,
+        ),
+        _buildFontPickerRow(
+          description: 'Font',
+          font: themeProvider.dataTableFontFamily,
+          saveFontFunc: themeProvider.setDataTableFontFamily,
+          themeProvider: themeProvider,
+        ),
+      ],
+    );
+  }
 }
 
 _buildColorPicker({
@@ -366,6 +398,9 @@ Widget _buildExampleTableGridBox({
     ['Row 2 Data 1', 'Row 2 Data 2'],
     ['Row 3 Data 1', 'Row 3 Data 2'],
     ['Row 4 Data 1', 'Row 4 Data 2'],
+    ['Row 5 Data 1', 'Row 5 Data 2'],
+    ['Row 6 Data 1', 'Row 6 Data 2'],
+    ['Row 7 Data 1', 'Row 7 Data 2'],
   ];
 
   return Container(
@@ -434,16 +469,17 @@ Widget _buildExampleTable({
           final index = entry.key;
           final row = entry.value;
           final isAlternateRow = index % 2 == 1;
+          final isSelectedRow = index % 5 == 3;
           return TableRow(
             decoration: BoxDecoration(
-              color: isAlternateRow ? themeProvider.tableAltBackgroundColour : themeProvider.tableBackgroundColour,
+              color: getBoxDecorationColor(isAlternateRow, isSelectedRow, themeProvider),
             ),
             children: row.map((cell) {
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   cell,
-                  style: isAlternateRow ? themeProvider.styleTableAltRow : themeProvider.styleTableRow,
+                  style: getRowStyle(isAlternateRow, isSelectedRow, themeProvider),
                 ),
               );
             }).toList(),
@@ -452,4 +488,24 @@ Widget _buildExampleTable({
       ],
     ),
   );
+}
+
+TextStyle getRowStyle(bool isAlternateRow, bool isSelectedRow, ThemeProvider themeProvider) {
+  if (isSelectedRow) {
+    return themeProvider.styleTableSelectRow;
+  }
+  if (isAlternateRow) {
+    return themeProvider.styleTableAltRow;
+  }
+  return themeProvider.styleTableRow;
+}
+
+Color getBoxDecorationColor(bool isAlternateRow, bool isSelectedRow, ThemeProvider themeProvider) {
+  if (isSelectedRow) {
+    return themeProvider.tableSelectBackgroundColour;
+  }
+  if (isAlternateRow) {
+    return themeProvider.tableAltBackgroundColour;
+  }
+  return themeProvider.tableBackgroundColour;
 }

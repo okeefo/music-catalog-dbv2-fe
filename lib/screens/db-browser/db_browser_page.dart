@@ -38,6 +38,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   final Map<String, Set<String>> _publisherAlbums = {};
   final Set<String> _selectedPublishers = {};
   final Set<String> _selectedAlbums = {};
+  final MediaPlayer _mediaPlayer = MediaPlayer();
 
   final Logger _logger = Logger('DbBrowserPageState');
 
@@ -199,7 +200,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
         Expanded(
           child: Padding(
             padding: const EdgeInsets.only(left: 4), // Add padding to align with search bar
-            child: MediaPlayer(),
+            child: _mediaPlayer,
           ),
         ),
       ],
@@ -394,6 +395,10 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                 child: TrackTable(
                   tracks: _filterTracks(),
                   scrollController: _scrollController,
+                  onTrackSelected: (track) {
+                    _logger.info('Track selected: ${track.id} : ${track.title}');
+                    _mediaPlayer.loadTrack(track);
+                  },
                 ),
               ),
             ),
