@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:front_end/screens/popups.dart';
@@ -132,6 +133,19 @@ class TrackProvider {
 
   Future<void> stopTrack() async {
     await _mediaService.stopTrack();
+  }
+
+  Future<Uint8List> loadTrackArtwork(Track track) async {
+    final response = await _mediaService.getTrackArtwork(track.id);
+    if (response.statusCode == 200) {
+      if (response.headers['content-type']?.startsWith('image/') ?? false) {
+        return response.bodyBytes;
+      } else {
+        throw Exception('Invalid content type: ${response.headers['content-type']}');
+      }
+    } else {
+      throw Exception('Failed to load track artwork');
+    }
   }
 }
 

@@ -38,7 +38,8 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   final Map<String, Set<String>> _publisherAlbums = {};
   final Set<String> _selectedPublishers = {};
   final Set<String> _selectedAlbums = {};
-  final MediaPlayer _mediaPlayer = MediaPlayer();
+  final GlobalKey<MediaPlayerState> _mediaPlayerKey = GlobalKey<MediaPlayerState>();
+  late MediaPlayer _mediaPlayer;
 
   final Logger _logger = Logger('DbBrowserPageState');
 
@@ -56,6 +57,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
     _initializeWebSocket();
 
     _scrollController.addListener(_scrollListener);
+    _mediaPlayer = MediaPlayer(key: _mediaPlayerKey);
   }
 
   @override
