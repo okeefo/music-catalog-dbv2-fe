@@ -121,7 +121,7 @@ class MediaPlayerState extends State<MediaPlayer> {
       });
     }).catchError((error) {
       _logger.severe("Failed to load artwork: $error");
-            setState(() {
+      setState(() {
         _currentArtwork = null;
       });
     });
@@ -142,29 +142,34 @@ class MediaPlayerState extends State<MediaPlayer> {
     );
   }
 
-  _buildArtwork() {
+  Widget _buildArtwork() {
     if (_currentArtwork == null) {
       return _buildDefaultArtwork();
     } else {
-      return Container(
-        width: 94.0,
-        height: 94.0,
-        color: Colors.white,
-        child: Center(
-          child: Image.memory(
-            _currentArtwork!,
-            fit: BoxFit.fill,
-            errorBuilder: (context, error, stackTrace) {
-              _logger.severe('Error displaying artwork: $error$stackTrace');
-              return _buildDefaultArtwork();
-            },
+      return GestureDetector(
+        onDoubleTap: () {
+          _showFullSizeArtwork(context, _currentArtwork!);
+        },
+        child: Container(
+          width: 94.0,
+          height: 94.0,
+          color: Colors.white,
+          child: Center(
+            child: Image.memory(
+              _currentArtwork!,
+              fit: BoxFit.fill,
+              errorBuilder: (context, error, stackTrace) {
+                _logger.severe('Error displaying artwork: $error$stackTrace');
+                return _buildDefaultArtwork();
+              },
+            ),
           ),
         ),
       );
     }
   }
 
-  _buildDefaultArtwork() {
+  Widget _buildDefaultArtwork() {
     return ClipOval(
       child: Container(
         width: 94.0, // Reduced width to better fit the layout
@@ -177,6 +182,32 @@ class MediaPlayerState extends State<MediaPlayer> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showFullSizeArtwork(BuildContext context, Uint8List artwork) {
+
+    // Show the dialog with the calculated dimensions
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ContentDialog(
+          title: Text('Artwork'),
+          constraints: BoxConstraints(maxWidth: 600, maxHeight: 900),
+          content: Image.memory(
+            artwork,
+            fit: BoxFit.fill,
+          ),
+          actions: [
+            Button(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
