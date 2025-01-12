@@ -56,8 +56,8 @@ class Endpoints {
   static String stopMediaUri() {
     return '$_baseUriHttp$_stopMedia';
   }
-    
-  static String getArtWorkUri(String trackId) {
+
+  static String getTrackArtworkUri(String trackId) {
     return '$_baseUriHttp$_tracks/$trackId/album-art';
   }
 }

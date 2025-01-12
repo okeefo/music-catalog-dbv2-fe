@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:front_end/providers/theme_provider.dart';
 import 'package:front_end/screens/db-browser/track_model.dart';
@@ -5,12 +8,45 @@ import 'package:front_end/screens/db-browser/track_provider.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
-class MediaPlayer extends StatelessWidget {
+class MediaPlayer extends StatefulWidget {
+  const MediaPlayer({required GlobalKey<MediaPlayerState> key}) : super(key: key);
+  MediaPlayerState? get _playerState => (key as GlobalKey<MediaPlayerState>).currentState;
+
   static final Logger _logger = Logger('MediaPlayer');
+
+  @override
+  MediaPlayerState createState() => MediaPlayerState();
+
+  void play() {
+    _playerState?._play();
+  }
+
+  void pause() {
+    _playerState?._pause();
+  }
+
+  void stop() {
+    _playerState?._stop();
+  }
+
+  void loadTrack(Track track) {
+    _logger.info("Loading track: ${track.id}: ${track.title}");
+    _playerState?._loadTrack(track);
+  }
+
+  void unloadTrack() {
+    _playerState?.unloadTrack();
+  }
+}
+
+class MediaPlayerState extends State<MediaPlayer> {
+  static final Logger _logger = Logger('MediaPlayerState');
   static final spacer = const SizedBox(width: 16);
   static final TrackProvider _trackProvider = TrackProvider();
+  static final AssetImage defaultArtwork = AssetImage('assets/vinyl-100.png');
 
-  const MediaPlayer({super.key});
+  Track? _currentTrack;
+  Uint8List? _currentArtwork;
 
   @override
   Widget build(BuildContext context) {
@@ -23,24 +59,7 @@ class MediaPlayer extends StatelessWidget {
           children: [
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ClipOval(
-                  child: Container(
-                    width: 94.0, // Reduced width to better fit the layout
-                    height: 94.0,
-                    color: Colors.white,
-                    child: Center(
-                      child: Image.asset(
-                        'assets/vinyl-100.png',
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-                  ),
-                ),
-
-                //spacer,
-                _buildMedialButtons()
-              ],
+              children: [_buildArtwork(), _buildMedialButtons()],
             ),
             spacer,
             Expanded(
@@ -65,36 +84,99 @@ class MediaPlayer extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        IconButton(
-          icon: Icon(FluentIcons.play),
-          onPressed: () {
-            _logger.info("Play button pressed");
-          },
-        ),
-        IconButton(
-          icon: Icon(FluentIcons.pause),
-          onPressed: () {
-            _logger.info("Pause button pressed");
-          },
-        ),
-        IconButton(
-          icon: Icon(FluentIcons.stop),
-          onPressed: () {
-            _logger.info("Stop button pressed");
-          },
-        ),
+        _createButton(FluentIcons.play, _play),
+        _createButton(FluentIcons.pause, _pause),
+        _createButton(FluentIcons.stop, _stop),
       ],
     );
   }
 
-  void loadTrack(Track track) {
-    _logger.info("Loading track: ${track.id}: ${track.title}");
-    _trackProvider.playTrack(track, (error) {
-      _logger.severe("Failed to play track: $error");
+  void _play() {
+    _logger.info("Play button pressed");
+    if (_currentTrack != null) {
+      _trackProvider.playTrack(_currentTrack!, (error) {
+        _logger.severe("Failed to play track: $error");
+      });
+    }
+  }
+
+  void _pause() {
+    _logger.info("Pause button pressed");
+    _trackProvider.pauseTrack();
+  }
+
+  void _stop() {
+    _logger.info("Stop button pressed");
+    _trackProvider.stopTrack();
+  }
+
+  void _loadTrack(Track track) {
+    _logger.info("(state) Loading track: ${track.id}: ${track.title}");
+    setState(() {
+      _currentTrack = track;
     });
+    _trackProvider.loadTrackArtwork(track).then((artwork) {
+      setState(() {
+        _currentArtwork = artwork;
+      });
+    }).catchError((error) {
+      _logger.severe("Failed to load artwork: $error");
+            setState(() {
+        _currentArtwork = null;
+      });
+    });
+  }
 
-    //Load Track Artwork
-    //_trackProvider().loadTrackArtwork(track);
+  void unloadTrack() {
+    _logger.info("Unloading track");
+    setState(() {
+      _currentTrack = null;
+      _currentArtwork = null;
+    });
+  }
 
+  Widget _createButton(IconData icon, Function() action) {
+    return IconButton(
+      icon: Icon(icon),
+      onPressed: action,
+    );
+  }
+
+  _buildArtwork() {
+    if (_currentArtwork == null) {
+      return _buildDefaultArtwork();
+    } else {
+      return Container(
+        width: 94.0,
+        height: 94.0,
+        color: Colors.white,
+        child: Center(
+          child: Image.memory(
+            _currentArtwork!,
+            fit: BoxFit.fill,
+            errorBuilder: (context, error, stackTrace) {
+              _logger.severe('Error displaying artwork: $error$stackTrace');
+              return _buildDefaultArtwork();
+            },
+          ),
+        ),
+      );
+    }
+  }
+
+  _buildDefaultArtwork() {
+    return ClipOval(
+      child: Container(
+        width: 94.0, // Reduced width to better fit the layout
+        height: 94.0,
+        color: Colors.white,
+        child: Center(
+          child: Image(
+            image: defaultArtwork,
+            fit: BoxFit.fill,
+          ),
+        ),
+      ),
+    );
   }
 }
