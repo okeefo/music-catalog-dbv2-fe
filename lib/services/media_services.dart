@@ -77,11 +77,10 @@ class MediaService {
   }
 
   Future<http.Response> getTrackArtwork(int id) async {
-
     Uri uri = Uri.parse(Endpoints.getTrackArtworkUri(id.toString()));
-    
+
     _logger.info('Calling backend to get track artwork: $uri');
-    
+
     final stopwatch = Stopwatch()..start();
     final response = await http.get(
       uri,
@@ -93,8 +92,29 @@ class MediaService {
       _logger.info('get track artwork request took: ${stopwatch.elapsedMilliseconds}ms');
       return response;
     } else {
-      _logger.severe('Failed to request to get track artwork: ${response.body} operation took ${stopwatch.elapsedMilliseconds}ms');
+      _logger.severe('Failed to request track artwork: ${response.body} operation took ${stopwatch.elapsedMilliseconds}ms');
       throw Exception('Failed to get track artwork');
+    }
+  }
+
+    Future<http.Response> getTrackWaveform(int id) async {
+    Uri uri = Uri.parse(Endpoints.getTrackWaveformUri(id.toString()));
+
+    _logger.info('Calling backend to get track waveform: $uri');
+
+    final stopwatch = Stopwatch()..start();
+    final response = await http.get(
+      uri,
+      headers: {'Accept': 'image/*'},
+    );
+
+    stopwatch.stop();
+    if (response.statusCode == 200) {
+      _logger.info('get track waveform request took: ${stopwatch.elapsedMilliseconds}ms');
+      return response;
+    } else {
+      _logger.severe('Failed to request track waveform: ${response.body} operation took ${stopwatch.elapsedMilliseconds}ms');
+      throw Exception('Failed to get track waveform');
     }
   }
 }
