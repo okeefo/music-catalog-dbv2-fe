@@ -147,6 +147,20 @@ class TrackProvider {
       throw Exception('Failed to load track artwork');
     }
   }
+
+  loadTrackWaveform(Track track) async {
+    _logger.info("Loading waveform for track: ${track.id} - ${track.title}");
+    final response = await _mediaService.getTrackWaveform(track.id);
+    if (response.statusCode == 200) {
+      if (response.headers['content-type']?.startsWith('image/') ?? false) {
+        return response.bodyBytes;
+      } else {
+        throw Exception('Invalid content type: ${response.headers['content-type']}');
+      }
+    } else {
+      throw Exception('Failed to load track artwork');
+    }
+  }
 }
 
 class TrackProviderState {

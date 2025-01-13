@@ -401,6 +401,10 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                     _logger.info('Track selected: ${track.id} : ${track.title}');
                     _mediaPlayer.loadTrack(track);
                   },
+                  onTrackDeSelected: () {
+                    _logger.info('Track de-selected');
+                    _mediaPlayer.unloadTrack();
+                  },
                 ),
               ),
             ),

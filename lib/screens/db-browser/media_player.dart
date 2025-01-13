@@ -47,6 +47,7 @@ class MediaPlayerState extends State<MediaPlayer> {
 
   Track? _currentTrack;
   Uint8List? _currentArtwork;
+  Uint8List? _currentWaveform;
 
   @override
   Widget build(BuildContext context) {
@@ -66,12 +67,30 @@ class MediaPlayerState extends State<MediaPlayer> {
               child: Container(
                 height: double.infinity,
                 color: themeProvider.greyBackground,
-                child: Center(
-                  child: Text(
-                    'No Track Selected / Loaded',
-                    style: TextStyle(color: themeProvider.fontColour, fontSize: themeProvider.fontSizeLarge), // Ensure color is not null
-                  ),
-                ),
+                child: _currentWaveform == null
+                    ? Center(
+                      child: Text(
+                          'No Track Selected / Loaded',
+                          style: TextStyle(
+                            color: themeProvider.fontColour,
+                            fontSize: themeProvider.fontSizeLarge,
+                          ), // Ensure color is not null
+                        ),
+                    )
+                    : Image.memory(
+                        _currentWaveform!,
+                        fit: BoxFit.fitWidth,
+                        errorBuilder: (context, error, stackTrace) {
+                          _logger.severe('Error displaying waveform: $error$stackTrace');
+                          return Text(
+                            'Error loading waveform',
+                            style: TextStyle(
+                              color: themeProvider.fontColour,
+                              fontSize: themeProvider.fontSizeLarge,
+                            ),
+                          );
+                        },
+                      ),
               ),
             ),
           ],
@@ -115,6 +134,11 @@ class MediaPlayerState extends State<MediaPlayer> {
     setState(() {
       _currentTrack = track;
     });
+    _loadArtwork(track);
+    _loadWaveform(track);
+  }
+
+  void _loadArtwork(Track track) {
     _trackProvider.loadTrackArtwork(track).then((artwork) {
       setState(() {
         _currentArtwork = artwork;
@@ -132,6 +156,7 @@ class MediaPlayerState extends State<MediaPlayer> {
     setState(() {
       _currentTrack = null;
       _currentArtwork = null;
+      _currentWaveform = null;
     });
   }
 
@@ -186,7 +211,6 @@ class MediaPlayerState extends State<MediaPlayer> {
   }
 
   void _showFullSizeArtwork(BuildContext context, Uint8List artwork) {
-
     // Show the dialog with the calculated dimensions
     showDialog(
       context: context,
@@ -209,5 +233,18 @@ class MediaPlayerState extends State<MediaPlayer> {
         );
       },
     );
+  }
+  
+  void _loadWaveform(Track track) {
+    _trackProvider.loadTrackWaveform(track).then((waveform) {
+      setState(() {
+        _currentWaveform = waveform;
+      });
+    }).catchError((error) {
+      _logger.severe("Failed to load waveform: $error");
+      setState(() {
+        _currentWaveform = null;
+      });
+    });
   }
 }

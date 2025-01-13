@@ -17,6 +17,7 @@ class TrackTable extends StatelessWidget {
   final Logger _logger = Logger('TrackTable');
   final TrackProvider _trackProvider = TrackProvider();
   final Function(Track) onTrackSelected;
+  final Function() onTrackDeSelected;
   final double borderWidth = 0.5;
 
   TrackTable({
@@ -24,6 +25,7 @@ class TrackTable extends StatelessWidget {
     required this.tracks,
     required this.scrollController,
     required this.onTrackSelected,
+    required this.onTrackDeSelected,
   });
 
   @override
@@ -59,9 +61,10 @@ class TrackTable extends StatelessWidget {
         onRowTap: (rowIndex) {
           if (rowIndex == -1) {
             _logger.info("de-selected track");
-            return;
+            onTrackDeSelected();
+          } else {
+            onTrackSelected(tracks[rowIndex]);
           }
-          onTrackSelected(tracks[rowIndex]);
         },
       ),
     );
