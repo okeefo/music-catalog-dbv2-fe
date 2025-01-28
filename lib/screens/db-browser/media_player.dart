@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:fluent_ui/fluent_ui.dart';
@@ -79,7 +78,7 @@ class MediaPlayerState extends State<MediaPlayer> {
                     )
                     : Image.memory(
                         _currentWaveform!,
-                        fit: BoxFit.fitWidth,
+                        fit: BoxFit.fill,
                         errorBuilder: (context, error, stackTrace) {
                           _logger.severe('Error displaying waveform: $error$stackTrace');
                           return Text(
