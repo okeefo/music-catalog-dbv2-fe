@@ -62,6 +62,9 @@ class Endpoints {
   }
 
   static String getTrackWaveformUri(String trackId) {
-    return '$_baseUriHttp$_tracks/$trackId/waveform';
+    return '$_baseUriHttp$_tracks/$trackId/waveform/image';
+  }
+  static String getTrackWaveformDataUri(String trackId) {
+    return '$_baseUriHttp$_tracks/$trackId/waveform/data';
   }
 }

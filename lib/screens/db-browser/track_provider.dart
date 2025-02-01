@@ -148,8 +148,19 @@ class TrackProvider {
     }
   }
 
+  loadTrackWaveformData(Track track) async {
+    _logger.info("Loading waveform data for track: ${track.id} - ${track.title}");
+    final response = await _mediaService.getTrackWaveformData(track.id);
+    if (response.statusCode == 200) {
+      final rawList = jsonDecode(response.body) as List<dynamic>;
+      return rawList.map((e) => (e as num).toDouble()).toList();
+    } else {
+      throw Exception('Failed to load track waveform data');
+    }
+  }
+
   loadTrackWaveform(Track track) async {
-    _logger.info("Loading waveform for track: ${track.id} - ${track.title}");
+    _logger.info("Loading waveform image for track: ${track.id} - ${track.title}");
     final response = await _mediaService.getTrackWaveform(track.id);
     if (response.statusCode == 200) {
       if (response.headers['content-type']?.startsWith('image/') ?? false) {
