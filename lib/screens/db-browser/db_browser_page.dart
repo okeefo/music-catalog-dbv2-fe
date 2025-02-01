@@ -172,6 +172,8 @@ class DbBrowserPageState extends State<DbBrowserPage> {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return ScaffoldPage(
+      header: null,
+      padding: EdgeInsets.zero,
       // header: _buildHeader(themeProvider),
       content: Padding(
         padding: const EdgeInsets.fromLTRB(4.0, 0, 16.0, 0),

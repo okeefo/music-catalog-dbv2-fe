@@ -47,60 +47,70 @@ class MediaPlayerState extends State<MediaPlayer> {
 
   Track? _currentTrack;
   Uint8List? _currentArtwork;
-  Uint8List? _currentWaveform;
   List<double>? _waveformData;
   double _playbackProgress = 0.0;
+  String _playerStatus = "";
 
   @override
   Widget build(BuildContext context) {
     final ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
+    // ...existing code...
     return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: 600), // Set a maximum width constraint
+      constraints: BoxConstraints(maxWidth: 600),
       child: SizedBox(
-        height: 120.0, // Reduced height to better fit the layout
+        // remove fixed height, let Column decide
         child: Row(
           children: [
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [_buildArtwork(), _buildMedialButtons()],
+              children: [
+                _buildArtwork(),
+                _buildMedialButtons(),
+              ],
             ),
             spacer,
             Expanded(
-              child: Container(
-                height: double.infinity,
-                color: themeProvider.greyBackground,
-                child: _waveformData == null
-                    ? Center(
-                        child: Text(
-                          'No Track Selected / Loaded',
-                          style: TextStyle(
-                            color: themeProvider.fontColour,
-                            fontSize: themeProvider.fontSizeLarge,
-                          ), // Ensure color is not null
-                        ),
-                      )
-                    : CustomPaint(
-                        size: Size(600, 60),
-                        painter: WaveformPainter(
-                          waveformData: _waveformData!,
-                          playbackProgress: _playbackProgress,
-                        ),
+              child: Column(
+                children: [
+                  // Waveform area
+                  Container(
+                    padding: const EdgeInsets.all(8.0),
+                    height: 100.0,
+                    // color: themeProvider.greyBackground,
+                    child: _waveformData == null
+                        ? Center(
+                            child: Text(
+                              'No Track Selected / Loaded',
+                              style: TextStyle(
+                                color: themeProvider.fontColour,
+                                fontSize: themeProvider.fontSizeLarge,
+                              ),
+                            ),
+                          )
+                        : CustomPaint(
+                            size: Size(double.infinity, 60),
+                            painter: WaveformPainter(
+                              waveformData: _waveformData!,
+                              playbackProgress: _playbackProgress,
+                            ),
+                          ),
+                  ),
+                  // Player status area
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
+                    child: Text(
+                      _currentTrack == null
+                          ? "No track info"
+                          : _playerStatus.isEmpty
+                              ? _currentTrack!.title
+                              : "$_playerStatus: ${_currentTrack!.title}",
+                      style: TextStyle(
+                        color: themeProvider.fontColour,
+                        fontSize: themeProvider.fontSizeReg,
                       ),
-
-                // Image.memory(
-                //     _currentWaveform!,
-                //     fit: BoxFit.fill,
-                //     errorBuilder: (context, error, stackTrace) {
-                //       _logger.severe('Error displaying waveform: $error$stackTrace');
-                //       return Text(
-                //         'Error loading waveform',
-                //         style: TextStyle(
-                //           color: themeProvider.fontColour,
-                //           fontSize: themeProvider.fontSizeLarge,
-                //         ),
-                //       );
-                //     },
-                //   ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -123,6 +133,9 @@ class MediaPlayerState extends State<MediaPlayer> {
   void _play() {
     _logger.info("Play button pressed");
     if (_currentTrack != null) {
+      setState(() {
+        _playerStatus = "Now playing";
+      });
       _trackProvider.playTrack(_currentTrack!, (error) {
         _logger.severe("Failed to play track: $error");
       });
@@ -131,11 +144,17 @@ class MediaPlayerState extends State<MediaPlayer> {
 
   void _pause() {
     _logger.info("Pause button pressed");
+    setState(() {
+      _playerStatus = "Paused";
+    });
     _trackProvider.pauseTrack();
   }
 
   void _stop() {
     _logger.info("Stop button pressed");
+    setState(() {
+      _playerStatus = ""; // just show title
+    });
     _trackProvider.stopTrack();
   }
 
@@ -166,7 +185,7 @@ class MediaPlayerState extends State<MediaPlayer> {
     setState(() {
       _currentTrack = null;
       _currentArtwork = null;
-      _currentWaveform = null;
+      _waveformData = null;
     });
   }
 
@@ -254,19 +273,6 @@ class MediaPlayerState extends State<MediaPlayer> {
       _logger.severe("Failed to load waveform: $error");
       setState(() {
         _waveformData = null;
-      });
-    });
-  }
-
-  void _loadWaveform2(Track track) {
-    _trackProvider.loadTrackWaveform(track).then((waveform) {
-      setState(() {
-        _currentWaveform = waveform;
-      });
-    }).catchError((error) {
-      _logger.severe("Failed to load waveform: $error");
-      setState(() {
-        _currentWaveform = null;
       });
     });
   }
