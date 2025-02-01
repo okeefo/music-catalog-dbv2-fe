@@ -6,6 +6,7 @@ import 'package:front_end/screens/db-browser/track_model.dart';
 import 'package:front_end/screens/db-browser/track_provider.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
+import 'package:front_end/screens/db-browser/waveform-painter.dart';
 
 class MediaPlayer extends StatefulWidget {
   const MediaPlayer({required GlobalKey<MediaPlayerState> key}) : super(key: key);
@@ -47,6 +48,8 @@ class MediaPlayerState extends State<MediaPlayer> {
   Track? _currentTrack;
   Uint8List? _currentArtwork;
   Uint8List? _currentWaveform;
+  List<double>? _waveformData;
+  double _playbackProgress = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -66,30 +69,38 @@ class MediaPlayerState extends State<MediaPlayer> {
               child: Container(
                 height: double.infinity,
                 color: themeProvider.greyBackground,
-                child: _currentWaveform == null
+                child: _waveformData == null
                     ? Center(
-                      child: Text(
+                        child: Text(
                           'No Track Selected / Loaded',
                           style: TextStyle(
                             color: themeProvider.fontColour,
                             fontSize: themeProvider.fontSizeLarge,
                           ), // Ensure color is not null
                         ),
-                    )
-                    : Image.memory(
-                        _currentWaveform!,
-                        fit: BoxFit.fill,
-                        errorBuilder: (context, error, stackTrace) {
-                          _logger.severe('Error displaying waveform: $error$stackTrace');
-                          return Text(
-                            'Error loading waveform',
-                            style: TextStyle(
-                              color: themeProvider.fontColour,
-                              fontSize: themeProvider.fontSizeLarge,
-                            ),
-                          );
-                        },
+                      )
+                    : CustomPaint(
+                        size: Size(600, 60),
+                        painter: WaveformPainter(
+                          waveformData: _waveformData!,
+                          playbackProgress: _playbackProgress,
+                        ),
                       ),
+
+                // Image.memory(
+                //     _currentWaveform!,
+                //     fit: BoxFit.fill,
+                //     errorBuilder: (context, error, stackTrace) {
+                //       _logger.severe('Error displaying waveform: $error$stackTrace');
+                //       return Text(
+                //         'Error loading waveform',
+                //         style: TextStyle(
+                //           color: themeProvider.fontColour,
+                //           fontSize: themeProvider.fontSizeLarge,
+                //         ),
+                //       );
+                //     },
+                //   ),
               ),
             ),
           ],
@@ -233,8 +244,21 @@ class MediaPlayerState extends State<MediaPlayer> {
       },
     );
   }
-  
+
   void _loadWaveform(Track track) {
+    _trackProvider.loadTrackWaveformData(track).then((data) {
+      setState(() {
+        _waveformData = data; // data is a List<double> from backend
+      });
+    }).catchError((error) {
+      _logger.severe("Failed to load waveform: $error");
+      setState(() {
+        _waveformData = null;
+      });
+    });
+  }
+
+  void _loadWaveform2(Track track) {
     _trackProvider.loadTrackWaveform(track).then((waveform) {
       setState(() {
         _currentWaveform = waveform;
