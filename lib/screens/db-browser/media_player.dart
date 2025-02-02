@@ -178,7 +178,10 @@ class MediaPlayerState extends State<MediaPlayer> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _createButton(FluentIcons.play, _play),
-        _createButton(FluentIcons.pause, _pause),
+        _createButton(
+          _playerStatus == PlayerStatus.Paused ? FluentIcons.play_resume : FluentIcons.pause,
+          _pause,
+        ),
         _createButton(FluentIcons.stop, _stop),
       ],
     );
@@ -216,6 +219,8 @@ class MediaPlayerState extends State<MediaPlayer> {
     _logger.info("Stop button pressed");
     setState(() {
       _playerStatus = PlayerStatus.Stopped;
+      _playPosition = 0.0;
+      _playbackProgress = 0.0;
     });
     _stopTimer();
     _trackProvider.stopTrack();
