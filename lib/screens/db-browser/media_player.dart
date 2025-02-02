@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:fluent_ui/fluent_ui.dart';
@@ -39,6 +40,12 @@ class MediaPlayer extends StatefulWidget {
   }
 }
 
+enum PlayerStatus {
+  Playing,
+  Paused,
+  Stopped,
+}
+
 class MediaPlayerState extends State<MediaPlayer> {
   static final Logger _logger = Logger('MediaPlayerState');
   static final spacer = const SizedBox(width: 16);
@@ -49,17 +56,17 @@ class MediaPlayerState extends State<MediaPlayer> {
   Uint8List? _currentArtwork;
   List<double>? _waveformData;
   double _playbackProgress = 0.0;
-  String _playerStatus = "";
+  PlayerStatus _playerStatus = PlayerStatus.Stopped;
   TrackDuration _duration = TrackDuration.zero;
+  double _playPosition = 0.0;
+  Timer? _timer;
 
   @override
   Widget build(BuildContext context) {
     final ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
-    // ...existing code...
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: 600),
       child: SizedBox(
-        // remove fixed height, let Column decide
         child: Row(
           children: [
             Column(
@@ -77,7 +84,6 @@ class MediaPlayerState extends State<MediaPlayer> {
                   Container(
                     padding: const EdgeInsets.all(8.0),
                     height: 100.0,
-                    // color: themeProvider.greyBackground,
                     child: _waveformData == null
                         ? Center(
                             child: Text(
@@ -104,7 +110,7 @@ class MediaPlayerState extends State<MediaPlayer> {
                         // Show duration if we have a track
                         if (_currentTrack != null)
                           Text(
-                            "Duration: ${_duration.formattedValue}",
+                            formatPlayPosition(_playPosition),
                             style: TextStyle(
                               color: themeProvider.fontColour,
                               fontSize: themeProvider.fontSizeReg,
@@ -116,9 +122,9 @@ class MediaPlayerState extends State<MediaPlayer> {
                             child: Text(
                               _currentTrack == null
                                   ? "No track info"
-                                  : _playerStatus.isEmpty
-                                      ? _currentTrack!.title
-                                      : "$_playerStatus: ${_currentTrack!.title}",
+                                  : _playerStatus == PlayerStatus.Paused
+                                      ? "** Paused **  : ${_currentTrack!.title}"
+                                      : _currentTrack!.title,
                               style: TextStyle(
                                 color: themeProvider.fontColour,
                                 fontSize: themeProvider.fontSizeReg,
@@ -126,6 +132,14 @@ class MediaPlayerState extends State<MediaPlayer> {
                             ),
                           ),
                         ),
+                        if (_currentTrack != null)
+                          Text(
+                            _duration.formattedValue,
+                            style: TextStyle(
+                              color: themeProvider.fontColour,
+                              fontSize: themeProvider.fontSizeReg,
+                            ),
+                          )
                       ],
                     ),
                   ),
@@ -153,8 +167,9 @@ class MediaPlayerState extends State<MediaPlayer> {
     _logger.info("Play button pressed");
     if (_currentTrack != null) {
       setState(() {
-        _playerStatus = "Now playing";
+        _playerStatus = PlayerStatus.Playing;
       });
+      _startTimer();
       _trackProvider.playTrack(_currentTrack!, (error) {
         _logger.severe("Failed to play track: $error");
       });
@@ -163,8 +178,15 @@ class MediaPlayerState extends State<MediaPlayer> {
 
   void _pause() {
     _logger.info("Pause button pressed");
+
     setState(() {
-      _playerStatus = "Paused";
+      if (_playerStatus == PlayerStatus.Playing) {
+        _playerStatus = PlayerStatus.Paused;
+        _pauseTimer();
+      } else if (_playerStatus == PlayerStatus.Paused) {
+        _playerStatus = PlayerStatus.Playing;
+        _resumeTimer();
+      }
     });
     _trackProvider.pauseTrack();
   }
@@ -172,8 +194,9 @@ class MediaPlayerState extends State<MediaPlayer> {
   void _stop() {
     _logger.info("Stop button pressed");
     setState(() {
-      _playerStatus = ""; // just show title
+      _playerStatus = PlayerStatus.Stopped;
     });
+    _stopTimer();
     _trackProvider.stopTrack();
   }
 
@@ -181,6 +204,7 @@ class MediaPlayerState extends State<MediaPlayer> {
     _logger.info("(state) Loading track: ${track.id}: ${track.title}");
     setState(() {
       _currentTrack = track;
+      _playPosition = 0.0;
     });
     _loadArtwork(track);
     _loadWaveform(track);
@@ -207,7 +231,9 @@ class MediaPlayerState extends State<MediaPlayer> {
       _currentArtwork = null;
       _waveformData = null;
       _duration = TrackDuration.zero;
+      _playPosition = 0.0;
     });
+    _stopTimer();
   }
 
   Widget _createButton(IconData icon, Function() action) {
@@ -310,6 +336,45 @@ class MediaPlayerState extends State<MediaPlayer> {
       });
     });
   }
+
+  void _resumeTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        _playPosition += 1.0;
+        if (_playPosition >= _duration.rawValue) {
+          _playPosition = _duration.rawValue;
+          _stop();
+        }
+      });
+    });
+  }
+
+  void _startTimer() {
+    _playPosition = 0.0;
+    _resumeTimer();
+  }
+
+  void _stopTimer() {
+    _pauseTimer();
+  }
+
+  void _pauseTimer() {
+    _timer?.cancel();
+    _timer = null;
+  }
+}
+
+String formatPlayPosition(double seconds) {
+  int hours = seconds ~/ 3600;
+  int minutes = (seconds % 3600) ~/ 60;
+  int secs = (seconds % 60).toInt();
+
+  if (hours > 0) {
+    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
+  } else {
+    return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
+  }
 }
 
 class TrackDuration {
@@ -331,14 +396,6 @@ class TrackDuration {
   String get formattedValue => _formattedValue;
 
   static String _formatDuration(double seconds) {
-    int hours = seconds ~/ 3600;
-    int minutes = (seconds % 3600) ~/ 60;
-    int secs = (seconds % 60).toInt();
-
-    if (hours > 0) {
-      return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
-    } else {
-      return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
-    }
+    return formatPlayPosition(seconds);
   }
 }
