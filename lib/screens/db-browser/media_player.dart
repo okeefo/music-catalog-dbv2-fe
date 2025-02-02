@@ -80,34 +80,9 @@ class MediaPlayerState extends State<MediaPlayer> {
             Expanded(
               child: Column(
                 children: [
-                  // Waveform area
-                  Container(
-                    padding: const EdgeInsets.all(8.0),
-                    height: 100.0,
-                    child: _waveformData == null
-                        ? Center(
-                            child: Text(
-                              'No Track Selected / Loaded',
-                              style: TextStyle(
-                                color: themeProvider.fontColour,
-                                fontSize: themeProvider.fontSizeLarge,
-                              ),
-                            ),
-                          )
-                        : CustomPaint(
-                            size: Size(double.infinity, 60),
-                            painter: WaveformPainter(
-                              waveformData: _waveformData!,
-                              playbackProgress: _playbackProgress,
-                              waveformColor: themeProvider.waveformColour,
-                              progressColor: themeProvider.waveformProgressColour,
-                              progressBarColor: themeProvider.waveformProgressBarColour,
-                            ),
-                          ),
-                  ),
                   // Player status area
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                     child: Row(
                       children: [
                         // Show duration if we have a track
@@ -144,6 +119,49 @@ class MediaPlayerState extends State<MediaPlayer> {
                             ),
                           )
                       ],
+                    ),
+                  ),
+
+                  // Waveform area
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 4),
+                    height: 100.0,
+                    child: _waveformData == null
+                        ? Center(
+                            child: Text(
+                              'No Track Selected / Loaded',
+                              style: TextStyle(
+                                color: themeProvider.fontColour,
+                                fontSize: themeProvider.fontSizeLarge,
+                              ),
+                            ),
+                          )
+                        : CustomPaint(
+                            size: Size(double.infinity, 60),
+                            painter: WaveformPainter(
+                              waveformData: _waveformData!,
+                              playbackProgress: _playbackProgress,
+                              waveformColor: themeProvider.waveformColour,
+                              progressColor: themeProvider.waveformProgressColour,
+                              progressBarColor: themeProvider.waveformProgressBarColour,
+                            ),
+                          ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Slider(
+                      value: _playPosition,
+                      min: 0,
+                      max: _duration.rawValue,
+                      onChanged: (value) {
+                        setState(() {
+                          _playPosition = value;
+                          _playbackProgress = _playPosition / _duration.rawValue;
+                        });
+                      },
+                      onChangeEnd: (value) {
+                        _trackProvider.seekTo(_currentTrack!, value);
+                      },
                     ),
                   ),
                 ],

@@ -170,6 +170,17 @@ class TrackProvider {
       throw Exception('Failed to load track duration');
     }
   }
+  
+  seekTo(Track track, value) async {
+    _logger.info("Seek to point in time, $value for track: ${track.id} - ${track.title}");
+    final response = await _mediaService.seekTo(track, value);
+    if (response.statusCode == 200) {
+      _logger.info("Successful - Seek to point in time, ${value} for track: ${track.id} - ${track.title}");
+       ;
+    } else {
+      throw Exception('Failed to load track duration');
+    }
+  }
 }
 
 class TrackProviderState {
