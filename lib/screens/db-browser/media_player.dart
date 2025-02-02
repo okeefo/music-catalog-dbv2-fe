@@ -50,6 +50,7 @@ class MediaPlayerState extends State<MediaPlayer> {
   List<double>? _waveformData;
   double _playbackProgress = 0.0;
   String _playerStatus = "";
+  TrackDuration _duration = TrackDuration.zero;
 
   @override
   Widget build(BuildContext context) {
@@ -98,16 +99,34 @@ class MediaPlayerState extends State<MediaPlayer> {
                   // Player status area
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
-                    child: Text(
-                      _currentTrack == null
-                          ? "No track info"
-                          : _playerStatus.isEmpty
-                              ? _currentTrack!.title
-                              : "$_playerStatus: ${_currentTrack!.title}",
-                      style: TextStyle(
-                        color: themeProvider.fontColour,
-                        fontSize: themeProvider.fontSizeReg,
-                      ),
+                    child: Row(
+                      children: [
+                        // Show duration if we have a track
+                        if (_currentTrack != null)
+                          Text(
+                            "Duration: ${_duration.formattedValue}",
+                            style: TextStyle(
+                              color: themeProvider.fontColour,
+                              fontSize: themeProvider.fontSizeReg,
+                            ),
+                          ),
+                        // Center the status details
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              _currentTrack == null
+                                  ? "No track info"
+                                  : _playerStatus.isEmpty
+                                      ? _currentTrack!.title
+                                      : "$_playerStatus: ${_currentTrack!.title}",
+                              style: TextStyle(
+                                color: themeProvider.fontColour,
+                                fontSize: themeProvider.fontSizeReg,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -165,6 +184,7 @@ class MediaPlayerState extends State<MediaPlayer> {
     });
     _loadArtwork(track);
     _loadWaveform(track);
+    _loadDuration(track);
   }
 
   void _loadArtwork(Track track) {
@@ -186,6 +206,7 @@ class MediaPlayerState extends State<MediaPlayer> {
       _currentTrack = null;
       _currentArtwork = null;
       _waveformData = null;
+      _duration = TrackDuration.zero;
     });
   }
 
@@ -275,5 +296,49 @@ class MediaPlayerState extends State<MediaPlayer> {
         _waveformData = null;
       });
     });
+  }
+
+  void _loadDuration(Track track) {
+    _trackProvider.loadTrackDuration(track).then((durationInSeconds) {
+      setState(() {
+        _duration = TrackDuration(durationInSeconds);
+      });
+    }).catchError((error) {
+      _logger.severe("Failed to load duration: $error");
+      setState(() {
+        _duration = TrackDuration.zero;
+      });
+    });
+  }
+}
+
+class TrackDuration {
+  final double _seconds;
+  final String _formattedValue;
+
+  // Private constructor
+  TrackDuration._(this._seconds) : _formattedValue = _formatDuration(_seconds);
+
+  factory TrackDuration(double seconds) {
+    return TrackDuration._(seconds);
+  }
+
+  // Singleton instance for zero duration
+  static final TrackDuration zero = TrackDuration._(0.0);
+
+  double get rawValue => _seconds;
+
+  String get formattedValue => _formattedValue;
+
+  static String _formatDuration(double seconds) {
+    int hours = seconds ~/ 3600;
+    int minutes = (seconds % 3600) ~/ 60;
+    int secs = (seconds % 60).toInt();
+
+    if (hours > 0) {
+      return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
+    } else {
+      return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
+    }
   }
 }

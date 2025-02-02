@@ -118,24 +118,24 @@ class MediaService {
     }
   }
 
-  Future<http.Response> getTrackWaveform(int id) async {
-    Uri uri = Uri.parse(Endpoints.getTrackWaveformUri(id.toString()));
+  Future<http.Response> getTrackDuration(int id) async {
+    Uri uri = Uri.parse(Endpoints.getTrackDurationUri(id.toString()));
 
     _logger.info('Calling backend to get track waveform: $uri');
 
     final stopwatch = Stopwatch()..start();
     final response = await http.get(
       uri,
-      headers: {'Accept': 'image/*'},
+      headers: {'Content-Type': 'application/json'},
     );
 
     stopwatch.stop();
     if (response.statusCode == 200) {
-      _logger.info('get track waveform request took: ${stopwatch.elapsedMilliseconds}ms');
+      _logger.info('get track duration request took: ${stopwatch.elapsedMilliseconds}ms');
       return response;
     } else {
-      _logger.severe('Failed to request track waveform: ${response.body} operation took ${stopwatch.elapsedMilliseconds}ms');
-      throw Exception('Failed to get track waveform');
+      _logger.severe('Failed to request track duration: ${response.body} operation took ${stopwatch.elapsedMilliseconds}ms');
+      throw Exception('Failed to get track duration');
     }
   }
 }

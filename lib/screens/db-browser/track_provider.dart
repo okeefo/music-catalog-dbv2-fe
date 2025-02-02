@@ -159,17 +159,15 @@ class TrackProvider {
     }
   }
 
-  loadTrackWaveform(Track track) async {
-    _logger.info("Loading waveform image for track: ${track.id} - ${track.title}");
-    final response = await _mediaService.getTrackWaveform(track.id);
+  loadTrackDuration(Track track) async {
+    _logger.info("Loading duration for track: ${track.id} - ${track.title}");
+    final response = await _mediaService.getTrackDuration(track.id);
     if (response.statusCode == 200) {
-      if (response.headers['content-type']?.startsWith('image/') ?? false) {
-        return response.bodyBytes;
-      } else {
-        throw Exception('Invalid content type: ${response.headers['content-type']}');
-      }
+      final durationInNanoseconds = jsonDecode(utf8.decode(response.bodyBytes)) as int;
+      // Convert nanoseconds to seconds
+      return durationInNanoseconds /1e9 ;
     } else {
-      throw Exception('Failed to load track artwork');
+      throw Exception('Failed to load track duration');
     }
   }
 }
