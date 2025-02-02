@@ -18,6 +18,9 @@ class ThemeProvider with ChangeNotifier {
   late final ThemeColourItem _tableSelectBackgroundColour;
   late final ThemeColourItem _toggleSwitchBackgroundColour;
   late final ThemeColourItem _toggleSwitchKnobColour;
+  late final ThemeColourItem _waveformColour;
+  late final ThemeColourItem _waveformProgressColour;
+  late final ThemeColourItem _waveformProgressBarColour;
 
   late List<ThemeColourItem> colourItems;
 
@@ -143,6 +146,30 @@ class ThemeProvider with ChangeNotifier {
     _toggleSwitchKnobColour = ThemeColourItem(
         key: 'toggleSwitch', defaultDark: AppTheme.black, defaultLight: AppTheme.black, isDarkMode: () => _isDarkMode(), onChanged: () => _onColorChanged());
     colourItems.add(_toggleSwitchBackgroundColour);
+
+    _waveformColour = ThemeColourItem(
+        key: 'toggleSwitch',
+        defaultDark: AppTheme.waveformColourDark,
+        defaultLight: AppTheme.waveformColourLight,
+        isDarkMode: () => _isDarkMode(),
+        onChanged: () => _onColorChanged());
+    colourItems.add(_toggleSwitchBackgroundColour);
+
+    _waveformProgressColour = ThemeColourItem(
+        key: 'toggleSwitch',
+        defaultDark: AppTheme.waveformProgressColourDark,
+        defaultLight: AppTheme.waveformProgressColourLight,
+        isDarkMode: () => _isDarkMode(),
+        onChanged: () => _onColorChanged());
+    colourItems.add(_toggleSwitchBackgroundColour);
+
+    _waveformProgressBarColour = ThemeColourItem(
+        key: 'toggleSwitch',
+        defaultDark: AppTheme.white,
+        defaultLight: AppTheme.black,
+        isDarkMode: () => _isDarkMode(),
+        onChanged: () => _onColorChanged());
+    colourItems.add(_toggleSwitchBackgroundColour);
   }
 
   // Factory constructor
@@ -232,11 +259,25 @@ class ThemeProvider with ChangeNotifier {
   }
 
   String get dataTableFontFamily => _dataTableFont;
-
   void setDataTableFontFamily(String font) {
     _dataTableFont = font;
     _savePreferences();
     notifyListeners();
+  }
+
+  Color get waveformColour => _waveformColour.getColour();
+  void setWaveformColour(Color color) {
+    _waveformColour.setColor(color);
+  }
+
+  Color get waveformProgressColour => _waveformProgressColour.getColour();
+  void setWaveformProgressColour(Color color) {
+    _waveformProgressColour.setColor(color);
+  }
+
+  Color get waveformProgressBarColour => _waveformProgressBarColour.getColour();
+  void setWaveformProgressBarColour(Color color) {
+    _waveformProgressBarColour.setColor(color);
   }
 
   double get fontSizeDataTableHeader => AppTheme.dataTableFontHeaderSize;

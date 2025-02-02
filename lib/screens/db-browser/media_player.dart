@@ -99,6 +99,9 @@ class MediaPlayerState extends State<MediaPlayer> {
                             painter: WaveformPainter(
                               waveformData: _waveformData!,
                               playbackProgress: _playbackProgress,
+                              waveformColor: themeProvider.waveformColour,
+                              progressColor: themeProvider.waveformProgressColour,
+                              progressBarColor: themeProvider.waveformProgressBarColour,
                             ),
                           ),
                   ),
@@ -339,13 +342,19 @@ class MediaPlayerState extends State<MediaPlayer> {
 
   void _resumeTimer() {
     _timer?.cancel();
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
       setState(() {
-        _playPosition += 1.0;
+        _playPosition += 0.1;
         if (_playPosition >= _duration.rawValue) {
           _playPosition = _duration.rawValue;
           _stop();
         }
+        if (_playPosition <= 0.0) {
+          _playbackProgress = 0.0;
+        } else {
+          _playbackProgress = _playPosition / _duration.rawValue;
+        }
+        //_logger.info('playbackProgress = $_playbackProgress playPosition = $_playPosition');
       });
     });
   }
