@@ -138,4 +138,28 @@ class MediaService {
       throw Exception('Failed to get track duration');
     }
   }
+
+  Future<http.Response> seekTo(Track track, double value) async {
+    Uri uri = Uri.parse(Endpoints.playMediaUri());
+    _logger.info('Calling backend to seekTo: ${value.toString()} in track: ${track.id}, ${track.title}, uri: $uri');
+    String body = jsonEncode({'trackId': track.id, 'startTime': value});
+
+    _logger.info('Calling backend to seek to point in time: $uri');
+
+    final stopwatch = Stopwatch()..start();
+    final response = await http.post(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: body,
+    );
+
+    stopwatch.stop();
+    if (response.statusCode == 200) {
+      _logger.info('seek to point in time request took: ${stopwatch.elapsedMilliseconds}ms');
+      return response;
+    } else {
+      _logger.severe('Failed to request seek to point in time: ${response.body} operation took ${stopwatch.elapsedMilliseconds}ms');
+      throw Exception('Failed to seek to point in time');
+    }
+  }
 }
