@@ -28,24 +28,25 @@ class AppTheme {
   static const double iconSizeMedium = 16.0;
   static const double iconSizeLarge = 24.0;
 
-  static const Color black = Color(0xff000000);
+  static const Color black = Color.fromARGB(255, 0, 0, 0);
+  static const Color white = Color.fromARGB(255, 255, 255, 255);
 
   // Default colour theme
-  static const Color darkBackground = Color(0xff1e1e1e);
-  static const Color lightBackground = Color(0xffffffff);
+  static const Color darkBackground = Color.fromARGB(246, 30, 30, 30);
+  static const Color lightBackground = Color.fromARGB(255, 255, 255, 255);
   static const Color greyBackground = Color.fromARGB(255, 76, 75, 75);
 
-  static const Color fontColourDark = Color(0xffffa500);
-  static const Color fontColourLight = Color(0xff000000);
+  static const Color fontColourDark = Color.fromARGB(255, 255, 165, 0);
+  static const Color fontColourLight = Color.fromARGB(255, 0, 0, 0);
 
   static const Color boldFontColourDark = Color.fromARGB(255, 219, 218, 218);
-  static const Color boldFontColourLight = Color(0xff1e1e1e);
+  static const Color boldFontColourLight = Color.fromARGB(255, 30, 30, 30);
 
   static const Color iconColorDark = Color.fromARGB(255, 219, 218, 218);
-  static const Color iconColorLight = Color(0xff1e1e1e);
+  static const Color iconColorLight = Color.fromARGB(231, 30, 30, 30);
 
   static const Color tableBorderColourDark = Color.fromARGB(255, 219, 218, 218);
-  static const Color tableBorderColourLight = Color(0xff000000);
+  static const Color tableBorderColourLight = Color.fromARGB(244, 0, 0, 0);
 
   static const Color toggleSwitchBackgroundDark = Color.fromARGB(255, 33, 150, 243);
   static const Color toggleSwitchBackgroundLight = Color.fromARGB(255, 33, 150, 243);
@@ -73,4 +74,9 @@ class AppTheme {
 
   static const Color tableBackgroundSelectColourDark = Color.fromARGB(255, 243, 246, 239);
   static const Color tableBackgroundSelectColourLight = Color.fromARGB(255, 76, 75, 75);
+
+  static const Color waveformColourDark = Color.fromARGB(255, 255, 130, 0);
+  static const Color waveformColourLight = Color.fromARGB(255, 255, 130, 0);
+  static const Color waveformProgressColourDark = Color.fromARGB(255, 0, 0, 255);
+  static const Color waveformProgressColourLight = Color.fromARGB(255, 0, 0, 255);
 }
