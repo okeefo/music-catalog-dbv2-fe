@@ -9,7 +9,7 @@ import 'track_model.dart';
 import '../../services/db_service.dart';
 import 'package:logging/logging.dart';
 
-class TrackProvider {
+class TrackProvider extends ChangeNotifier {
   // Private constructor
   TrackProvider._privateConstructor();
 
@@ -148,7 +148,7 @@ class TrackProvider {
     }
   }
 
-  loadTrackWaveformData(Track track) async {
+  Future<List<double>> loadTrackWaveformData(Track track) async {
     _logger.info("Loading waveform data for track: ${track.id} - ${track.title}");
     final response = await _mediaService.getTrackWaveformData(track.id);
     if (response.statusCode == 200) {
@@ -159,23 +159,13 @@ class TrackProvider {
     }
   }
 
-  loadTrackDuration(Track track) async {
+  Future<double> loadTrackDuration(Track track) async {
     _logger.info("Loading duration for track: ${track.id} - ${track.title}");
     final response = await _mediaService.getTrackDuration(track.id);
     if (response.statusCode == 200) {
       final durationInNanoseconds = jsonDecode(utf8.decode(response.bodyBytes)) as int;
       // Convert nanoseconds to seconds
-      return durationInNanoseconds /1e9 ;
-    } else {
-      throw Exception('Failed to load track duration');
-    }
-  }
-  
-  seekTo(Track track, value) async {
-    _logger.info("Seek to point in time, $value for track: ${track.id} - ${track.title}");
-    final response = await _mediaService.seekTo(track, value);
-    if (response.statusCode == 200) {
-      _logger.info("Successful - Seek to point in time, $value for track: ${track.id} - ${track.title}");
+      return durationInNanoseconds / 1e9;
     } else {
       throw Exception('Failed to load track duration');
     }
@@ -197,7 +187,6 @@ class TrackProviderState {
     offset = 0;
   }
 
-//TODO: improve the state handling of offset and totalTracks
   void incrementOffset() {
     if (offset + limit > totalTracks) {
       offset = totalTracks;

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:front_end/providers/table_settings_provider.dart';
+import 'package:front_end/screens/db-browser/media_player_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:logging/logging.dart';
 import 'package:window_manager/window_manager.dart';
@@ -36,6 +37,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => MediaPlayerProvider()),
         ChangeNotifierProvider(create: (_) => themeProvider),
         ChangeNotifierProvider(create: (_) => DbProvider()),
         ChangeNotifierProvider(create: (_) => TableSettingsProvider()),

@@ -14,6 +14,7 @@ import 'publisher_browser.dart';
 import 'track_model.dart';
 import '../../utils/endpoints.dart';
 import 'media_player.dart';
+import 'media_player_provider.dart';
 
 // Constants for repeated values
 const double paddingValue = 16.0;
@@ -38,8 +39,6 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   final Map<String, Set<String>> _publisherAlbums = {};
   final Set<String> _selectedPublishers = {};
   final Set<String> _selectedAlbums = {};
-  final GlobalKey<MediaPlayerState> _mediaPlayerKey = GlobalKey<MediaPlayerState>();
-  late MediaPlayer _mediaPlayer;
 
   final Logger _logger = Logger('DbBrowserPageState');
 
@@ -57,7 +56,6 @@ class DbBrowserPageState extends State<DbBrowserPage> {
     _initializeWebSocket();
 
     _scrollController.addListener(_scrollListener);
-    _mediaPlayer = MediaPlayer(key: _mediaPlayerKey);
   }
 
   @override
@@ -174,7 +172,6 @@ class DbBrowserPageState extends State<DbBrowserPage> {
     return ScaffoldPage(
       header: null,
       padding: EdgeInsets.zero,
-      // header: _buildHeader(themeProvider),
       content: Padding(
         padding: const EdgeInsets.fromLTRB(4.0, 0, 16.0, 0),
         child: Column(
@@ -191,7 +188,6 @@ class DbBrowserPageState extends State<DbBrowserPage> {
 
   Widget _buildHeader(ThemeProvider themeProvider) {
     return Row(
-      //  crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
           width: fixedFirstColumnWidth,
@@ -200,11 +196,14 @@ class DbBrowserPageState extends State<DbBrowserPage> {
             child: _buildDBControls(themeProvider),
           ),
         ),
-        // const SizedBox(width: 16),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.only(left: 4), // Add padding to align with search bar
-            child: _mediaPlayer,
+            child: Consumer<MediaPlayerProvider>(
+              builder: (context, mediaPlayerProvider, child) {
+                return MediaPlayer();
+              },
+            ),
           ),
         ),
       ],
@@ -248,7 +247,6 @@ class DbBrowserPageState extends State<DbBrowserPage> {
         ),
         Row(
           children: [
-            //const SizedBox(width: 12),
             Padding(
               padding: const EdgeInsets.fromLTRB(8.00, 6.0, 0.0, 0),
               child: _buildIconButton(
@@ -259,7 +257,6 @@ class DbBrowserPageState extends State<DbBrowserPage> {
                 label: 'Scan',
               ),
             ),
-//                    const SizedBox(width: 6),
             Padding(
               padding: const EdgeInsets.fromLTRB(8.00, 6.0, 0.0, 0),
               child: _buildIconButton(
@@ -396,16 +393,20 @@ class DbBrowserPageState extends State<DbBrowserPage> {
               padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
               child: Align(
                 alignment: Alignment.topCenter,
-                child: TrackTable(
-                  tracks: _filterTracks(),
-                  scrollController: _scrollController,
-                  onTrackSelected: (track) {
-                    _logger.info('Track selected: ${track.id} : ${track.title}');
-                    _mediaPlayer.loadTrack(track);
-                  },
-                  onTrackDeSelected: () {
-                    _logger.info('Track de-selected');
-                    _mediaPlayer.unloadTrack();
+                child: Consumer<MediaPlayerProvider>(
+                  builder: (context, mediaPlayerProvider, child) {
+                    return TrackTable(
+                      tracks: _filterTracks(),
+                      scrollController: _scrollController,
+                      onTrackSelected: (track) {
+                        _logger.info('Track selected: ${track.id} : ${track.title}');
+                        mediaPlayerProvider.loadTrack(track);
+                      },
+                      onTrackDeSelected: () {
+                        _logger.info('Track de-selected');
+                        mediaPlayerProvider.unloadTrack();
+                      },
+                    );
                   },
                 ),
               ),
