@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:fluent_ui/fluent_ui.dart';
@@ -8,6 +7,7 @@ import 'package:front_end/screens/db-browser/track_provider.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:front_end/screens/db-browser/waveform-painter.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class MediaPlayer extends StatefulWidget {
   const MediaPlayer({required GlobalKey<MediaPlayerState> key}) : super(key: key);
@@ -52,189 +52,98 @@ class MediaPlayerState extends State<MediaPlayer> {
   static final TrackProvider _trackProvider = TrackProvider();
   static final AssetImage defaultArtwork = AssetImage('assets/vinyl-100.png');
 
+  final AudioPlayer _audioPlayer = AudioPlayer();
   Track? _currentTrack;
   Uint8List? _currentArtwork;
   List<double>? _waveformData;
   double _playbackProgress = 0.0;
   PlayerStatus _playerStatus = PlayerStatus.Stopped;
-  TrackDuration _duration = TrackDuration.zero;
-  double _playPosition = 0.0;
-  Timer? _timer;
+  Duration _duration = Duration.zero;
+  Duration _position = Duration.zero;
+  bool _isInteractingWithSlider = false;
 
   @override
-  Widget build(BuildContext context) {
-    final ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: 600),
-      child: SizedBox(
-        child: Row(
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildArtwork(),
-                _buildMedialButtons(),
-              ],
-            ),
-            spacer,
-            Expanded(
-              child: Column(
-                children: [
-                  // Player status area
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                    child: Row(
-                      children: [
-                        // Show duration if we have a track
-                        if (_currentTrack != null)
-                          Text(
-                            formatPlayPosition(_playPosition),
-                            style: TextStyle(
-                              color: themeProvider.fontColour,
-                              fontSize: themeProvider.fontSizeReg,
-                            ),
-                          ),
-                        // Center the status details
-                        Expanded(
-                          child: Center(
-                            child: Text(
-                              _currentTrack == null
-                                  ? "No track info"
-                                  : _playerStatus == PlayerStatus.Paused
-                                      ? "** Paused **  : ${_currentTrack!.title}"
-                                      : _currentTrack!.title,
-                              style: TextStyle(
-                                color: themeProvider.fontColour,
-                                fontSize: themeProvider.fontSizeReg,
-                              ),
-                            ),
-                          ),
-                        ),
-                        if (_currentTrack != null)
-                          Text(
-                            _duration.formattedValue,
-                            style: TextStyle(
-                              color: themeProvider.fontColour,
-                              fontSize: themeProvider.fontSizeReg,
-                            ),
-                          )
-                      ],
-                    ),
-                  ),
+  void initState() {
+    super.initState();
 
-                  // Waveform area
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 4),
-                    height: 100.0,
-                    child: _waveformData == null
-                        ? Center(
-                            child: Text(
-                              'No Track Selected / Loaded',
-                              style: TextStyle(
-                                color: themeProvider.fontColour,
-                                fontSize: themeProvider.fontSizeLarge,
-                              ),
-                            ),
-                          )
-                        : CustomPaint(
-                            size: Size(double.infinity, 60),
-                            painter: WaveformPainter(
-                              waveformData: _waveformData!,
-                              playbackProgress: _playbackProgress,
-                              waveformColor: themeProvider.waveformColour,
-                              progressColor: themeProvider.waveformProgressColour,
-                              progressBarColor: themeProvider.waveformProgressBarColour,
-                            ),
-                          ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Slider(
-                      value: _playPosition,
-                      min: 0,
-                      max: _duration.rawValue,
-                      onChanged: (value) {
-                        setState(() {
-                          _playPosition = value;
-                          _playbackProgress = _playPosition / _duration.rawValue;
-                        });
-                      },
-                      onChangeEnd: (value) {
-                        _trackProvider.seekTo(_currentTrack!, value);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    _audioPlayer.onDurationChanged.listen((duration) {
+      setState(() {
+        _duration = duration;
+      });
+    });
+
+    _audioPlayer.onPositionChanged.listen((position) {
+      setState(() {
+        if (!_isInteractingWithSlider) {
+          final int milliseconds = position.inMilliseconds;
+          final int roundedMilliseconds = (milliseconds / 100).round() * 100; // Round to nearest 100ms
+          _position = Duration(milliseconds: roundedMilliseconds);
+          _playbackProgress = _position.inMilliseconds / (_duration.inMilliseconds == 0 ? 1 : _duration.inMilliseconds);
+        }
+      });
+    });
   }
 
-  Row _buildMedialButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _createButton(FluentIcons.play, _play),
-        _createButton(
-          _playerStatus == PlayerStatus.Paused ? FluentIcons.play_resume : FluentIcons.pause,
-          _pause,
-        ),
-        _createButton(FluentIcons.stop, _stop),
-      ],
-    );
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
   }
 
-  void _play() {
+  void _play() async {
     _logger.info("Play button pressed");
     if (_currentTrack != null) {
       setState(() {
         _playerStatus = PlayerStatus.Playing;
       });
-      _startTimer();
-      _trackProvider.playTrack(_currentTrack!, (error) {
-        _logger.severe("Failed to play track: $error");
-      });
+      await _audioPlayer.setSourceDeviceFile(_currentTrack!.fileLocation);
+      _audioPlayer.resume();
+      //await _audioPlayer.play(_currentTrack!.fileLocation);
     }
   }
 
-  void _pause() {
+  void _pause() async {
     _logger.info("Pause button pressed");
 
-    setState(() {
-      if (_playerStatus == PlayerStatus.Playing) {
+    if (_playerStatus == PlayerStatus.Playing) {
+      setState(() {
         _playerStatus = PlayerStatus.Paused;
-        _pauseTimer();
-      } else if (_playerStatus == PlayerStatus.Paused) {
+      });
+      await _audioPlayer.pause();
+    } else if (_playerStatus == PlayerStatus.Paused) {
+      setState(() {
         _playerStatus = PlayerStatus.Playing;
-        _resumeTimer();
-      }
-    });
-    _trackProvider.pauseTrack();
+      });
+      await _audioPlayer.resume();
+    }
   }
 
-  void _stop() {
+  void _stop() async {
     _logger.info("Stop button pressed");
     setState(() {
       _playerStatus = PlayerStatus.Stopped;
-      _playPosition = 0.0;
+      _position = Duration.zero;
       _playbackProgress = 0.0;
     });
-    _stopTimer();
-    _trackProvider.stopTrack();
+    await _audioPlayer.stop();
   }
 
-  void _loadTrack(Track track) {
+  void _loadTrack(Track track) async {
     _logger.info("(state) Loading track: ${track.id}: ${track.title}");
     setState(() {
       _currentTrack = track;
-      _playPosition = 0.0;
+      _position = Duration.zero;
     });
+
+    // Check if the track is a local file or a URL
+    if (track.fileLocation.startsWith('http') || track.fileLocation.startsWith('https')) {
+      await _audioPlayer.setSourceUrl(track.fileLocation);
+    } else {
+      await _audioPlayer.setSourceDeviceFile(track.fileLocation);
+    }
+
     _loadArtwork(track);
     _loadWaveform(track);
-    _loadDuration(track);
   }
 
   void _loadArtwork(Track track) {
@@ -256,10 +165,10 @@ class MediaPlayerState extends State<MediaPlayer> {
       _currentTrack = null;
       _currentArtwork = null;
       _waveformData = null;
-      _duration = TrackDuration.zero;
-      _playPosition = 0.0;
+      _duration = Duration.zero;
+      _position = Duration.zero;
     });
-    _stopTimer();
+    _audioPlayer.stop();
   }
 
   Widget _createButton(IconData icon, Function() action) {
@@ -350,84 +259,156 @@ class MediaPlayerState extends State<MediaPlayer> {
     });
   }
 
-  void _loadDuration(Track track) {
-    _trackProvider.loadTrackDuration(track).then((durationInSeconds) {
-      setState(() {
-        _duration = TrackDuration(durationInSeconds);
-      });
-    }).catchError((error) {
-      _logger.severe("Failed to load duration: $error");
-      setState(() {
-        _duration = TrackDuration.zero;
-      });
-    });
+  @override
+  Widget build(BuildContext context) {
+    final ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: 600),
+      child: SizedBox(
+        child: Row(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildArtwork(),
+                _buildMedialButtons(),
+              ],
+            ),
+            spacer,
+            Expanded(
+              child: Column(
+                children: [
+                  // Player status area
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                    child: Row(
+                      children: [
+                        // Show duration if we have a track
+                        if (_currentTrack != null)
+                          Text(
+                            formatPlayPosition(_position.inMilliseconds),
+                            style: TextStyle(
+                              color: themeProvider.fontColour,
+                              fontSize: themeProvider.fontSizeReg,
+                            ),
+                          ),
+                        // Center the status details
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              _currentTrack == null
+                                  ? "No track info"
+                                  : _playerStatus == PlayerStatus.Paused
+                                      ? "** Paused **  : ${_currentTrack!.title}"
+                                      : _currentTrack!.title,
+                              style: TextStyle(
+                                color: themeProvider.fontColour,
+                                fontSize: themeProvider.fontSizeReg,
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (_currentTrack != null)
+                          Text(
+                            formatPlayPosition(_duration.inMilliseconds),
+                            style: TextStyle(
+                              color: themeProvider.fontColour,
+                              fontSize: themeProvider.fontSizeReg,
+                            ),
+                          )
+                      ],
+                    ),
+                  ),
+
+                  // Waveform area
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 4),
+                    height: 100.0,
+                    child: _waveformData == null
+                        ? Center(
+                            child: Text(
+                              'No Track Selected / Loaded',
+                              style: TextStyle(
+                                color: themeProvider.fontColour,
+                                fontSize: themeProvider.fontSizeLarge,
+                              ),
+                            ),
+                          )
+                        : CustomPaint(
+                            size: Size(double.infinity, 60),
+                            painter: WaveformPainter(
+                              waveformData: _waveformData!,
+                              playbackProgress: _playbackProgress,
+                              waveformColor: themeProvider.waveformColour,
+                              progressColor: themeProvider.waveformProgressColour,
+                              progressBarColor: themeProvider.waveformProgressBarColour,
+                            ),
+                          ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Slider(
+                      style: SliderThemeData(
+                        useThumbBall: true,
+                        thumbRadius: WidgetStateProperty.all(12.00),
+                        activeColor: WidgetStateProperty.all(const Color.fromARGB(255, 67, 52, 235)),
+                        inactiveColor: WidgetStateProperty.all(const Color.fromARGB(255, 105, 156, 12)),
+                        thumbBallInnerFactor: WidgetStateProperty.fromMap({WidgetState.pressed: 0.8, WidgetState.hovered: 0.65}),
+                      ),
+                      value: _position.inMilliseconds.toDouble() / 1000,
+                      autofocus: false,
+                      min: 0,
+                      max: _duration.inMilliseconds.toDouble() / 1000,
+                      onChangeStart: (value) {
+                        _isInteractingWithSlider = true;
+                      },
+                      onChanged: (value) {
+                        setState(() {
+                          _position = Duration(seconds: value.toInt());
+                          _playbackProgress = _position.inSeconds / (_duration.inSeconds == 0 ? 1 : _duration.inSeconds);
+                        });
+                      },
+                      onChangeEnd: (value) {
+                        setState(() {
+                          _isInteractingWithSlider = false;
+                        });
+                        _audioPlayer.seek(Duration(seconds: value.toInt()));
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
-  void _resumeTimer() {
-    _timer?.cancel();
-    _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
-      setState(() {
-        _playPosition += 0.1;
-        if (_playPosition >= _duration.rawValue) {
-          _playPosition = _duration.rawValue;
-          _stop();
-        }
-        if (_playPosition <= 0.0) {
-          _playbackProgress = 0.0;
-        } else {
-          _playbackProgress = _playPosition / _duration.rawValue;
-        }
-        //_logger.info('playbackProgress = $_playbackProgress playPosition = $_playPosition');
-      });
-    });
-  }
-
-  void _startTimer() {
-    _playPosition = 0.0;
-    _resumeTimer();
-  }
-
-  void _stopTimer() {
-    _pauseTimer();
-  }
-
-  void _pauseTimer() {
-    _timer?.cancel();
-    _timer = null;
+  Row _buildMedialButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _createButton(FluentIcons.play, _play),
+        _createButton(
+          _playerStatus == PlayerStatus.Paused ? FluentIcons.play_resume : FluentIcons.pause,
+          _pause,
+        ),
+        _createButton(FluentIcons.stop, _stop),
+      ],
+    );
   }
 }
 
-String formatPlayPosition(double seconds) {
-  int hours = seconds ~/ 3600;
-  int minutes = (seconds % 3600) ~/ 60;
-  int secs = (seconds % 60).toInt();
+String formatPlayPosition(int milliseconds) {
+  int hours = milliseconds ~/ 3600000;
+  int minutes = (milliseconds % 3600000) ~/ 60000;
+  int seconds = (milliseconds % 60000) ~/ 1000;
+  int millis = (milliseconds % 1000) ~/ 100;
 
   if (hours > 0) {
-    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
+    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}.${millis.toString().padLeft(1, '0')}';
   } else {
-    return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
-  }
-}
-
-class TrackDuration {
-  final double _seconds;
-  final String _formattedValue;
-
-  // Private constructor
-  TrackDuration._(this._seconds) : _formattedValue = _formatDuration(_seconds);
-
-  factory TrackDuration(double seconds) {
-    return TrackDuration._(seconds);
-  }
-
-  // Singleton instance for zero duration
-  static final TrackDuration zero = TrackDuration._(0.0);
-
-  double get rawValue => _seconds;
-
-  String get formattedValue => _formattedValue;
-
-  static String _formatDuration(double seconds) {
-    return formatPlayPosition(seconds);
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}.${millis.toString().padLeft(1, '0')}';
   }
 }

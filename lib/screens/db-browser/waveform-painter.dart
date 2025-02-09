@@ -36,6 +36,8 @@ class WaveformPainter extends CustomPainter {
     // Draw the full waveform in orange
     paintWaveform(waveformData, step, midY, size.height, size.width, canvas, waveformPainter);
 
+   // _logger.info('WaveformPainter: paint() - playbackProgress: $playbackProgress step: $step');
+
     // Draw the "played" portion in blue
     final playedWidth = size.width * playbackProgress;
     paintWaveform(waveformData, step, midY, size.height, playedWidth, canvas, progressPainter);
@@ -53,6 +55,7 @@ class WaveformPainter extends CustomPainter {
   void paintWaveform(List<double> waveformData, double step, double midY, double maxHeight, double widthToDraw, Canvas? canvas, Paint painter) {
     for (double x = 0; x < widthToDraw; x++) {
       final index = (x * step).clamp(0, waveformData.length - 1).toInt();
+      //final index = x.toInt();
 
       // Normalize the amplitude 0..1
       final amplitudeNormalized = (waveformData[index] / 100.0).clamp(0.0, 1.0);

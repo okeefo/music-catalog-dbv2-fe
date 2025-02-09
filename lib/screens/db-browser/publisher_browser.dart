@@ -155,14 +155,14 @@ class PublisherRow extends StatelessWidget {
               onTap: onIconClick,
               child: Icon(
                 isExpanded ? FluentIcons.folder_open : FluentIcons.folder_list,
-                color: themeProvider.iconColour,
+                color: isSelected ? themeProvider.tableSelectFontColour : themeProvider.iconColour,
                 size: iconSize,
               ),
             ),
             title: Text(
               publisher,
               style: TextStyle(
-                color: themeProvider.fontColour,
+                color: isSelected ? themeProvider.tableSelectFontColour : themeProvider.fontColour,
                 fontSize: themeProvider.fontSizeDataTableRow,
                 fontFamily: themeProvider.dataTableFontFamily,
                 overflow: TextOverflow.ellipsis,
