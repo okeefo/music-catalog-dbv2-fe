@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:front_end/providers/theme_provider.dart';
@@ -35,7 +36,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   final ValueNotifier<String> _statusNotifier = ValueNotifier<String>('No updates yet');
   final TrackProviderState _trackProviderState = TrackProviderState();
   final TrackProvider _trackProvider = TrackProvider();
-  final Map<String, Set<String>> _publisherAlbums = {};
+  final SplayTreeMap<String, Set<String>> _publisherAlbums = SplayTreeMap();
   final Set<String> _selectedPublishers = {};
   final Set<String> _selectedAlbums = {};
   final GlobalKey<MediaPlayerState> _mediaPlayerKey = GlobalKey<MediaPlayerState>();
@@ -141,7 +142,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
   void _populatePublisherAlbums(List<Track> tracks) {
     _publisherAlbums.clear();
     for (var track in tracks) {
-      _publisherAlbums.putIfAbsent(track.label, () => <String>{}).add(track.albumTitle);
+      _publisherAlbums.putIfAbsent(track.label, () => <String>{}).add(track.albumTitle);      
     }
   }
 
@@ -361,7 +362,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
     );
   }
 
-  Map<String, Set<String>> _filterPublisherAlbums() {
+  SplayTreeMap<String, Set<String>> _filterPublisherAlbums() {
     return PublisherFilter.filterPublisherAlbums(_publisherAlbums, _fileBrowserSearchQuery);
   }
 

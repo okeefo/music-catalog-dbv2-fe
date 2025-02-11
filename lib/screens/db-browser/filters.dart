@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'track_model.dart';
 import 'package:logging/logging.dart';
 
@@ -96,11 +98,11 @@ class TrackFilter {
 }
 
 class PublisherFilter {
-  static Map<String, Set<String>> filterPublisherAlbums(Map<String, Set<String>> publisherAlbums, String query) {
+  static SplayTreeMap<String, Set<String>> filterPublisherAlbums(SplayTreeMap<String, Set<String>> publisherAlbums, String query) {
     if (query.isEmpty) {
       return publisherAlbums;
     }
-    final filtered = <String, Set<String>>{};
+    final filtered = SplayTreeMap<String, Set<String>>();
     publisherAlbums.forEach((publisher, albums) {
       final matchingAlbums = albums.where((album) => album.toLowerCase().contains(query.toLowerCase())).toSet();
       if (publisher.toLowerCase().contains(query.toLowerCase()) || matchingAlbums.isNotEmpty) {
