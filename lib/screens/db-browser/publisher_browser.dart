@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:front_end/providers/theme_provider.dart';
@@ -12,7 +14,7 @@ const EdgeInsets listTilePadding = EdgeInsets.symmetric(vertical: 0.0, horizonta
 const EdgeInsets albumListTilePadding = EdgeInsets.fromLTRB(30.0, 0.0, 0.0, 0.0);
 
 class PublisherBrowser extends StatefulWidget {
-  final Map<String, Set<String>> publisherAlbums;
+  final SplayTreeMap<String, Set<String>> publisherAlbums;
   final ValueChanged<Set<String>> onPublishersSelected;
   final ValueChanged<Set<String>> onAlbumsSelected;
 
