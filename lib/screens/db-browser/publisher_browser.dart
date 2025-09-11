@@ -148,7 +148,7 @@ class PublisherRow extends StatelessWidget {
       onPointerDown: (event) => onClick(),
       child: Container(
         padding: rowPadding,
-        color: isSelected ? themeProvider.selectedRowColor : Colors.transparent,
+        color: isSelected ? themeProvider.tableSelectBackgroundColour : Colors.transparent,
         child: SizedBox(
           height: rowHeight,
           child: ListTile(
@@ -197,16 +197,18 @@ class AlbumRow extends StatelessWidget {
       onPointerDown: (event) => onClick(),
       child: Container(
         padding: rowPadding,
-        color: isSelected ? themeProvider.selectedRowColor : Colors.transparent,
+        color: isSelected ? themeProvider.tableSelectBackgroundColour : Colors.transparent,
         child: SizedBox(
           height: rowHeight,
           child: ListTile(
             contentPadding: albumListTilePadding,
-            leading: Icon(FluentIcons.music_note, color: themeProvider.iconColour, size: iconSize),
+            leading: Icon(FluentIcons.music_note, 
+              color:isSelected ? themeProvider.tableSelectFontColour : themeProvider.iconColour,
+              size: iconSize),
             title: Text(
               album,
               style: TextStyle(
-                color: themeProvider.fontColour,
+                color: isSelected ? themeProvider.tableSelectFontColour :themeProvider.fontColour,
                 fontSize: themeProvider.fontSizeDataTableRow,
                 fontFamily: themeProvider.dataTableFontFamily,
               ),
