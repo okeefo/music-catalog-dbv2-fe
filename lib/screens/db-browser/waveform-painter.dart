@@ -58,7 +58,7 @@ class WaveformPainter extends CustomPainter {
       //final index = x.toInt();
 
       // Normalize the amplitude 0..1
-      final amplitudeNormalized = (waveformData[index] / 100.0).clamp(0.0, 1.0);
+      final amplitudeNormalized = (waveformData[index] ).clamp(0.0, 1.0);
       final amplitude = amplitudeNormalized * (maxHeight / 2);
 
       // Draw one vertical line from top of the wave to bottom of the wave
