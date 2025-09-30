@@ -1,11 +1,9 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:logging/logging.dart';
 
 class WaveformPainter extends CustomPainter {
   final List<double> waveformData;
   final double playbackProgress;
-  static final Logger _logger = Logger('WaveformPainter');
   final Paint progressBarPainter;
   final Paint waveformPainter;
   final Paint progressPainter;
@@ -18,14 +16,14 @@ class WaveformPainter extends CustomPainter {
     required Color progressColor,
   })  : progressBarPainter = Paint()
           ..color = progressBarColor
-          ..strokeWidth = 1,
+          ..strokeWidth = 0.5,
         waveformPainter = Paint()
           ..color = waveformColor
-          ..strokeWidth = 2
+          ..strokeWidth = 1.5
           ..style = PaintingStyle.stroke,
         progressPainter = Paint()
           ..color = progressColor
-          ..strokeWidth = 2
+          ..strokeWidth = 1.5
           ..style = PaintingStyle.stroke;
 
   @override

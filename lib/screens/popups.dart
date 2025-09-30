@@ -35,8 +35,8 @@ Future<bool?> showConfirmDialog(BuildContext context, String message, String tit
       title: Row(
         children: [
           Icon(FluentIcons.info, color: themeProvider.iconColour, size: themeProvider.iconSizeLarge),
-          const SizedBox(width: 8),
-          Text("Info: $title"),
+          const SizedBox(width: 20),
+          Text(title),
         ],
       ),
       content: Text(message),
