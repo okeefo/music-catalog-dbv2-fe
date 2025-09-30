@@ -213,4 +213,19 @@ class DbService {
       throw Exception('Failed to load tracks');
     }
   }
+
+  // add method to call back end to analyse a track
+  Future<http.Response> analyseTrack(int trackId) async {
+    Uri uri = Uri.parse(Endpoints.getAnalyseTrackUri(trackId.toString()));
+    _logger.info('Calling backend to analyse track: $uri');
+    final response = await http.post(uri);
+
+    if (response.statusCode == 200) {
+      _logger.info('Track analysis initiated successfully');
+      return response;
+    } else {
+      _logger.severe('Failed to initiate track analysis: ${response.body}');
+      throw Exception('Failed to initiate track analysis');
+    }
+  }
 }

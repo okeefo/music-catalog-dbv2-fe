@@ -4,7 +4,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:front_end/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:logging/logging.dart';
 
 // Constants for repeated values
 const double rowHeight = 22.0;
@@ -28,7 +27,7 @@ class PublisherBrowser extends StatefulWidget {
   @override
   _PublisherBrowserState createState() => _PublisherBrowserState();
 
-  notifyFilterChange(Set<String> selectedPublishers, Set<String> selectedAlbums) {
+  void notifyFilterChange(Set<String> selectedPublishers, Set<String> selectedAlbums) {
     onPublishersSelected(selectedPublishers);
     onAlbumsSelected(selectedAlbums);
   }
@@ -38,7 +37,6 @@ class _PublisherBrowserState extends State<PublisherBrowser> {
   final Map<String, bool> _expandedPublishers = {};
   final Set<String> _selectedPublishers = {};
   final Set<String> _selectedAlbums = {};
-  final Logger _logger = Logger('PublisherBrowser');
 
   @override
   void initState() {

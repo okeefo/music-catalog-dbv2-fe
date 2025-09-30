@@ -1,11 +1,9 @@
 import 'dart:collection';
 
 import 'track_model.dart';
-import 'package:logging/logging.dart';
 
 class TrackFilter {
-  static final Logger _logger = Logger('TrackFilter');
-
+  
   static List<Track> filterTracks(List<Track> tracks, String query, Set<String> selectedPublishers, Set<String> selectedAlbums) {
     tracks = _filterByPublisher(selectedPublishers, tracks);
     tracks = _filterByAlbum(selectedAlbums, tracks);

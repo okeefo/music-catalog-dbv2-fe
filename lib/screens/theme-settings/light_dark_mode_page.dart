@@ -246,7 +246,7 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
     );
   }
 
-  _buildGeneralSettings(ThemeProvider themeProvider, double maxDescriptionWidth) {
+  Widget _buildGeneralSettings(ThemeProvider themeProvider, double maxDescriptionWidth) {
     return _buildGridBox(
       title: 'General',
       themeProvider: themeProvider,
@@ -292,7 +292,7 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
     );
   }
 
-  _buildTableSettings(ThemeProvider themeProvider, double maxDescriptionWidth) {
+  Widget _buildTableSettings(ThemeProvider themeProvider, double maxDescriptionWidth) {
     return _buildGridBox(
       title: 'Table',
       themeProvider: themeProvider,
@@ -350,7 +350,7 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
     );
   }
 
-  _buildTableSettings2(ThemeProvider themeProvider, double maxDescriptionWidth) {
+  Widget _buildTableSettings2(ThemeProvider themeProvider, double maxDescriptionWidth) {
     return _buildGridBox(
       title: 'Table',
       themeProvider: themeProvider,
@@ -373,7 +373,7 @@ class _LightDarkModePageState extends State<LightDarkModePage> {
   }
 }
 
-_buildColorPicker({
+ColorPickerRow _buildColorPicker({
   required Color colour,
   required void Function(Color color) saveColourFunc,
   required bool addBorder,

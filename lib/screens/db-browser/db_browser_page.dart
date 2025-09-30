@@ -370,7 +370,7 @@ class DbBrowserPageState extends State<DbBrowserPage> {
     return TrackFilter.filterTracks(_trackProviderState.tracks, _trackTableSearchQuery, _selectedPublishers, _selectedAlbums);
   }
 
-  _buildBrowserAndTable(ThemeProvider themeProvider) {
+  Expanded _buildBrowserAndTable(ThemeProvider themeProvider) {
     return Expanded(
       child: Row(
         children: [

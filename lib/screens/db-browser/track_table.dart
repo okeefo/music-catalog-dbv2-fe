@@ -108,6 +108,11 @@ class TrackTable extends StatelessWidget {
       builder: (context) {
         return MenuFlyout(items: [
           MenuFlyoutItem(
+            leading: const Icon(FluentIcons.lightning_bolt_solid),
+            text: const Text('Analyze'),
+            onPressed: () => _analyzeTrack(context, rowIndex),
+          ),
+          MenuFlyoutItem(
             leading: const Icon(FluentIcons.play),
             text: const Text('Play'),
             onPressed: () => _playTrack(context, rowIndex),
@@ -173,10 +178,31 @@ class TrackTable extends StatelessWidget {
     showErrorDialog(context, "Nothing to see here", "Not Implemented");
   }
 
-  _playTrack(BuildContext context, int rowIndex) {
+  void _playTrack(BuildContext context, int rowIndex) {
     _trackProvider.playTrack(tracks[rowIndex], (errorMessage) {
       if (context.mounted) {
         showErrorDialog(context, errorMessage, ' Playback Failure');
+      }
+    });
+  }
+
+  void _analyzeTrack(BuildContext context, int rowIndex) {
+    Flyout.of(context).close();
+    final String message =
+        'Are you sure you want to analyze the track: ${tracks[rowIndex].title}? \nThis will re-read the file and update its metadata in the database.';
+    final String title = 'Confirm Analyze Track';
+
+    showConfirmDialog(context, message, title).then((confirmed) {
+      if (confirmed == true) {
+        _logger.info('User confirmed analyze track for: ${tracks[rowIndex].title}');
+
+        _trackProvider.performAnalyzeTrack(tracks[rowIndex], (errorMessage) {
+          _logger.warning('Track analysis completed with error for track: ${tracks[rowIndex].title}  Error: $errorMessage');
+          return;
+        });
+        _logger.info('Track analysis initiated for: ${tracks[rowIndex].title}');
+      } else {
+        _logger.info('User cancelled analyze track for: ${tracks[rowIndex].title}');
       }
     });
   }

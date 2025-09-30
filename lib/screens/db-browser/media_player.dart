@@ -6,7 +6,7 @@ import 'package:front_end/screens/db-browser/track_model.dart';
 import 'package:front_end/screens/db-browser/track_provider.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
-import 'package:front_end/screens/db-browser/waveform-painter.dart';
+import 'package:front_end/screens/db-browser/waveform_painter.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class MediaPlayer extends StatefulWidget {
@@ -41,9 +41,9 @@ class MediaPlayer extends StatefulWidget {
 }
 
 enum PlayerStatus {
-  Playing,
-  Paused,
-  Stopped,
+  playing,
+  paused,
+  stopped,
 }
 
 class MediaPlayerState extends State<MediaPlayer> {
@@ -57,7 +57,7 @@ class MediaPlayerState extends State<MediaPlayer> {
   Uint8List? _currentArtwork;
   List<double>? _waveformData;
   double _playbackProgress = 0.0;
-  PlayerStatus _playerStatus = PlayerStatus.Stopped;
+  PlayerStatus _playerStatus = PlayerStatus.stopped;
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
   bool _isInteractingWithSlider = false;
@@ -94,7 +94,7 @@ class MediaPlayerState extends State<MediaPlayer> {
     _logger.info("Play button pressed");
     if (_currentTrack != null) {
       setState(() {
-        _playerStatus = PlayerStatus.Playing;
+        _playerStatus = PlayerStatus.playing;
       });
       await _audioPlayer.setSourceDeviceFile(_currentTrack!.fileLocation);
       _audioPlayer.resume();
@@ -105,14 +105,14 @@ class MediaPlayerState extends State<MediaPlayer> {
   void _pause() async {
     _logger.info("Pause button pressed");
 
-    if (_playerStatus == PlayerStatus.Playing) {
+    if (_playerStatus == PlayerStatus.playing) {
       setState(() {
-        _playerStatus = PlayerStatus.Paused;
+        _playerStatus = PlayerStatus.paused;
       });
       await _audioPlayer.pause();
-    } else if (_playerStatus == PlayerStatus.Paused) {
+    } else if (_playerStatus == PlayerStatus.paused) {
       setState(() {
-        _playerStatus = PlayerStatus.Playing;
+        _playerStatus = PlayerStatus.playing;
       });
       await _audioPlayer.resume();
     }
@@ -121,7 +121,7 @@ class MediaPlayerState extends State<MediaPlayer> {
   void _stop() async {
     _logger.info("Stop button pressed");
     setState(() {
-      _playerStatus = PlayerStatus.Stopped;
+      _playerStatus = PlayerStatus.stopped;
       _position = Duration.zero;
       _playbackProgress = 0.0;
     });
@@ -298,7 +298,7 @@ class MediaPlayerState extends State<MediaPlayer> {
                             child: Text(
                               _currentTrack == null
                                   ? "No track info"
-                                  : _playerStatus == PlayerStatus.Paused
+                                  : _playerStatus == PlayerStatus.paused
                                       ? "** Paused **  : ${_currentTrack!.title}"
                                       : _currentTrack!.title,
                               style: TextStyle(
@@ -391,7 +391,7 @@ class MediaPlayerState extends State<MediaPlayer> {
       children: [
         _createButton(FluentIcons.play, _play),
         _createButton(
-          _playerStatus == PlayerStatus.Paused ? FluentIcons.play_resume : FluentIcons.pause,
+          _playerStatus == PlayerStatus.paused ? FluentIcons.play_resume : FluentIcons.pause,
           _pause,
         ),
         _createButton(FluentIcons.stop, _stop),

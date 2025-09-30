@@ -119,6 +119,20 @@ class TrackProvider {
     }
   }
 
+    Future<void> performAnalyzeTrack(Track track, Function(String) onError) async {
+    try {
+      final response = await _dbService.analyseTrack(track.id);
+      if (response.statusCode != 200) {
+        _logger.warning('Failed to analyze track: ${response.body}');
+        onError('Failed to analyze track: ${track.title}\n\n${response.body}');
+        return;
+      }
+      _logger.info('Track analysis initiated successfully for track: ${track.title}');
+    } catch (e) {
+      onError('Failed to analyze track: ${track.title}\n\n${e.toString()}');
+    }
+  }
+
   Future<void> playTrack(Track track, Function(String) onError) async {
     try {
       await _mediaService.playTrack(track);
@@ -148,7 +162,7 @@ class TrackProvider {
     }
   }
 
-  loadTrackWaveformData(Track track) async {
+  Future<List<double>> loadTrackWaveformData(Track track) async {
     _logger.info("Loading waveform data for track: ${track.id} - ${track.title}");
     final response = await _mediaService.getTrackWaveformData(track.id);
     if (response.statusCode == 200) {
@@ -159,7 +173,7 @@ class TrackProvider {
     }
   }
 
-  loadTrackDuration(Track track) async {
+  Future<double> loadTrackDuration(Track track) async {
     _logger.info("Loading duration for track: ${track.id} - ${track.title}");
     final response = await _mediaService.getTrackDuration(track.id);
     if (response.statusCode == 200) {
@@ -171,7 +185,7 @@ class TrackProvider {
     }
   }
   
-  seekTo(Track track, value) async {
+  Future<void> seekTo(Track track, value) async {
     _logger.info("Seek to point in time, $value for track: ${track.id} - ${track.title}");
     final response = await _mediaService.seekTo(track, value);
     if (response.statusCode == 200) {
@@ -180,6 +194,8 @@ class TrackProvider {
       throw Exception('Failed to load track duration');
     }
   }
+
+
 }
 
 class TrackProviderState {
