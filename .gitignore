@@ -1,4 +1,5 @@
 # Flutter/Dart tooling
+.metadata
 .dart_tool/
 .packages
 .flutter-plugins
