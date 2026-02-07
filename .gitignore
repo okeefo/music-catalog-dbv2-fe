@@ -1,3 +1,30 @@
+# Flutter/Dart tooling
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# IDE/editor
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+logs/
+
+# Build outputs
+build/
+coverage/
+coverage.xml
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS files
+Thumbs.db
+.DS_Store
 # Miscellaneous
 *.class
 *.log
