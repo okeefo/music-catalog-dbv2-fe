@@ -62,25 +62,18 @@ A Golang and MySQL-based web service designed to handle music catalog management
 
 --- 
 
+Screen Shots
 
+![Db Connctions](image.png)
+![Db Browser](image-1.png)
+![Theme controller](image-2.png)
+---
 My TODO LIST
 
 <br>//TODO: Improvement - when clicking to another page - table - re-renders
 <br>//TODO: improve styling
 <br>//TODO: replace MP3/WAV/FLAC with icons
 <br>//TODO: Add a filter to show only MP3/WAV/FLAC
-<br>//TODO: Add album art
-<br>//TODO: add column show/hide selector
-<br>//TODO: Add column sort
-<br>//TODO: Add a search bar
-<br>//TODO: add a tree view to list by artist/album/label
-<br>//TODO: When selecting a folder in the tree-view show the tracks in the main view
-<br>//TODO: Add a stereo bar to load tracks, show progress, with a playlist button
-<br>//TODO: Show wave file in stereo bar - and be able to click on it to jump to that part of the track
-<br>//TODO: Add volume control to stereo bar
-<br>//TODO: Add a stop button to stereo bar
-<br>//TODO: Add a pause button to stereo bar
-<br>//TODO: Add a next track button to stereo bar
 <br>//TODO: the initialise method show check the version number and if the DB is valid before adding it to the list
 
 
