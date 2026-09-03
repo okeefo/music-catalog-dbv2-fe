@@ -60,7 +60,7 @@ class MediaPlayerState extends State<MediaPlayer> {
   PlayerStatus _playerStatus = PlayerStatus.stopped;
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
-  bool _isInteractingWithSlider = false;
+  bool _isSeeking = false;
 
   @override
   void initState() {
@@ -74,7 +74,7 @@ class MediaPlayerState extends State<MediaPlayer> {
 
     _audioPlayer.onPositionChanged.listen((position) {
       setState(() {
-        if (!_isInteractingWithSlider) {
+        if (!_isSeeking) {
           final int milliseconds = position.inMilliseconds;
           final int roundedMilliseconds = (milliseconds / 100).round() * 100; // Round to nearest 100ms
           _position = Duration(milliseconds: roundedMilliseconds);
@@ -246,6 +246,19 @@ class MediaPlayerState extends State<MediaPlayer> {
     );
   }
 
+  void _seekFromWaveformOffset(double dx, double width, {required bool commit}) {
+    if (_duration.inMilliseconds == 0 || width <= 0) return;
+    final fraction = (dx / width).clamp(0.0, 1.0);
+    final newPosition = Duration(milliseconds: (fraction * _duration.inMilliseconds).round());
+    setState(() {
+      _position = newPosition;
+      _playbackProgress = fraction;
+    });
+    if (commit) {
+      _audioPlayer.seek(newPosition);
+    }
+  }
+
   void _loadWaveform(Track track) {
     _trackProvider.loadTrackWaveformData(track).then((data) {
       setState(() {
@@ -334,15 +347,35 @@ class MediaPlayerState extends State<MediaPlayer> {
                               ),
                             ),
                           )
-                        : CustomPaint(
-                            size: Size(double.infinity, 60),
-                            painter: WaveformPainter(
-                              waveformData: _waveformData!,
-                              playbackProgress: _playbackProgress,
-                              waveformColor: themeProvider.waveformColour,
-                              progressColor: themeProvider.waveformProgressColour,
-                              progressBarColor: themeProvider.waveformProgressBarColour,
-                            ),
+                        : LayoutBuilder(
+                            builder: (context, constraints) {
+                              return GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTapUp: (details) {
+                                  _seekFromWaveformOffset(details.localPosition.dx, constraints.maxWidth, commit: true);
+                                },
+                                onHorizontalDragStart: (_) {
+                                  _isSeeking = true;
+                                },
+                                onHorizontalDragUpdate: (details) {
+                                  _seekFromWaveformOffset(details.localPosition.dx, constraints.maxWidth, commit: false);
+                                },
+                                onHorizontalDragEnd: (_) {
+                                  _isSeeking = false;
+                                  _audioPlayer.seek(_position);
+                                },
+                                child: CustomPaint(
+                                  size: Size(double.infinity, 60),
+                                  painter: WaveformPainter(
+                                    waveformData: _waveformData!,
+                                    playbackProgress: _playbackProgress,
+                                    waveformColor: themeProvider.waveformColour,
+                                    progressColor: themeProvider.waveformProgressColour,
+                                    progressBarColor: themeProvider.waveformProgressBarColour,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                   ),
                   Container(
@@ -360,7 +393,7 @@ class MediaPlayerState extends State<MediaPlayer> {
                       min: 0,
                       max: _duration.inMilliseconds.toDouble() / 1000,
                       onChangeStart: (value) {
-                        _isInteractingWithSlider = true;
+                        _isSeeking = true;
                       },
                       onChanged: (value) {
                         setState(() {
@@ -370,7 +403,7 @@ class MediaPlayerState extends State<MediaPlayer> {
                       },
                       onChangeEnd: (value) {
                         setState(() {
-                          _isInteractingWithSlider = false;
+                          _isSeeking = false;
                         });
                         _audioPlayer.seek(Duration(seconds: value.toInt()));
                       },
